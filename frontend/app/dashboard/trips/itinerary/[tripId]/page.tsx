@@ -1,4 +1,5 @@
 export const dynamic = 'force-dynamic';
+import { cookies } from "next/headers";
 
 import { Button } from "@/components/ui/button";
 import { ChevronRight, Edit, MapPin, Clock } from "lucide-react";
@@ -24,12 +25,16 @@ interface ItineraryPageProps {
 }
 
 async function fetchItinerary(tripId: string): Promise<ItineraryDay[]> {
+  const cookieStore = await cookies();
+
   const res = await fetch(`http://localhost:8000/api/trips/${tripId}/itinerary`, {
     cache: "no-store",
-    credentials: "include",
+    headers: {
+      Cookie: cookieStore.toString(),
+    },
     next: { tags: ["itinerary"] },
   });
-  
+
   if (!res.ok) {
     const errorText = await res.text();
     console.error(`Failed to fetch itinerary. Status: ${res.status}. Body: ${errorText}`);
@@ -39,18 +44,22 @@ async function fetchItinerary(tripId: string): Promise<ItineraryDay[]> {
     throw new Error("Failed to fetch itinerary");
   }
 
-  return res.json();
+  const json = await res.json();
+
+  return json.data || []; 
 }
 
+
+
 export default async function ItineraryPage({ params }: ItineraryPageProps) {
-  const tripId = params?.tripId;
+  const {tripId} = await params;
 
   if (!tripId) {
     throw new Error("Trip ID is missing in params.");
   }
 
   const itinerary = await fetchItinerary(tripId);
-
+  console.log('itinerary: ', itinerary);
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString("en-US", {
