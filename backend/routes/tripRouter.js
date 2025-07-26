@@ -31,11 +31,13 @@ router
   .route("/trips/:tripId/itinerary/:itineraryId")
   .put(authController.protect, tripController.editItinerary);
 
+router.route("/trips/:tripId/itinerary/:itineraryId/activities");
+
 router
   .route("/trips/:tripId/itinerary/:itineraryId/activities/:activityId")
+  .get(authController.protect, tripController.getItineraryActivity)
   .put(authController.protect, tripController.editItineraryActivity);
 
-  
 router
   .route("/trips/:tripId/tasks")
   .get(authController.protect, tripController.getTripTasks)
@@ -55,5 +57,7 @@ router
   .route("/trips/:tripId/expenses/:expenseId")
   .put(authController.protect, tripController.editExpenses);
 
-router.route("/trips/:tripId/invite").post(authController.protect, tripController.inviteCollaborator);
+router
+  .route("/trips/:tripId/invite")
+  .post(authController.protect, tripController.inviteCollaborator);
 module.exports = router;

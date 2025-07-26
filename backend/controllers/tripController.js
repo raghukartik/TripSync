@@ -3,11 +3,12 @@ const TripModel = require("../models/Trips");
 const Notification = require("../models/Notification");
 const mongoose = require("mongoose");
 const User = require("../models/User");
+
 // get all the stories
 
 exports.getAllUserTrips = async (req, res, next) => {
-  const start = new Date('2025-08-01');
-  const end = new Date('2025-08-10');
+  const start = new Date("2025-08-01");
+  const end = new Date("2025-08-10");
   try {
     const { userId } = req.user;
     const trips = await TripModel.find({
@@ -352,6 +353,116 @@ exports.editItinerary = async (req, res, next) => {
   }
 };
 
+exports.getItineraryActivity = async (req, res, next) => {
+  try {
+    const { tripId, itineraryId, activityId } = req.params;
+    const { userId } = req.user;
+
+    // Validate params
+    if (!tripId || !itineraryId || !activityId) {
+      return res
+        .status(400)
+        .json({
+          message: "Trip ID, itinerary ID, and activity ID are required",
+        });
+    }
+
+    // Find the trip for this user or collaborator
+    const trip = await TripModel.findOne({
+      _id: tripId,
+      $or: [{ owner: userId }, { collaborators: userId }],
+    });
+
+    if (!trip) {
+      return res
+        .status(404)
+        .json({ message: "Trip not found or access denied" });
+    }
+
+    // Find the itinerary
+
+    const itinerary = trip.itinerary.find(
+      (i) => i._id.toString() === itineraryId
+    );
+    if (!itinerary) {
+      return res.status(404).json({ message: "Itinerary not found" });
+    }
+    // Find the activity
+
+    const activity = itinerary.activities.find(a => String(a.activityId).trim() === String(activityId).trim());
+    if (!activity) {
+      return res.status(404).json({ message: "Activity not found" });
+    }
+
+    // Return the activity
+    return res.status(200).json({
+      message: "Activity fetched successfully",
+      activity,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+exports.addItineraryActivity = async (req, res, next) => {
+  try {
+    const { userId } = req.user;
+    const { tripId, itineraryId } = req.params;
+    const { time, title, location, notes } = req.body;
+
+    // Validate inputs
+    if (!tripId || !itineraryId) {
+      return res
+        .status(400)
+        .json({ message: "Trip ID and itinerary ID are required" });
+    }
+    if (!time || !title) {
+      return res
+        .status(400)
+        .json({ message: "Time and title are required for an activity" });
+    }
+
+    // Find the trip and ensure the user owns it
+    const trip = await Trip.findOne({ _id: tripId, userId });
+    if (!trip) {
+      return res
+        .status(404)
+        .json({ message: "Trip not found or access denied" });
+    }
+
+    // Find the itinerary within the trip
+    const itinerary = trip.itineraries.find(
+      (i) => i.itineraryId === itineraryId
+    );
+    if (!itinerary) {
+      return res.status(404).json({ message: "Itinerary not found" });
+    }
+
+    // Create new activity object
+    const newActivity = {
+      time,
+      title,
+      location: location || "",
+      notes: notes || "",
+    };
+
+    // Push new activity into itinerary
+    itinerary.activities.push(newActivity);
+
+    // Save trip
+    await trip.save();
+
+    return res.status(201).json({
+      message: "Activity added successfully",
+      activity: newActivity,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 exports.editItineraryActivity = async (req, res, next) => {
   try {
     const { tripId, itineraryId, activityId } = req.params;
@@ -384,7 +495,7 @@ exports.editItineraryActivity = async (req, res, next) => {
     }
 
     // Find the specific activity by its _id
-    const activity = itinerary.activities.id(activityId);
+    const activity = itinerary.activities.find(a => String(a.activityId).trim() === String(activityId).trim());
     if (!activity) {
       return res.status(404).json({
         message: "Activity not found",
@@ -820,4 +931,3 @@ exports.inviteCollaborator = async (req, res, next) => {
     });
   }
 };
-
