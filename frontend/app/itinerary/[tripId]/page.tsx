@@ -1,7 +1,14 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 import { cookies } from "next/headers";
 import { Button } from "@/components/ui/button";
-import { Edit, MapPin, Clock, Calendar, NotebookText, Plus } from "lucide-react";
+import {
+  Edit,
+  MapPin,
+  Clock,
+  Calendar,
+  NotebookText,
+  Plus,
+} from "lucide-react";
 import Link from "next/link";
 
 interface Activity {
@@ -15,6 +22,7 @@ interface Activity {
 interface ItineraryDay {
   date: string;
   activities: Activity[];
+  _id: string;
 }
 
 interface ItineraryPageProps {
@@ -26,17 +34,22 @@ interface ItineraryPageProps {
 async function fetchItinerary(tripId: string): Promise<ItineraryDay[]> {
   const cookieStore = await cookies();
 
-  const res = await fetch(`http://localhost:8000/api/trips/${tripId}/itinerary`, {
-    cache: "no-store",
-    headers: {
-      Cookie: cookieStore.toString(),
-    },
-    next: { tags: ["itinerary"] },
-  });
+  const res = await fetch(
+    `http://localhost:8000/api/trips/${tripId}/itinerary`,
+    {
+      cache: "no-store",
+      headers: {
+        Cookie: cookieStore.toString(),
+      },
+      next: { tags: ["itinerary"] },
+    }
+  );
 
   if (!res.ok) {
     const errorText = await res.text();
-    console.error(`Failed to fetch itinerary. Status: ${res.status}. Body: ${errorText}`);
+    console.error(
+      `Failed to fetch itinerary. Status: ${res.status}. Body: ${errorText}`
+    );
     if (res.status === 404) {
       return [];
     }
@@ -44,7 +57,7 @@ async function fetchItinerary(tripId: string): Promise<ItineraryDay[]> {
   }
 
   const json = await res.json();
-  return json.data || []; 
+  return json.data || [];
 }
 
 export default async function ItineraryPage({ params }: ItineraryPageProps) {
@@ -80,7 +93,9 @@ export default async function ItineraryPage({ params }: ItineraryPageProps) {
         </div>
         <div className="text-center py-12">
           <div className="mx-auto max-w-md">
-            <h3 className="text-lg font-medium text-gray-900">No activities planned yet</h3>
+            <h3 className="text-lg font-medium text-gray-900">
+              No activities planned yet
+            </h3>
             <p className="mt-2 text-sm text-gray-500">
               Start by adding your first activity to create your itinerary.
             </p>
@@ -119,8 +134,8 @@ export default async function ItineraryPage({ params }: ItineraryPageProps) {
 
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {day.activities.map((activity) => (
-                <div 
-                  key={activity.activityId} 
+                <div
+                  key={activity.activityId}
                   className="border rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow"
                 >
                   <div className="p-5 space-y-4">
@@ -144,14 +159,13 @@ export default async function ItineraryPage({ params }: ItineraryPageProps) {
                       >
                         <Link
                           href={{
-                            pathname: `/itinerary/${tripId}/edit`,
+                            pathname: `/itinerary/${tripId}/edit/${day._id}`,
                             query: {
                               activity: activity.activityId,
-                              date: day.date,
                             },
                           }}
                         >
-                          <Edit className="h-4 w-4" />
+                          <Edit className="h-4 w-4"/>
                         </Link>
                       </Button>
                     </div>
@@ -159,15 +173,21 @@ export default async function ItineraryPage({ params }: ItineraryPageProps) {
                     <div className="space-y-3">
                       <div className="flex items-start gap-2">
                         <MapPin className="h-4 w-4 text-gray-500 mt-0.5 flex-shrink-0" />
-                        <p className="text-sm text-gray-700">{activity.location}</p>
+                        <p className="text-sm text-gray-700">
+                          {activity.location}
+                        </p>
                       </div>
 
                       {activity.notes && (
                         <div className="flex items-start gap-2">
                           <NotebookText className="h-4 w-4 text-gray-500 mt-0.5 flex-shrink-0" />
                           <div>
-                            <p className="text-xs font-medium text-gray-500">Notes</p>
-                            <p className="text-sm text-gray-700">{activity.notes}</p>
+                            <p className="text-xs font-medium text-gray-500">
+                              Notes
+                            </p>
+                            <p className="text-sm text-gray-700">
+                              {activity.notes}
+                            </p>
                           </div>
                         </div>
                       )}

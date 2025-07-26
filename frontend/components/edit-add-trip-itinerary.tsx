@@ -1,21 +1,13 @@
-"use client";
+'use client';
 
-import { useRouter } from "next/navigation";
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import {
-  Clock,
-  MapPin,
-  NotebookText,
-  X,
-  Check,
-  Loader2,
-  Calendar,
-} from "lucide-react";
-import { toast } from "sonner";
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Clock, MapPin, NotebookText, X, Check, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface ActivityFormData {
   title: string;
@@ -24,45 +16,32 @@ interface ActivityFormData {
   notes: string;
 }
 
-interface EditActivityProps {
+interface EditActivityClientProps {
   tripId: string;
   itineraryId: string;
   activityId?: string;
   initialData?: ActivityFormData;
-  date: string;
 }
 
-export default function EditActivity({
+export default function EditActivityClient({
   tripId,
   itineraryId,
   activityId,
   initialData,
-  date,
-}: EditActivityProps) {
+}: EditActivityClientProps) {
   const router = useRouter();
   const [formData, setFormData] = useState<ActivityFormData>({
-    title: "",
-    time: "",
-    location: "",
-    notes: "",
+    title: initialData?.title || '',
+    time: initialData?.time || '',
+    location: initialData?.location || '',
+    notes: initialData?.notes || '',
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [isEditing] = useState(!!activityId);
+  const isEditing = !!activityId;
 
-  useEffect(() => {
-    if (initialData) {
-      setFormData(initialData);
-    }
-  }, [initialData]);
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -70,66 +49,59 @@ export default function EditActivity({
     setIsLoading(true);
 
     try {
-      const url = activityId
+      const url = isEditing
         ? `http://localhost:8000/api/trips/${tripId}/itinerary/${itineraryId}/activities/${activityId}`
         : `http://localhost:8000/api/trips/${tripId}/itinerary/${itineraryId}/activities`;
 
-      const method = activityId ? "PUT" : "POST";
+      const method = isEditing ? 'PUT' : 'POST';
 
       const response = await fetch(url, {
         method,
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          ...formData,
-          date, // Include the date in the payload
-        }),
-        credentials: "include",
+        body: JSON.stringify(formData),
+        credentials: 'include',
       });
 
       if (!response.ok) {
-        throw new Error(
-          `Failed to ${isEditing ? "update" : "create"} activity`
-        );
+        throw new Error(`Failed to ${isEditing ? 'update' : 'create'} activity`);
       }
 
-      toast.success(
-        `Activity ${isEditing ? "updated" : "created"} successfully`
-      );
+      toast.success(`Activity ${isEditing ? 'updated' : 'created'} successfully`);
       router.push(`/itinerary/${tripId}`);
       router.refresh();
     } catch (error) {
-      console.error("Error:", error);
-      toast.error(`Failed to ${isEditing ? "update" : "create"} activity`);
+      console.error('Error:', error);
+      toast.error(`Failed to ${isEditing ? 'update' : 'create'} activity`);
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleDelete = async () => {
-    if (!activityId) return;
+    if (!isEditing) return;
 
     setIsLoading(true);
     try {
       const response = await fetch(
         `http://localhost:8000/api/trips/${tripId}/itinerary/${itineraryId}/activities/${activityId}`,
         {
-          method: "DELETE",
-          credentials: "include",
+          method: 'DELETE',
+          credentials: 'include',
         }
       );
 
       if (!response.ok) {
-        throw new Error("Failed to delete activity");
+        throw new Error('Failed to delete activity');
       }
 
-      toast.success("Activity deleted successfully");
+      toast.success('Activity deleted successfully');
       router.push(`/itinerary/${tripId}`);
       router.refresh();
     } catch (error) {
-      console.error("Error:", error);
-      toast.error("Failed to delete activity");
+      console.error('Error:', error);
+      toast.error('Failed to delete activity');
     } finally {
       setIsLoading(false);
     }
@@ -138,9 +110,9 @@ export default function EditActivity({
   return (
     <div className="max-w-2xl mx-auto p-6">
       <h2 className="text-2xl font-bold mb-6">
-        {isEditing ? "Edit Activity" : "Add New Activity"}
+        {isEditing ? 'Edit Activity' : 'Add New Activity'}
       </h2>
-
+      
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-2">
           <Label htmlFor="title">Activity Title</Label>
@@ -168,14 +140,6 @@ export default function EditActivity({
               onChange={handleChange}
               required
             />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="date">
-              <Calendar className="inline mr-2 h-4 w-4" />
-              Date
-            </Label>
-            <Input id="date" type="date" value={date} disabled />
           </div>
         </div>
 
@@ -218,11 +182,7 @@ export default function EditActivity({
                 onClick={handleDelete}
                 disabled={isLoading}
               >
-                {isLoading ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <X className="mr-2 h-4 w-4" />
-                )}
+                {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <X className="mr-2 h-4 w-4" />}
                 Delete
               </Button>
             )}
@@ -242,7 +202,7 @@ export default function EditActivity({
               ) : (
                 <Check className="mr-2 h-4 w-4" />
               )}
-              {isEditing ? "Update" : "Create"} Activity
+              {isEditing ? 'Update' : 'Create'} Activity
             </Button>
           </div>
         </div>
