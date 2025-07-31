@@ -1,181 +1,49 @@
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/router'
-import {
-  Table,
-  TableBody,
-  TableCaption,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import { Skeleton } from "@/components/ui/skeleton"
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { PlusCircle, RefreshCw } from "lucide-react"
-import { format } from 'date-fns'
-import { Badge } from "@/components/ui/badge"
+import { cookies } from 'next/headers';
+import ExpenseList from '@/components/trip-expenses'
+
+interface User {
+  _id: string;
+  name: string;
+  email: string;
+}
 
 interface Expense {
-  _id: string
-  amount: number
-  category: string
-  spentBy: string
-  sharedWith: string[]
-  note: string
-  date: string
+  _id: string;
+  amount: number;
+  category: string;
+  spentBy: User;
+  sharedWith: User[];
+  note: string;
+  date: string;
 }
 
-interface UserMap {
-  [key: string]: string
+interface expenseProps {
+  params: {
+    tripId: string;
+  }
 }
 
-export function ExpenseList() {
-  const router = useRouter()
-  const { tripId } = router.query
-  const [expenses, setExpenses] = useState<Expense[]>([])
-  const [loading, setLoading] = useState<boolean>(true)
-  const [error, setError] = useState<string | null>(null)
-  // In a real app, you would fetch this from your API
-  const [userMap, setUserMap] = useState<UserMap>({})
+async function getExpenses(tripId: string): Promise<Expense[] | null> {
+  const cookieStore = cookies();
+  const res = await fetch(`http://localhost:8000/api/trips/${tripId}/expenses`, {
+    headers: {
+      Cookie: cookieStore.toString(),
+    },
+    next: { tags: ['expenses'] },
+  });
 
-  useEffect(() => {
-    if (tripId) {
-      fetchExpenses()
-    }
-  }, [tripId])
+  if(!res.ok) return null;
+  const data = await res.json();
+  return data.data;
+}
 
-  const fetchExpenses = async () => {
-    try {
-      setLoading(true)
-      setError(null)
-      const response = await fetch(`http://localhost:8000/api/trips/${tripId}/expenses`)
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch expenses')
-      }
-      
-      const data = await response.json()
-      setExpenses(data.data)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An unknown error occurred')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const formatDate = (dateString: string) => {
-    return format(new Date(dateString), 'MMM dd, yyyy')
-  }
-
-  const getCategoryBadgeVariant = (category: string) => {
-    const lowerCategory = category.toLowerCase()
-    if (['transport', 'travel'].includes(lowerCategory)) return 'secondary'
-    if (['food', 'dining', 'restaurant'].includes(lowerCategory)) return 'destructive'
-    if (['hotel', 'accommodation'].includes(lowerCategory)) return 'outline'
-    return 'default'
-  }
-
-  const getUserName = (userId: string) => {
-    return userMap[userId] || 'Unknown User'
-  }
-
-  if (error) {
-    return (
-      <Card className="w-full max-w-4xl mx-auto">
-        <CardHeader>
-          <CardTitle>Expenses</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-center py-8">
-            <p className="text-red-500 mb-4">{error}</p>
-            <Button onClick={fetchExpenses} variant="outline">
-              <RefreshCw className="mr-2 h-4 w-4" />
-              Retry
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    )
-  }
-
+export default async function ExpensePage({ params }: expenseProps) {
+  const expenses = await getExpenses(params.tripId);
+  
   return (
-    <Card className="w-full max-w-4xl mx-auto">
-      <CardHeader className="flex flex-row items-center justify-between">
-        <div>
-          <CardTitle>Expenses</CardTitle>
-          <p className="text-sm text-muted-foreground">
-            All expenses for this trip
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button onClick={fetchExpenses} variant="outline" size="sm">
-            <RefreshCw className="mr-2 h-4 w-4" />
-            Refresh
-          </Button>
-          <Button size="sm">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Add Expense
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent>
-        {loading ? (
-          <div className="space-y-4">
-            {[...Array(3)].map((_, i) => (
-              <Skeleton key={i} className="h-16 w-full" />
-            ))}
-          </div>
-        ) : expenses.length === 0 ? (
-          <div className="text-center py-8">
-            <p className="text-muted-foreground">No expenses recorded yet</p>
-            <Button className="mt-4">Add your first expense</Button>
-          </div>
-        ) : (
-          <Table>
-            <TableCaption>A list of all expenses for this trip.</TableCaption>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Date</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead>Paid by</TableHead>
-                <TableHead>Shared with</TableHead>
-                <TableHead className="text-right">Amount</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {expenses.map((expense) => (
-                <TableRow key={expense._id}>
-                  <TableCell className="font-medium">
-                    {formatDate(expense.date)}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={getCategoryBadgeVariant(expense.category)}>
-                      {expense.category}
-                    </Badge>
-                  </TableCell>
-                  <TableCell>{expense.note}</TableCell>
-                  <TableCell>{getUserName(expense.spentBy)}</TableCell>
-                  <TableCell>
-                    {expense.sharedWith.length > 0 
-                      ? `${expense.sharedWith.length} people`
-                      : 'Not shared'}
-                  </TableCell>
-                  <TableCell className="text-right font-semibold">
-                    ${expense.amount.toFixed(2)}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
-      </CardContent>
-    </Card>
+    <ExpenseList 
+      tripId={params.tripId}
+      initialExpenses={expenses || []}
+    />
   )
 }

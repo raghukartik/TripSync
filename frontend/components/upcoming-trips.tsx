@@ -113,11 +113,11 @@ const TripCard = ({ trip }: { trip: Trip }) => {
             <Edit className="h-4 w-4" />
             <span>Edit</span>
           </button>
-          <button className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary transition-colors"  onClick={() => router.push(`/itinerary/${trip._id}`)}>
+          <button className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary transition-colors" onClick={() => router.push(`/itinerary/${trip._id}`)}>
             <List className="h-4 w-4" />
             <span>Itinerary</span>
           </button>
-          <button className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary transition-colors">
+          <button className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary transition-colors" onClick={() => router.push(`/expenses/${trip._id}`)}>
             <DollarSign className="h-4 w-4" />
             <span>Expenses</span>
           </button>

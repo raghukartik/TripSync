@@ -31,12 +31,11 @@ router
   .route("/trips/:tripId/itinerary/:itineraryId")
   .put(authController.protect, tripController.editItinerary);
 
-router.route("/trips/:tripId/itinerary/:itineraryId/activities");
-
 router
   .route("/trips/:tripId/itinerary/:itineraryId/activities/:activityId")
   .get(authController.protect, tripController.getItineraryActivity)
-  .put(authController.protect, tripController.editItineraryActivity);
+  .put(authController.protect, tripController.editItineraryActivity)
+  .delete(authController.protect, tripController.deleteItineraryActivity);
 
 router
   .route("/trips/:tripId/tasks")

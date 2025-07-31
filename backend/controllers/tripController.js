@@ -360,11 +360,9 @@ exports.getItineraryActivity = async (req, res, next) => {
 
     // Validate params
     if (!tripId || !itineraryId || !activityId) {
-      return res
-        .status(400)
-        .json({
-          message: "Trip ID, itinerary ID, and activity ID are required",
-        });
+      return res.status(400).json({
+        message: "Trip ID, itinerary ID, and activity ID are required",
+      });
     }
 
     // Find the trip for this user or collaborator
@@ -389,7 +387,9 @@ exports.getItineraryActivity = async (req, res, next) => {
     }
     // Find the activity
 
-    const activity = itinerary.activities.find(a => String(a.activityId).trim() === String(activityId).trim());
+    const activity = itinerary.activities.find(
+      (a) => String(a.activityId).trim() === String(activityId).trim()
+    );
     if (!activity) {
       return res.status(404).json({ message: "Activity not found" });
     }
@@ -495,7 +495,9 @@ exports.editItineraryActivity = async (req, res, next) => {
     }
 
     // Find the specific activity by its _id
-    const activity = itinerary.activities.find(a => String(a.activityId).trim() === String(activityId).trim());
+    const activity = itinerary.activities.find(
+      (a) => String(a.activityId).trim() === String(activityId).trim()
+    );
     if (!activity) {
       return res.status(404).json({
         message: "Activity not found",
@@ -518,6 +520,62 @@ exports.editItineraryActivity = async (req, res, next) => {
     console.error("Edit Activity Error:", error);
     return res.status(500).json({
       message: "Something went wrong",
+      error: error.message,
+    });
+  }
+};
+
+exports.deleteItineraryActivity = async (req, res, next) => {
+  try {
+    const { tripId, itineraryId, activityId } = req.params;
+    const { userId } = req.user;
+
+    if (!tripId || !itineraryId || !activityId) {
+      return res.status(400).json({
+        message: "Trip ID, itinerary ID, and activity ID are required",
+      });
+    }
+
+    const trip = await TripModel.findOne({
+      _id: tripId,
+      $or: [{ owner: userId }, { collaborators: userId }],
+    });
+
+    if (!trip) {
+      return res.status(404).json({
+        message: "Trip not found or access denied",
+      });
+    }
+
+    // Find the specific itinerary day
+    const itinerary = trip.itinerary.id(itineraryId);
+    if (!itinerary) {
+      return res.status(404).json({
+        message: "Itinerary day not found",
+      });
+    }
+
+    const activity = itinerary.activities.find(
+      (a) => String(a.activityId).trim() === String(activityId).trim()
+    );
+    if (!activity) {
+      return res.status(404).json({
+        message: "Activity not found",
+      });
+    }
+
+    activity.deleteOne();
+
+    await trip.save();
+
+    return res.status(200).json({
+      message: "Activity deleted successfully",
+      itinerary,
+    });
+  } catch (error) {
+    console.error("Error deleting itinerary activity:", error);
+    return res.status(500).json({
+      message: "Internal server error",
       error: error.message,
     });
   }
@@ -694,37 +752,46 @@ exports.getTripExpenses = async (req, res, next) => {
     const { userId } = req.user;
 
     if (!tripId) {
-      return res.status(400).json({
-        message: "Trip ID is required",
-      });
+      return res.status(400).json({ message: "Trip ID is required" });
     }
 
     const trip = await TripModel.findOne({
       _id: tripId,
       $or: [{ owner: userId }, { collaborators: userId }],
-    });
+    }).populate([
+      {
+        path: "expenses.spentBy",
+        model: "User",
+        select: "name email",
+      },
+      {
+        path: "expenses.sharedWith",
+        model: "User",
+        select: "name email",
+      },
+    ]);
 
     if (!trip) {
-      return res.status(400).json({
-        message: "Trip not found or denied access.",
-      });
+      return res
+        .status(404)
+        .json({ message: "Trip not found or denied access." });
     }
 
     if (trip.expenses.length > 0) {
-      res.status(200).json({
+      return res.status(200).json({
         status: "success",
         results: trip.expenses.length,
         data: trip.expenses,
       });
     } else {
-      res.status(200).json({
+      return res.status(200).json({
         status: "success",
         message: "No expenses added for this trip.",
       });
     }
   } catch (error) {
     console.error("Get Expense Error:", error.message);
-    res.status(500).json({ status: "error", message: error.message });
+    return res.status(500).json({ status: "error", message: error.message });
   }
 };
 
