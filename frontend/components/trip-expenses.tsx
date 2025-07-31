@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react'
+
+
 import {
   Table,
   TableBody,
@@ -47,6 +49,7 @@ export default function ExpenseList({ tripId, initialExpenses }: PageProps) {
   const [expenses, setExpenses] = useState<Expense[]>(initialExpenses);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  
 
   const fetchExpenses = async () => {
     setLoading(true);
