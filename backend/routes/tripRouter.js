@@ -15,7 +15,7 @@ router
   .delete(authController.protect, tripController.deleteTrip);
 
 router
-  .route("/trips/:tripId/add-collaborators")
+  .route("/trips/:tripId/collaborators").get(authController.protect, tripController.getTripCollaborators)
   .put(authController.protect, tripController.addCollaborators);
 
 router

@@ -105,6 +105,45 @@ exports.deleteTrip = async (req, res, next) => {
   }
 };
 
+exports.getTripCollaborators = async (req, res, next) => {
+  try {
+    const { tripId } = req.params;
+    const { userId } = req.user;
+
+    if (!tripId) {
+      return res.status(400).json({ message: "Trip ID is required" });
+    }
+
+    // Find the trip and verify access
+    const trip = await TripModel.findOne({
+      _id: tripId,
+      $or: [{ owner: userId }, { collaborators: userId }],
+    }).populate({
+      path: "collaborators",
+      select: "name email", // Fetch only name and email
+    });
+
+    if (!trip) {
+      return res.status(403).json({
+        message: "Trip not found or access denied.",
+      });
+    }
+
+    // Return collaborator details
+    return res.status(200).json({
+      message: "Collaborators fetched successfully",
+      collaborators: trip.collaborators, 
+    });
+
+  } catch (error) {
+    console.error("Error fetching collaborators:", error);
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
 exports.addCollaborators = async (req, res, next) => {
   try {
     const { tripId } = req.params;
