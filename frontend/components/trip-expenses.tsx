@@ -1,6 +1,6 @@
 'use client';
-
 import { useState } from 'react'
+import { useRouter } from 'next/navigation';  // ✅ Correct for App Router
 
 
 import {
@@ -49,7 +49,7 @@ export default function ExpenseList({ tripId, initialExpenses }: PageProps) {
   const [expenses, setExpenses] = useState<Expense[]>(initialExpenses);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  
+  const router = useRouter();
 
   const fetchExpenses = async () => {
     setLoading(true);
@@ -111,7 +111,7 @@ export default function ExpenseList({ tripId, initialExpenses }: PageProps) {
             <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
             Refresh
           </Button>
-          <Button size="sm">
+          <Button size="sm" onClick={() => router.push(`/expenses/add-expenses/${tripId}`)}>
             <PlusCircle className="mr-2 h-4 w-4" />
             Add Expense
           </Button>

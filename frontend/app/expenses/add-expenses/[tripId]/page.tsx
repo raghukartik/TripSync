@@ -7,10 +7,11 @@ interface PageProps {
   };
 }
 
-export default function AddExpensePage({ params }: PageProps) {
+export default async function AddExpensePage({ params }: PageProps) {
+  const {tripId} = await params;
   return (
     <div className="container mx-auto py-8">
-      <ExpenseForm tripId={params.tripId} />
+      <ExpenseForm tripId={tripId} />
     </div>
   );
 }
