@@ -46,7 +46,7 @@ const data = {
         },
         {
           title: "Completed",
-          url: "/dashboard/trips/completed",
+          url: "/completed-trips",
         },
         {
           title: "Create Trip",

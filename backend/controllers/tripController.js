@@ -634,7 +634,7 @@ exports.getTripTasks = async (req, res, next) => {
     const trip = await TripModel.findOne({
       _id: tripId,
       $or: [{ owner: userId }, { collaborators: userId }],
-    });
+    }).populate('tasks.assignedTo', 'name');
 
     if (!trip) {
       return res.status(400).json({

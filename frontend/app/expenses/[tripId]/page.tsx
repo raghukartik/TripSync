@@ -38,11 +38,12 @@ async function getExpenses(tripId: string): Promise<Expense[] | null> {
 }
 
 export default async function ExpensePage({ params }: expenseProps) {
-  const expenses = await getExpenses(params.tripId);
+  const paramsAwaited = await params;
+  const expenses = await getExpenses(paramsAwaited.tripId);
   
   return (
     <ExpenseList 
-      tripId={params.tripId}
+      tripId={paramsAwaited.tripId}
       initialExpenses={expenses || []}
     />
   )

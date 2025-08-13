@@ -136,7 +136,7 @@ exports.upComingTrips = async (req, res, next) => {
 exports.completedTrips = async (req, res, next) => {
   try {
     const { userId } = req.user;
-    const upComingTrips = await TripModel.find({
+    const completedTrips = await TripModel.find({
       $and: [
         {
           $or: [{ owner: userId }, { collaborators: userId }],
@@ -147,16 +147,16 @@ exports.completedTrips = async (req, res, next) => {
       ],
     });
 
-    if (!upComingTrips) {
+    if (!completedTrips) {
       return res.status(400).json({
         message: "No upcoming trips found!",
       });
     }
     res.status(200).json({
       status: "success",
-      results: upComingTrips.length,
+      results: completedTrips.length,
       data: {
-        upComingTrips,
+        completedTrips,
       },
     });
   } catch (error) {
