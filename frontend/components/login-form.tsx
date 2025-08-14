@@ -219,6 +219,7 @@ export function LoginForm({
               src="/login-bg.jpg"
               alt="Image"
               className="absolute inset-0 h-full w-full object-cover transition-all duration-500 dark:brightness-100 dark:contrast-125"
+              fill
             />
           </div>
         </CardContent>
@@ -237,3 +238,5 @@ export function LoginForm({
     </div>
   );
 }
+
+
