@@ -32,11 +32,15 @@ import FooterSection from "./footer";
 interface FormData {
   title: string;
   description: string;
+  startDate: string;
+  endDate: string;
 }
 
 interface FormErrors {
   title?: string;
   description?: string;
+  startDate?: string;
+  endDate?: string;
 }
 
 export default function CreateTripPage() {
@@ -44,6 +48,8 @@ export default function CreateTripPage() {
   const [formData, setFormData] = useState<FormData>({
     title: "",
     description: "",
+    startDate: "",
+    endDate: "",
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -51,10 +57,10 @@ export default function CreateTripPage() {
   const [selectedTemplate, setSelectedTemplate] = useState<string | null>(null);
 
   const tripTemplates = [
-    { id: "beach", icon: Palmtree, title: "Beach Vacation", description: "Relaxing getaway by the ocean" },
-    { id: "adventure", icon: Mountain, title: "Adventure Trip", description: "Outdoor activities and exploration" },
-    { id: "city", icon: Building, title: "City Break", description: "Urban exploration and culture" },
-    { id: "international", icon: Globe, title: "International Trip", description: "Cross-border adventure" },
+    { id: "beach", icon: Palmtree, title: "Beach Vacation", description: "Relaxing getaway by the ocean", startDate: "", endDate: "" },
+    { id: "adventure", icon: Mountain, title: "Adventure Trip", description: "Outdoor activities and exploration", startDate: "", endDate: "" },
+    { id: "city", icon: Building, title: "City Break", description: "Urban exploration and culture", startDate: "", endDate: "" },
+    { id: "international", icon: Globe, title: "International Trip", description: "Cross-border adventure", startDate: "", endDate: "" },
   ];
 
   const validateForm = (): boolean => {
@@ -74,6 +80,18 @@ export default function CreateTripPage() {
       newErrors.description = "Description should be at least 10 characters long";
     } else if (formData.description.length > 500) {
       newErrors.description = "Description should be less than 500 characters";
+    }
+
+    if (!formData.startDate) {
+      newErrors.startDate = "Start date is required";
+    } else if (new Date(formData.startDate) < new Date()) {
+      newErrors.startDate = "Start date cannot be in the past";
+    }
+
+    if (!formData.endDate) {
+      newErrors.endDate = "End date is required";
+    } else if (formData.startDate && new Date(formData.endDate) < new Date(formData.startDate)) {
+      newErrors.endDate = "End date cannot be before start date";
     }
     
     setErrors(newErrors);
@@ -95,11 +113,11 @@ export default function CreateTripPage() {
   const handleTemplateSelect = (templateId: string) => {
     setSelectedTemplate(templateId);
     const template = tripTemplates.find(t => t.id === templateId);
-    if (template && !formData.title) {
-      handleInputChange("title", template.title);
-    }
-    if (template && !formData.description) {
-      handleInputChange("description", template.description);
+    if (template) {
+      const updates: Partial<FormData> = {};
+      if (!formData.title) updates.title = template.title;
+      if (!formData.description) updates.description = template.description;
+      setFormData(prev => ({ ...prev, ...updates }));
     }
   };
 
@@ -120,7 +138,12 @@ export default function CreateTripPage() {
           "Content-Type": "application/json",
         },
         credentials: "include",
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          title: formData.title,
+          description: formData.description,
+          startDate: formData.startDate,
+          endDate: formData.endDate
+        }),
       });
 
       if (!res.ok) {
@@ -141,7 +164,11 @@ export default function CreateTripPage() {
     }
   };
 
-  const isFormValid = formData.title.trim() && formData.description.trim() && Object.keys(errors).length === 0;
+  const isFormValid = formData.title.trim() && 
+                     formData.description.trim() && 
+                     formData.startDate && 
+                     formData.endDate && 
+                     Object.keys(errors).length === 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
@@ -258,6 +285,55 @@ export default function CreateTripPage() {
                     </div>
                   </div>
 
+                  {/* Trip Dates */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Start Date */}
+                    <div className="space-y-3">
+                      <Label htmlFor="startDate" className="text-base font-medium text-gray-900 flex items-center gap-2">
+                        <Calendar className="h-4 w-4 text-blue-600" />
+                        Start Date *
+                      </Label>
+                      <Input
+                        id="startDate"
+                        type="date"
+                        value={formData.startDate}
+                        onChange={(e) => handleInputChange("startDate", e.target.value)}
+                        className={`h-12 text-base ${errors.startDate ? 'border-red-500 focus:border-red-500' : ''}`}
+                        disabled={isSubmitting}
+                        min={new Date().toISOString().split('T')[0]}
+                      />
+                      {errors.startDate && (
+                        <div className="flex items-center gap-2 text-red-600 text-sm">
+                          <AlertCircle className="h-4 w-4" />
+                          {errors.startDate}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* End Date */}
+                    <div className="space-y-3">
+                      <Label htmlFor="endDate" className="text-base font-medium text-gray-900 flex items-center gap-2">
+                        <Calendar className="h-4 w-4 text-blue-600" />
+                        End Date *
+                      </Label>
+                      <Input
+                        id="endDate"
+                        type="date"
+                        value={formData.endDate}
+                        onChange={(e) => handleInputChange("endDate", e.target.value)}
+                        className={`h-12 text-base ${errors.endDate ? 'border-red-500 focus:border-red-500' : ''}`}
+                        disabled={isSubmitting}
+                        min={formData.startDate || new Date().toISOString().split('T')[0]}
+                      />
+                      {errors.endDate && (
+                        <div className="flex items-center gap-2 text-red-600 text-sm">
+                          <AlertCircle className="h-4 w-4" />
+                          {errors.endDate}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
                   {/* Trip Description */}
                   <div className="space-y-3">
                     <Label htmlFor="description" className="text-base font-medium text-gray-900 flex items-center gap-2">
@@ -348,6 +424,21 @@ export default function CreateTripPage() {
                       </div>
                     )}
                     
+                    {(formData.startDate || formData.endDate) && (
+                      <div className="flex items-center gap-2 text-sm text-gray-600">
+                        <Calendar className="h-4 w-4" />
+                        {formData.startDate && (
+                          <span>{new Date(formData.startDate).toLocaleDateString()}</span>
+                        )}
+                        {formData.startDate && formData.endDate && (
+                          <span>to</span>
+                        )}
+                        {formData.endDate && (
+                          <span>{new Date(formData.endDate).toLocaleDateString()}</span>
+                        )}
+                      </div>
+                    )}
+                    
                     {formData.description && (
                       <div>
                         <p className="text-gray-600 text-sm line-clamp-4 leading-relaxed">
@@ -359,10 +450,6 @@ export default function CreateTripPage() {
                     <div className="pt-3 border-t border-gray-100">
                       <p className="text-xs text-gray-500 mb-2">This is how your trip will appear</p>
                       <div className="flex items-center gap-4 text-xs text-gray-600">
-                        <div className="flex items-center gap-1">
-                          <Calendar className="h-3 w-3" />
-                          <span>Created today</span>
-                        </div>
                         <div className="flex items-center gap-1">
                           <Users className="h-3 w-3" />
                           <span>Just you</span>
@@ -388,22 +475,22 @@ export default function CreateTripPage() {
                     <div className="flex items-start gap-3">
                       <div className="w-6 h-6 rounded-full bg-blue-500 text-white text-xs flex items-center justify-center font-bold flex-shrink-0 mt-0.5">1</div>
                       <div>
-                        <p className="font-medium">Set your dates</p>
-                        <p className="text-blue-700 text-xs">Choose when your adventure begins</p>
-                      </div>
-                    </div>
-                    <div className="flex items-start gap-3">
-                      <div className="w-6 h-6 rounded-full bg-blue-400 text-white text-xs flex items-center justify-center font-bold flex-shrink-0 mt-0.5">2</div>
-                      <div>
                         <p className="font-medium">Invite your crew</p>
                         <p className="text-blue-700 text-xs">Add friends and family to collaborate</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
-                      <div className="w-6 h-6 rounded-full bg-blue-300 text-white text-xs flex items-center justify-center font-bold flex-shrink-0 mt-0.5">3</div>
+                      <div className="w-6 h-6 rounded-full bg-blue-400 text-white text-xs flex items-center justify-center font-bold flex-shrink-0 mt-0.5">2</div>
                       <div>
                         <p className="font-medium">Plan activities</p>
                         <p className="text-blue-700 text-xs">Create your perfect itinerary</p>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-3">
+                      <div className="w-6 h-6 rounded-full bg-blue-300 text-white text-xs flex items-center justify-center font-bold flex-shrink-0 mt-0.5">3</div>
+                      <div>
+                        <p className="font-medium">Pack your bags</p>
+                        <p className="text-blue-700 text-xs">Create a shared packing list</p>
                       </div>
                     </div>
                   </div>

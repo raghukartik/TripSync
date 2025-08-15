@@ -33,28 +33,51 @@ exports.getAllUserTrips = async (req, res, next) => {
 
 exports.createTrip = async (req, res) => {
   try {
-    const { title, description } = req.body;
-    const { userId: ownerId } = req.user;
+    const { title, description, startDate, endDate } = req.body;
+    const { userId: ownerId } = req.user || {};
+
+    // Validate userId presence
+    if (!ownerId) {
+      return res.status(400).json({ status: "error", message: "User ID missing from request" });
+    }
+
+    // Validate required fields
+    if (!title || !startDate || !endDate) {
+      return res.status(400).json({ status: "error", message: "Title, start date, and end date are required" });
+    }
+
+    // Validate date format
+    if (isNaN(Date.parse(startDate)) || isNaN(Date.parse(endDate))) {
+      return res.status(400).json({ status: "error", message: "Invalid date format" });
+    }
+
+    // Ensure user exists
+    const user = await User.findById(ownerId);
+    if (!user) {
+      return res.status(404).json({ status: "error", message: "User not found" });
+    }
 
     // Create trip
     const trip = await TripModel.create({
       title,
       description,
+      startDate,
+      endDate,
       owner: ownerId,
     });
 
-    // Add trip to user's tripsOwned
-    const user = await User.findById(ownerId);
+    // Update user's tripsOwned
     user.tripsOwned.push(trip._id);
     await user.save();
 
-    res.status(200).json({
+    return res.status(201).json({
       status: "success",
       data: trip,
     });
+
   } catch (error) {
     console.error("Error creating trip:", error);
-    res.status(500).json({
+    return res.status(500).json({
       status: "error",
       message: "Failed to create trip",
       error: error.message,

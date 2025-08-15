@@ -1,23 +1,23 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { format } from "date-fns";
-import { 
-  CalendarIcon, 
-  DollarSign, 
-  Receipt, 
-  Users, 
+import {
+  CalendarIcon,
+  DollarSign,
+  Receipt,
+  Users,
   ArrowLeft,
   Check,
   Loader2,
   Tag,
   FileText,
   Calculator,
-  AlertCircle
+  AlertCircle,
 } from "lucide-react";
 import {
   Form,
@@ -40,12 +40,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
@@ -55,7 +50,8 @@ const expenseFormSchema = z.object({
   category: z.string().min(1, "Please select a category"),
   note: z.string().min(1, "Please add a description for this expense"),
   date: z.date(),
-  sharedWith: z.array(z.string()).min(1, "Select at least one person to share this expense with"),
+  sharedWith: z.array(z.string().min(1, "Invalid user ID"))
+    .min(1, "Select at least one person to share this expense with"),
 });
 
 type ExpenseFormValues = z.infer<typeof expenseFormSchema>;
@@ -63,24 +59,51 @@ type ExpenseFormValues = z.infer<typeof expenseFormSchema>;
 interface ExpenseFormProps {
   tripId: string;
   currentUserId: string;
+  collaborators: {_id: string, name: string}[];
 }
 
 const categories = [
-  { value: "food", label: "Food & Dining", icon: "🍽️", color: "bg-orange-50 text-orange-700 border-orange-200" },
-  { value: "transport", label: "Transportation", icon: "🚗", color: "bg-blue-50 text-blue-700 border-blue-200" },
-  { value: "accommodation", label: "Accommodation", icon: "🏨", color: "bg-purple-50 text-purple-700 border-purple-200" },
-  { value: "activities", label: "Activities", icon: "🎯", color: "bg-green-50 text-green-700 border-green-200" },
-  { value: "shopping", label: "Shopping", icon: "🛍️", color: "bg-pink-50 text-pink-700 border-pink-200" },
-  { value: "other", label: "Other", icon: "💰", color: "bg-gray-50 text-gray-700 border-gray-200" },
+  {
+    value: "food",
+    label: "Food & Dining",
+    icon: "🍽️",
+    color: "bg-orange-50 text-orange-700 border-orange-200",
+  },
+  {
+    value: "transport",
+    label: "Transportation",
+    icon: "🚗",
+    color: "bg-blue-50 text-blue-700 border-blue-200",
+  },
+  {
+    value: "accommodation",
+    label: "Accommodation",
+    icon: "🏨",
+    color: "bg-purple-50 text-purple-700 border-purple-200",
+  },
+  {
+    value: "activities",
+    label: "Activities",
+    icon: "🎯",
+    color: "bg-green-50 text-green-700 border-green-200",
+  },
+  {
+    value: "shopping",
+    label: "Shopping",
+    icon: "🛍️",
+    color: "bg-pink-50 text-pink-700 border-pink-200",
+  },
+  {
+    value: "other",
+    label: "Other",
+    icon: "💰",
+    color: "bg-gray-50 text-gray-700 border-gray-200",
+  },
 ];
 
-export function ExpenseForm({ tripId, currentUserId }: ExpenseFormProps) {
+export function ExpenseForm({ tripId, currentUserId, collaborators}: ExpenseFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [collaborators, setCollaborators] = useState<
-    { _id: string; name: string }[]
-  >([]);
-  const [loadingCollaborators, setLoadingCollaborators] = useState(true);
   const [step, setStep] = useState(1);
 
   const form = useForm<ExpenseFormValues>({
@@ -94,7 +117,6 @@ export function ExpenseForm({ tripId, currentUserId }: ExpenseFormProps) {
     },
   });
 
-
   const amount = form.watch("amount");
   const category = form.watch("category");
   const note = form.watch("note");
@@ -103,54 +125,32 @@ export function ExpenseForm({ tripId, currentUserId }: ExpenseFormProps) {
 
   const watchedValues = form.watch();
   const selectedCollaborators = useMemo(() => {
-    return collaborators.filter(c => sharedWith?.includes(c._id));
+    return collaborators.filter((c) => sharedWith?.includes(c._id));
   }, [collaborators, sharedWith]);
 
   const splitAmount = useMemo(() => {
-    return amount && selectedCollaborators.length > 0 
-      ? amount / selectedCollaborators.length 
-      : 0;
-  }, [amount, selectedCollaborators.length]);
+    if (!amount || selectedCollaborators.length === 0) return 0;
 
-  useEffect(() => {
-    const getTripCollab = async () => {
-      try {
-        setLoadingCollaborators(true);
-        const res = await fetch(
-          `http://localhost:8000/api/trips/${tripId}/collaborators`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            credentials: "include",
-          }
-        );
+    const participants = selectedCollaborators.some(
+      (c) => c._id === currentUserId
+    )
+      ? selectedCollaborators
+      : [...selectedCollaborators, { _id: currentUserId, name: "You" }];
 
-        if (!res.ok) {
-          throw new Error(`Failed to fetch collaborators: ${res.statusText}`);
-        }
-        const data = await res.json();
-        setCollaborators(data.collaborators || []);
-      } catch (err) {
-        console.error(err);
-        toast.error("Failed to load trip members");
-      } finally {
-        setLoadingCollaborators(false);
-      }
-    };
+    return amount / participants.length;
+  }, [amount, selectedCollaborators, currentUserId]);
 
-    getTripCollab();
-  }, [tripId]);
+
 
   async function onSubmit(data: ExpenseFormValues) {
+    console.log("Form submission triggered", data);
     setIsSubmitting(true);
     try {
       const payload = {
         ...data,
         spentBy: currentUserId, // Automatically set the current user as the payer
       };
-
+      console.log("Submitting payload:", payload);
       const response = await fetch(
         `http://localhost:8000/api/trips/${tripId}/expenses`,
         {
@@ -162,9 +162,10 @@ export function ExpenseForm({ tripId, currentUserId }: ExpenseFormProps) {
           body: JSON.stringify(payload),
         }
       );
-
+       const responseData = await response.json();
       if (!response.ok) {
-        throw new Error("Failed to add expense");
+        console.error("Error response:", responseData);
+        throw new Error(responseData.message || "Failed to add expense");
       }
 
       toast.success("Expense added successfully! 🎉");
@@ -179,16 +180,19 @@ export function ExpenseForm({ tripId, currentUserId }: ExpenseFormProps) {
     }
   }
 
-  const isStepValid = useCallback((stepNumber: number) => {
-    switch (stepNumber) {
-      case 1:
-        return amount > 0 && category && note;
-      case 2:
-        return date && sharedWith && sharedWith.length > 0;
-      default:
-        return false;
-    }
-  }, [amount, category, note, date, sharedWith]);
+  const isStepValid = useCallback(
+    (stepNumber: number) => {
+      switch (stepNumber) {
+        case 1:
+          return amount > 0 && category && note;
+        case 2:
+          return date && sharedWith && sharedWith.length > 0;
+        default:
+          return false;
+      }
+    },
+    [amount, category, note, date, sharedWith]
+  );
 
   const nextStep = () => {
     if (step < 2) setStep(step + 1);
@@ -198,20 +202,7 @@ export function ExpenseForm({ tripId, currentUserId }: ExpenseFormProps) {
     if (step > 1) setStep(step - 1);
   };
 
-  if (loadingCollaborators) {
-    return (
-      <div className="max-w-2xl mx-auto p-6">
-        <Card>
-          <CardContent className="p-8">
-            <div className="flex items-center justify-center">
-              <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-            </div>
-            <p className="text-center text-gray-600 mt-4">Loading trip information...</p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+ 
 
   return (
     <div className="max-w-2xl mx-auto p-6 space-y-6">
@@ -236,11 +227,15 @@ export function ExpenseForm({ tripId, currentUserId }: ExpenseFormProps) {
       <Card className="border-blue-200 bg-blue-50/30">
         <CardContent className="p-4">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-blue-700">Step {step} of 2</span>
-            <span className="text-sm text-blue-600">{Math.round((step / 2) * 100)}% Complete</span>
+            <span className="text-sm font-medium text-blue-700">
+              Step {step} of 2
+            </span>
+            <span className="text-sm text-blue-600">
+              {Math.round((step / 2) * 100)}% Complete
+            </span>
           </div>
           <div className="w-full bg-blue-100 rounded-full h-2">
-            <div 
+            <div
               className="bg-blue-600 h-2 rounded-full transition-all duration-300 ease-in-out"
               style={{ width: `${(step / 2) * 100}%` }}
             />
@@ -256,8 +251,9 @@ export function ExpenseForm({ tripId, currentUserId }: ExpenseFormProps) {
       <Card className="border-0 shadow-lg">
         <CardContent className="p-8">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              
+            <form onSubmit={form.handleSubmit(onSubmit, (errors) =>  {
+              console.log("Form errors:", errors);
+            })} className="space-y-6">
               {/* Step 1: Expense Details */}
               {step === 1 && (
                 <div className="space-y-6">
@@ -265,7 +261,9 @@ export function ExpenseForm({ tripId, currentUserId }: ExpenseFormProps) {
                     <div className="inline-flex p-3 bg-blue-50 rounded-full mb-3">
                       <Receipt className="h-6 w-6 text-blue-600" />
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-900">Expense Details</h3>
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      Expense Details
+                    </h3>
                     <p className="text-gray-600">Tell us about this expense</p>
                   </div>
 
@@ -320,15 +318,20 @@ export function ExpenseForm({ tripId, currentUserId }: ExpenseFormProps) {
                                 className={cn(
                                   "p-4 rounded-lg border-2 cursor-pointer transition-all hover:shadow-md",
                                   field.value === category.value
-                                    ? category.color + " border-current shadow-md"
+                                    ? category.color +
+                                        " border-current shadow-md"
                                     : "border-gray-200 hover:border-gray-300"
                                 )}
                                 onClick={() => field.onChange(category.value)}
                               >
                                 <div className="flex items-center gap-3">
-                                  <span className="text-2xl">{category.icon}</span>
+                                  <span className="text-2xl">
+                                    {category.icon}
+                                  </span>
                                   <div>
-                                    <p className="font-medium text-sm">{category.label}</p>
+                                    <p className="font-medium text-sm">
+                                      {category.label}
+                                    </p>
                                   </div>
                                   {field.value === category.value && (
                                     <Check className="h-4 w-4 ml-auto" />
@@ -401,7 +404,8 @@ export function ExpenseForm({ tripId, currentUserId }: ExpenseFormProps) {
                               selected={field.value}
                               onSelect={field.onChange}
                               disabled={(date) =>
-                                date > new Date() || date < new Date("1900-01-01")
+                                date > new Date() ||
+                                date < new Date("1900-01-01")
                               }
                               initialFocus
                             />
@@ -424,8 +428,12 @@ export function ExpenseForm({ tripId, currentUserId }: ExpenseFormProps) {
                     <div className="inline-flex p-3 bg-purple-50 rounded-full mb-3">
                       <Users className="h-6 w-6 text-purple-600" />
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-900">Share Expense</h3>
-                    <p className="text-gray-600">Who should this expense be split between?</p>
+                    <h3 className="text-lg font-semibold text-gray-900">
+                      Share Expense
+                    </h3>
+                    <p className="text-gray-600">
+                      Who should this expense be split between?
+                    </p>
                   </div>
 
                   {/* Split Preview */}
@@ -435,11 +443,22 @@ export function ExpenseForm({ tripId, currentUserId }: ExpenseFormProps) {
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <Calculator className="h-5 w-5 text-blue-600" />
-                            <span className="font-medium text-blue-900">Split Calculation</span>
+                            <span className="font-medium text-blue-900">
+                              Split Calculation
+                            </span>
                           </div>
                           <div className="text-right">
                             <p className="text-sm text-blue-700">
-                              ${watchedValues.amount.toFixed(2)} ÷ {selectedCollaborators.length || 1} people
+                              ${watchedValues.amount.toFixed(2)} ÷{" "}
+                              {
+                                // Count includes the current user even if not explicitly selected
+                                selectedCollaborators.some(
+                                  (c) => c._id === currentUserId
+                                )
+                                  ? selectedCollaborators.length
+                                  : selectedCollaborators.length + 1
+                              }{" "}
+                              people
                             </p>
                             <p className="text-lg font-bold text-blue-900">
                               ${splitAmount.toFixed(2)} per person
@@ -457,7 +476,8 @@ export function ExpenseForm({ tripId, currentUserId }: ExpenseFormProps) {
                       </div>
                       <div className="ml-3">
                         <p className="text-sm text-yellow-700">
-                          You are automatically included as the payer of this expense.
+                          You are automatically included as the payer of this
+                          expense.
                         </p>
                       </div>
                     </div>
@@ -474,24 +494,24 @@ export function ExpenseForm({ tripId, currentUserId }: ExpenseFormProps) {
                         </FormLabel>
                         <FormControl>
                           <div className="space-y-3">
-                            {collaborators.map((collaborator) => {
-                              const isSelected = field.value?.includes(collaborator._id);
+                            {[
+                              { _id: currentUserId, name: "You" },
+                              ...collaborators.filter(
+                                (c) => c._id !== currentUserId
+                              ),
+                            ].map((collaborator) => {
+                              const isSelected = field.value?.includes(
+                                collaborator._id
+                              );
                               return (
                                 <div
                                   key={collaborator._id}
                                   className={cn(
-                                    "flex items-center justify-between p-4 rounded-lg border-2 cursor-pointer transition-all hover:shadow-md",
+                                    "flex items-center justify-between p-4 rounded-lg border-2 transition-all",
                                     isSelected
                                       ? "border-blue-500 bg-blue-50 shadow-md"
                                       : "border-gray-200 hover:border-gray-300"
                                   )}
-                                  onClick={() => {
-                                    const currentValues = field.value || [];
-                                    const newValues = isSelected
-                                      ? currentValues.filter(id => id !== collaborator._id)
-                                      : [...currentValues, collaborator._id];
-                                    field.onChange(newValues);
-                                  }}
                                 >
                                   <div className="flex items-center gap-3">
                                     <Avatar className="h-10 w-10">
@@ -500,7 +520,9 @@ export function ExpenseForm({ tripId, currentUserId }: ExpenseFormProps) {
                                       </AvatarFallback>
                                     </Avatar>
                                     <div>
-                                      <p className="font-medium text-gray-900">{collaborator.name}</p>
+                                      <p className="font-medium text-gray-900">
+                                        {collaborator.name}
+                                      </p>
                                       {isSelected && splitAmount > 0 && (
                                         <p className="text-sm text-blue-600 font-medium">
                                           Owes ${splitAmount.toFixed(2)}
@@ -510,12 +532,24 @@ export function ExpenseForm({ tripId, currentUserId }: ExpenseFormProps) {
                                   </div>
                                   <div className="flex items-center gap-2">
                                     {isSelected && (
-                                      <Badge variant="secondary" className="bg-blue-100 text-blue-700">
+                                      <Badge
+                                        variant="secondary"
+                                        className="bg-blue-100 text-blue-700"
+                                      >
                                         Selected
                                       </Badge>
                                     )}
                                     <Checkbox
                                       checked={isSelected}
+                                      onCheckedChange={(checked) => {
+                                        const currentValues = field.value || [];
+                                        const newValues = checked
+                                          ? [...currentValues, collaborator._id]
+                                          : currentValues.filter(
+                                              (id) => id !== collaborator._id
+                                            );
+                                        field.onChange(newValues);
+                                      }}
                                       className="data-[state=checked]:bg-blue-600"
                                     />
                                   </div>
@@ -525,7 +559,8 @@ export function ExpenseForm({ tripId, currentUserId }: ExpenseFormProps) {
                           </div>
                         </FormControl>
                         <FormDescription>
-                          Select all people who should share this expense (including yourself)
+                          Select all people who should share this expense
+                          (including yourself)
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -536,7 +571,7 @@ export function ExpenseForm({ tripId, currentUserId }: ExpenseFormProps) {
 
               {/* Navigation Buttons */}
               <Separator />
-              
+
               <div className="flex justify-between pt-4">
                 <Button
                   type="button"
@@ -560,8 +595,8 @@ export function ExpenseForm({ tripId, currentUserId }: ExpenseFormProps) {
                       <ArrowLeft className="h-4 w-4 rotate-180" />
                     </Button>
                   ) : (
-                    <Button 
-                      type="submit" 
+                    <Button
+                      type="submit"
                       disabled={isSubmitting || !isStepValid(2)}
                       className="gap-2 bg-green-600 hover:bg-green-700 min-w-32"
                     >
@@ -585,22 +620,33 @@ export function ExpenseForm({ tripId, currentUserId }: ExpenseFormProps) {
               {step === 2 && watchedValues.amount > 0 && (
                 <Card className="bg-gray-50 border-gray-200">
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-medium text-gray-700">Expense Summary</CardTitle>
+                    <CardTitle className="text-sm font-medium text-gray-700">
+                      Expense Summary
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="pt-0 space-y-2">
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Amount:</span>
-                      <span className="font-semibold">${watchedValues.amount.toFixed(2)}</span>
+                      <span className="font-semibold">
+                        ${watchedValues.amount.toFixed(2)}
+                      </span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Category:</span>
                       <span className="font-medium">
-                        {categories.find(c => c.value === watchedValues.category)?.icon} {watchedValues.category}
+                        {
+                          categories.find(
+                            (c) => c.value === watchedValues.category
+                          )?.icon
+                        }{" "}
+                        {watchedValues.category}
                       </span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Description:</span>
-                      <span className="font-medium text-right max-w-40 truncate">{watchedValues.note}</span>
+                      <span className="font-medium text-right max-w-40 truncate">
+                        {watchedValues.note}
+                      </span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Paid by:</span>
@@ -608,12 +654,16 @@ export function ExpenseForm({ tripId, currentUserId }: ExpenseFormProps) {
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Split between:</span>
-                      <span className="font-medium">{selectedCollaborators.length} people</span>
+                      <span className="font-medium">
+                        {selectedCollaborators.length} people
+                      </span>
                     </div>
                     <Separator />
                     <div className="flex justify-between text-sm font-bold">
                       <span>Per person:</span>
-                      <span className="text-green-600">${splitAmount.toFixed(2)}</span>
+                      <span className="text-green-600">
+                        ${splitAmount.toFixed(2)}
+                      </span>
                     </div>
                   </CardContent>
                 </Card>
@@ -626,6 +676,10 @@ export function ExpenseForm({ tripId, currentUserId }: ExpenseFormProps) {
   );
 
   function getInitials(name: string) {
-    return name.split(' ').map(n => n[0]).join('').toUpperCase();
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase();
   }
 }

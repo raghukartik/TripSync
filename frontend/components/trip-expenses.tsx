@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation';
 
 import {
@@ -117,32 +117,37 @@ export default function ExpenseList({ tripId, initialExpenses }: PageProps) {
   }
 
   // Filter and sort expenses
-  const filteredAndSortedExpenses = expenses
-    .filter(expense => {
-      const matchesSearch = expense.note.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          expense.spentBy.name.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesCategory = categoryFilter === 'all' || expense.category.toLowerCase() === categoryFilter.toLowerCase();
-      return matchesSearch && matchesCategory;
-    })
-    .sort((a, b) => {
-      switch (sortBy) {
-        case 'date-desc':
-          return new Date(b.date).getTime() - new Date(a.date).getTime();
-        case 'date-asc':
-          return new Date(a.date).getTime() - new Date(b.date).getTime();
-        case 'amount-desc':
-          return b.amount - a.amount;
-        case 'amount-asc':
-          return a.amount - b.amount;
-        default:
-          return 0;
-      }
-    });
+ const filteredAndSortedExpenses = useMemo(() => {
+    return expenses
+      .filter(expense => {
+        const matchesSearch = expense.note.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                            expense.spentBy.name.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesCategory = categoryFilter === 'all' || expense.category.toLowerCase() === categoryFilter.toLowerCase();
+        return matchesSearch && matchesCategory;
+      })
+      .sort((a, b) => {
+        switch (sortBy) {
+          case 'date-desc':
+            return new Date(b.date).getTime() - new Date(a.date).getTime();
+          case 'date-asc':
+            return new Date(a.date).getTime() - new Date(b.date).getTime();
+          case 'amount-desc':
+            return b.amount - a.amount;
+          case 'amount-asc':
+            return a.amount - b.amount;
+          default:
+            return 0;
+        }
+      });
+  }, [expenses, searchTerm, categoryFilter, sortBy]);
 
   // Calculate summary stats
-  const totalAmount = expenses.reduce((sum, expense) => sum + expense.amount, 0);
-  const uniqueCategories = [...new Set(expenses.map(e => e.category))];
-  const averageExpense = expenses.length > 0 ? totalAmount / expenses.length : 0;
+const { totalAmount, uniqueCategories, averageExpense } = useMemo(() => {
+    const total = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+    const unique = [...new Set(expenses.map(e => e.category))];
+    const average = expenses.length > 0 ? total / expenses.length : 0;
+    return { totalAmount: total, uniqueCategories: unique, averageExpense: average };
+  }, [expenses]);
 
   if (error) {
     return (
