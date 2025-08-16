@@ -2,7 +2,6 @@
 const express = require("express");
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
-const config = require("./config.json");
 const mongoose = require("mongoose");
 const passport = require("passport");
 const GoogleStrategy = require("passport-google-oauth20").Strategy;
@@ -17,7 +16,14 @@ const { authenticateToken } = require("./utilities");
 const tripRouter = require("./routes/tripRouter");
 const userRouter = require("./routes/userRouter");
 const authRouter = require("./routes/authRouter");
-mongoose.connect(config.connectionString);
+
+
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => console.log("MongoDB connected"))
+.catch(err => console.error("MongoDB connection error:", err));
 
 const app = express();
 app.use(cookieParser());
