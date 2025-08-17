@@ -327,6 +327,7 @@ const TripCard = ({ trip }: { trip: Trip }) => {
           <Button
             variant="ghost"
             size="sm"
+            onClick={() => router.push(`/tasks/${trip._id}`)}
             className="flex items-center gap-2 hover:bg-green-50 hover:text-green-700"
           >
             <CheckCircle className="h-4 w-4" />

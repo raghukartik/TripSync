@@ -712,7 +712,7 @@ exports.addTask = async (req, res, next) => {
     const newTask = {
       taskId: new mongoose.Types.ObjectId().toString(),
       text: text || "",
-      assignedTo,
+      assignedTo: new mongoose.Types.ObjectId(assignedTo),
       completed,
     };
 

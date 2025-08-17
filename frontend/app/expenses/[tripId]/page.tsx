@@ -24,7 +24,7 @@ interface expenseProps {
 }
 
 async function getExpenses(tripId: string): Promise<Expense[] | null> {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const res = await fetch(`http://localhost:8000/api/trips/${tripId}/expenses`, {
     headers: {
       Cookie: cookieStore.toString(),
