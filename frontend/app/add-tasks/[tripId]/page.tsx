@@ -1,16 +1,18 @@
-// app/[tripId]/expenses/add/page.tsx
-import { ExpenseForm } from "@/components/add-tripExpenses";
-import { cookies } from 'next/headers';
-interface PageProps {
+import { cookies } from "next/headers";
+import AddTask from "@/components/add-tripTasks";
+
+
+
+interface Collaborator {
+  _id: string;
+  name: string;
+  email: string;
+}
+
+interface AddTaskProps {
   params: {
     tripId: string;
   };
-}
-
-interface Collaborator{
-  _id: string;
-  name: string;
-  email?: string;
 }
 
 export async function getTripCollaborators(tripId: string): Promise<Collaborator[]>{
@@ -36,12 +38,14 @@ export async function getTripCollaborators(tripId: string): Promise<Collaborator
   }
 }
 
-export default async function AddExpensePage({ params }: PageProps) {
-  const {tripId} = await params;
+export default async function AddTaskServer({ params }: AddTaskProps) {
+  const { tripId } = params;
   const collaborators = await getTripCollaborators(tripId);
+  
   return (
-    <div className="container mx-auto py-8">
-      <ExpenseForm tripId={tripId} collaborators={collaborators} />
-    </div>
+    <AddTask 
+      tripId={tripId}
+      users={collaborators}
+    />
   );
 }

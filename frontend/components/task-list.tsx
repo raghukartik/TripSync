@@ -1,5 +1,6 @@
 "use client";
 import { useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { 
   CheckCircle2, 
   Circle, 
@@ -38,7 +39,7 @@ export function TasksList({ tasks, tripId }: TasksListProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<"all" | "pending" | "completed">("all");
   const [filterPriority, setFilterPriority] = useState<"all" | "high" | "medium" | "low">("all");
-
+  const router = useRouter();
   const handleToggleComplete = useCallback((taskId: string) => {
     setLocalTasks(prevTasks => 
       prevTasks.map(task => 
@@ -48,7 +49,7 @@ export function TasksList({ tasks, tripId }: TasksListProps) {
       )
     );
   }, []);
-  console.log(localTasks);
+ 
   const handleEditClick = useCallback((taskId: string) => {
     console.log("Edit task:", taskId);
     // Will be implemented with edit modal
@@ -155,7 +156,9 @@ export function TasksList({ tasks, tripId }: TasksListProps) {
               <div className="text-2xl font-bold text-gray-900">{completionPercentage}%</div>
               <div className="text-sm text-gray-500">Complete</div>
             </div>
-            <button className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+            <button className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+              onClick={() => router.push(`/add-tasks/${tripId}`)}
+            >
               <Plus className="h-4 w-4 mr-2" />
               Add Task
             </button>

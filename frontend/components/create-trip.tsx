@@ -114,10 +114,11 @@ export default function CreateTripPage() {
     setSelectedTemplate(templateId);
     const template = tripTemplates.find(t => t.id === templateId);
     if (template) {
-      const updates: Partial<FormData> = {};
-      if (!formData.title) updates.title = template.title;
-      if (!formData.description) updates.description = template.description;
-      setFormData(prev => ({ ...prev, ...updates }));
+      setFormData(prev => ({
+        ...prev,
+        title: template.title,
+        description: template.description
+      }));
     }
   };
 
