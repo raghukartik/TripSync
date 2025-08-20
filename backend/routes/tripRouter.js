@@ -1,8 +1,9 @@
-const express = require("express");
+import express from "express";
+import authController from "../controllers/authController.js";
+import upload from "../utils/multer.js";
+import tripController from "../controllers/tripController.js";
+
 const router = express.Router();
-const authController = require("../controllers/authController");
-const upload = require("../utils/multer");
-const tripController = require("../controllers/tripController");
 
 router
   .route("/trips")
@@ -59,4 +60,5 @@ router
 router
   .route("/trips/:tripId/invite")
   .post(authController.protect, tripController.inviteCollaborator);
-module.exports = router;
+
+export default router;

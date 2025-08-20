@@ -1,21 +1,29 @@
+import dotenv from "dotenv";
+dotenv.config();
 
-const express = require("express");
-const cors = require("cors");
-const jwt = require("jsonwebtoken");
-const mongoose = require("mongoose");
-const passport = require("passport");
-const GoogleStrategy = require("passport-google-oauth20").Strategy;
-const cookieParser = require("cookie-parser");
-require("dotenv").config();
-const { Server } = require('socket.io');
-const http = require('http');
-const path = require("path");
-const User = require("./models/User");
-const TripModel= require("./models/Trips");
-const { authenticateToken } = require("./utilities");
-const tripRouter = require("./routes/tripRouter");
-const userRouter = require("./routes/userRouter");
-const authRouter = require("./routes/authRouter");
+import express from "express";
+import session from "express-session";
+import cors from "cors";
+import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
+import passport from "passport";
+import { Strategy as GoogleStrategy } from "passport-google-oauth20";
+import cookieParser from "cookie-parser";
+import { Server } from "socket.io";
+import http from "http";
+import path from "path";
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import User from "./models/User.js";
+
+// Fix for __dirname in ES module scope
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+import TripModel from "./models/Trips.js";
+import { authenticateToken } from "./utilities.js";
+import tripRouter from "./routes/tripRouter.js";
+import userRouter from "./routes/userRouter.js";
+import authRouter from "./routes/authRouter.js";
 
 
 mongoose.connect(process.env.MONGO_URI)
@@ -31,9 +39,15 @@ app.use(
     credentials: true, // Allow cookies
   })
 );
+app.use(session({
+  secret: "your-secret-key", // change to something secure
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: false }, // true if using HTTPS
+}))
 const server = http.createServer(app);
 app.use(express.urlencoded({ extended: true }));
-app.use(passport.initialize());
+// app.use(passport.initialize());
 
 const io = new Server(server, {
   cors: {
@@ -43,62 +57,64 @@ const io = new Server(server, {
 });
 global.io = io;
 
-passport.use(
-  new GoogleStrategy(
-    {
-      clientID: process.env.OAuth_Client_ID,
-      clientSecret: process.env.OAuth_Client_Secret,
-      callbackURL: "/auth/google/callback",
-    },
-    async (accessToken, refreshToken, profile, done) => {
-      try {
-        let user = await User.findOne({ googleId: profile.id }); // ✅ await added
-        if (!user) {
-          user = await User.create({
-            googleId: profile.id,
-            name: profile.displayName,
-            email: profile.emails[0]?.value,
-            avatar: profile.photos[0]?.value,
-          });
-        }
+// passport.use(
+//   new GoogleStrategy(
+//     {
+//       clientID: process.env.OAuth_Client_ID,
+//       clientSecret: process.env.OAuth_Client_Secret,
+//       callbackURL: "/auth/google/callback",
+//     },
+//     async (accessToken, refreshToken, profile, done) => {
+//       try {
+//         let user = await User.findOne({ googleId: profile.id }); // ✅ await added
+//         if (!user) {
+//           user = await User.create({
+//             googleId: profile.id,
+//             name: profile.displayName,
+//             email: profile.emails[0]?.value,
+//             avatar: profile.photos[0]?.value,
+//           });
+//         }
 
-        return done(null, user); // ✅ user now has _id
-      } catch (error) {
-        return done(error, null);
-      }
-    }
-  )
-);
+//         return done(null, user); // ✅ user now has _id
+//       } catch (error) {
+//         return done(error, null);
+//       }
+//     }
+//   )
+// );
 
 // google routes
 
-app.get(
-  "/auth/google",
-  passport.authenticate("google", { scope: ["profile", "email"] })
-);
+// app.get(
+//   "/auth/google",
+//   passport.authenticate("google", { scope: ["profile", "email"] })
+// );
 
-app.get(
-  "/auth/google/callback",
-  passport.authenticate("google", { session: false, failureRedirect: "/" }),
-  (req, res) => {
-    const token = jwt.sign(
-      { userId: req.user._id },
-      process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: "72h" }
-    );
+// app.get(
+//   "/auth/google/callback",
+//   passport.authenticate("google", { session: false, failureRedirect: "/" }),
+//   (req, res) => {
+//     const token = jwt.sign(
+//       { userId: req.user._id },
+//       process.env.ACCESS_TOKEN_SECRET,
+//       { expiresIn: "72h" }
+//     );
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: false, // 🔐 set to true in production (with HTTPS)
-      sameSite: "Lax",
-      maxAge: 72 * 60 * 60 * 1000, // 72 hours
-    });
+//     res.cookie("token", token, {
+//       httpOnly: true,
+//       secure: false, // 🔐 set to true in production (with HTTPS)
+//       sameSite: "Lax",
+//       maxAge: 72 * 60 * 60 * 1000, // 72 hours
+//     });
 
-    res.redirect(`${process.env.CLIENT_URL}/dashboard`);
-  }
-);
+//     res.redirect(`${process.env.CLIENT_URL}/dashboard`);
+//   }
+// );
 
 // Socket.IO connection handler
+
+
 io.on('connection', (socket) => {
   console.log('🟢 A user connected:', socket.id);
 
@@ -158,4 +174,4 @@ server.listen(PORT, () => {
   console.log(`🚀 Server listening on port ${PORT}`);
 });
 
-module.exports = server;
+export default server;

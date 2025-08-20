@@ -1,12 +1,12 @@
-const express = require("express");
-const TripModel = require("../models/Trips");
-const Notification = require("../models/Notification");
-const mongoose = require("mongoose");
-const User = require("../models/User");
+import express from "express";
+import TripModel from "../models/Trips.js";
+import Notification from "../models/Notification.js";
+import mongoose from "mongoose";
+import User from "../models/User.js";
 
 // get all the stories
 
-exports.getAllUserTrips = async (req, res, next) => {
+const getAllUserTrips = async (req, res, next) => {
   const start = new Date("2025-08-01");
   const end = new Date("2025-08-10");
   try {
@@ -31,7 +31,7 @@ exports.getAllUserTrips = async (req, res, next) => {
   }
 };
 
-exports.createTrip = async (req, res) => {
+const createTrip = async (req, res) => {
   try {
     const { title, description, startDate, endDate } = req.body;
     const { userId: ownerId } = req.user || {};
@@ -85,7 +85,7 @@ exports.createTrip = async (req, res) => {
   }
 };
 
-exports.getTrip = async (req, res, next) => {
+const getTrip = async (req, res, next) => {
   try {
     const { tripId } = req.params;
     if (!tripId) {
@@ -104,7 +104,7 @@ exports.getTrip = async (req, res, next) => {
   }
 };
 
-exports.deleteTrip = async (req, res, next) => {
+const deleteTrip = async (req, res, next) => {
   try {
     const { tripId } = req.params;
     if (!tripId) {
@@ -128,7 +128,7 @@ exports.deleteTrip = async (req, res, next) => {
   }
 };
 
-exports.getTripCollaborators = async (req, res, next) => {
+const getTripCollaborators = async (req, res, next) => {
   try {
     const { tripId } = req.params;
     const { userId } = req.user;
@@ -167,7 +167,7 @@ exports.getTripCollaborators = async (req, res, next) => {
   }
 };
 
-exports.addCollaborators = async (req, res, next) => {
+const addCollaborators = async (req, res, next) => {
   try {
     const { tripId } = req.params;
     const { userId } = req.user;
@@ -212,7 +212,7 @@ exports.addCollaborators = async (req, res, next) => {
   }
 };
 
-exports.deleteCollaborators = async (req, res, next) => {
+const deleteCollaborators = async (req, res, next) => {
   try {
     const { tripId, collaboratorId } = req.params;
     const { userId: ownerId } = req.user;
@@ -257,7 +257,7 @@ exports.deleteCollaborators = async (req, res, next) => {
   }
 };
 
-exports.getTripItinerary = async (req, res, next) => {
+const getTripItinerary = async (req, res, next) => {
   try {
     const { tripId } = req.params;
     const { userId } = req.user;
@@ -300,7 +300,7 @@ exports.getTripItinerary = async (req, res, next) => {
   }
 };
 
-exports.addItinerary = async (req, res, next) => {
+const addItinerary = async (req, res, next) => {
   try {
     const { tripId } = req.params;
     const { userId } = req.user;
@@ -358,7 +358,7 @@ exports.addItinerary = async (req, res, next) => {
   }
 };
 
-exports.editItinerary = async (req, res, next) => {
+const editItinerary = async (req, res, next) => {
   try {
     const { tripId, itineraryId } = req.params;
     const { userId } = req.user;
@@ -415,7 +415,7 @@ exports.editItinerary = async (req, res, next) => {
   }
 };
 
-exports.getItineraryActivity = async (req, res, next) => {
+const getItineraryActivity = async (req, res, next) => {
   try {
     const { tripId, itineraryId, activityId } = req.params;
     const { userId } = req.user;
@@ -467,7 +467,7 @@ exports.getItineraryActivity = async (req, res, next) => {
   }
 };
 
-exports.addItineraryActivity = async (req, res, next) => {
+const addItineraryActivity = async (req, res, next) => {
   try {
     const { userId } = req.user;
     const { tripId, itineraryId } = req.params;
@@ -525,7 +525,7 @@ exports.addItineraryActivity = async (req, res, next) => {
   }
 };
 
-exports.editItineraryActivity = async (req, res, next) => {
+const editItineraryActivity = async (req, res, next) => {
   try {
     const { tripId, itineraryId, activityId } = req.params;
     const { userId } = req.user;
@@ -587,7 +587,7 @@ exports.editItineraryActivity = async (req, res, next) => {
   }
 };
 
-exports.deleteItineraryActivity = async (req, res, next) => {
+const deleteItineraryActivity = async (req, res, next) => {
   try {
     const { tripId, itineraryId, activityId } = req.params;
     const { userId } = req.user;
@@ -643,7 +643,7 @@ exports.deleteItineraryActivity = async (req, res, next) => {
   }
 };
 
-exports.getTripTasks = async (req, res, next) => {
+const getTripTasks = async (req, res, next) => {
   try {
     const { tripId } = req.params;
     const { userId } = req.user;
@@ -686,7 +686,7 @@ exports.getTripTasks = async (req, res, next) => {
   }
 };
 
-exports.addTask = async (req, res, next) => {
+const addTask = async (req, res, next) => {
   try {
     const { tripId } = req.params;
     const { userId } = req.user;
@@ -733,7 +733,7 @@ exports.addTask = async (req, res, next) => {
   }
 };
 
-exports.editTask = async (req, res, next) => {
+const editTask = async (req, res, next) => {
   try {
     const { tripId, taskId } = req.params;
     const { userId } = req.user;
@@ -773,7 +773,7 @@ exports.editTask = async (req, res, next) => {
   }
 };
 
-exports.deleteTask = async (req, res, next) => {
+const deleteTask = async (req, res, next) => {
   try {
     const { tripId, taskId } = req.params;
     const { userId } = req.user;
@@ -808,7 +808,7 @@ exports.deleteTask = async (req, res, next) => {
   }
 };
 
-exports.getTripExpenses = async (req, res, next) => {
+const getTripExpenses = async (req, res, next) => {
   try {
     const { tripId } = req.params;
     const { userId } = req.user;
@@ -857,7 +857,7 @@ exports.getTripExpenses = async (req, res, next) => {
   }
 };
 
-exports.addExpenses = async (req, res, next) => {
+const addExpenses = async (req, res, next) => {
   try {
     const { tripId } = req.params;
     const { userId } = req.user;
@@ -921,7 +921,7 @@ exports.addExpenses = async (req, res, next) => {
   }
 };
 
-exports.editExpenses = async (req, res, next) => {
+const editExpenses = async (req, res, next) => {
   try {
     const { tripId, expenseId } = req.params;
     const { userId } = req.user;
@@ -972,7 +972,7 @@ exports.editExpenses = async (req, res, next) => {
   }
 };
 
-exports.inviteCollaborator = async (req, res, next) => {
+const inviteCollaborator = async (req, res, next) => {
   try {
     const { userId } = req.user; // authenticated user (owner)
     const { tripId } = req.params;
@@ -1060,3 +1060,31 @@ exports.inviteCollaborator = async (req, res, next) => {
     });
   }
 };
+
+
+const tripController = {
+  getAllUserTrips,
+  createTrip,
+  getTrip,
+  deleteTrip,
+  getTripCollaborators,
+  addCollaborators,
+  deleteCollaborators,
+  getTripItinerary,
+  addItinerary,
+  editItinerary,
+  getItineraryActivity,
+  addItineraryActivity,
+  editItineraryActivity,
+  deleteItineraryActivity,
+  getTripTasks,
+  addTask,
+  editTask,
+  deleteTask,
+  getTripExpenses,
+  addExpenses,
+  editExpenses,
+  inviteCollaborator,
+};
+
+export default tripController;

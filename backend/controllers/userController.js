@@ -1,9 +1,10 @@
-const express = require("express");
-const User = require("../models/User");
-const TripModel = require("../models/Trips");
-const Notification = require("../models/Notification");
+import express from "express";
+import User from "../models/User.js";
+import TripModel from "../models/Trips.js";
+import Notification from "../models/Notification.js";
 
-exports.getAllUsers = async (req, res, next) => {
+
+const getAllUsers = async (req, res, next) => {
   try {
     const users = await userSchema.find({});
     res.status(200).json({
@@ -16,7 +17,7 @@ exports.getAllUsers = async (req, res, next) => {
   }
 };
 
-exports.respondToInvite = async (req, res, next) => {
+const respondToInvite = async (req, res, next) => {
   try {
     const { userId } = req.user;
     const { tripId } = req.params;
@@ -98,7 +99,7 @@ exports.respondToInvite = async (req, res, next) => {
   }
 };
 
-exports.upComingTrips = async (req, res, next) => {
+const upComingTrips = async (req, res, next) => {
   try {
     const { userId } = req.user;
     const upComingTrips = await TripModel.find({
@@ -133,7 +134,7 @@ exports.upComingTrips = async (req, res, next) => {
   }
 };
 
-exports.completedTrips = async (req, res, next) => {
+const completedTrips = async (req, res, next) => {
   try {
     const { userId } = req.user;
     const completedTrips = await TripModel.find({
@@ -167,6 +168,24 @@ exports.completedTrips = async (req, res, next) => {
     });
   }
 };
+
+
+export const getUserInfo = (req, res) => {
+  res.json({
+    message: "User info",
+    user: req.user, // comes from authMiddleware
+  });
+};
+
+const userController = {
+  getAllUsers,
+  respondToInvite,
+  upComingTrips,
+  completedTrips,
+  getUserInfo
+};
+
+export default userController;
 
 /* exports.getUserTrips = async (req, res, next) => {
   try {

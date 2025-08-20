@@ -1,11 +1,11 @@
 // controllers/authController.js
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
-require("dotenv").config();
-const userSchema = require("../models/User"); 
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
+import dotenv from "dotenv";
+import userSchema from "../models/User.js";
 
 
-exports.createAccount = async(req, res, next) => {
+const createAccount = async(req, res, next) => {
   const { name, email, password } = req.body;
 
   if (!name || !email || !password) {
@@ -54,21 +54,14 @@ exports.createAccount = async(req, res, next) => {
   });
 };
 
-exports.login = async(req, res, next) => {
+const login = async (req, res) => {
   const { email, password } = req.body;
-  if (!email || !password) {
-    return res.status(400).json({ message: "Email and Password are required" });
-  }
 
   const user = await userSchema.findOne({ email });
-  if (!user) {
-    return res.status(400).json({ message: "User not Found" });
-  }
+  if (!user) return res.status(400).json({ message: "User not found" });
 
   const isPasswordValid = await bcrypt.compare(password, user.password);
-  if (!isPasswordValid) {
-    return res.status(400).json({ message: "Invalid Credentials" });
-  }
+  if (!isPasswordValid) return res.status(400).json({ message: "Invalid credentials" });
 
   const accessToken = jwt.sign(
     { userId: user._id },
@@ -76,31 +69,24 @@ exports.login = async(req, res, next) => {
     { expiresIn: "72h" }
   );
 
-  // ✅ Set the token as an HTTP-only cookie
   res.cookie("token", accessToken, {
     httpOnly: true,
-    secure: false, // change to true in production (with HTTPS)
+    secure: false, // true in production
     sameSite: "Lax",
-    maxAge: 72 * 60 * 60 * 1000, // 72h
+    maxAge: 72 * 60 * 60 * 1000,
   });
 
-  return res.json({
-    error: false,
-    message: "Login Successful",
-    user: { Name: user.name, email: user.email },
-  });
+  res.json({ message: "Login successful" });
 };
 
-exports.logout = async(req, res, next) => {
-  res.clearCookie("token", {
-    httpOnly: true,
-    secure: false, // set to true in production with HTTPS
-    sameSite: "Lax",
-  });
+const logout = (req, res) => {
+  res.clearCookie("token");
   res.json({ message: "Logged out successfully" });
 };
 
-exports.protect = async (req, res, next) => {
+
+
+const protect = async (req, res, next) => {
   try {
     const token = req.cookies.token;
     if (!token) {
@@ -120,3 +106,12 @@ exports.protect = async (req, res, next) => {
     return res.status(401).json({ message: "Invalid or expired token" });
   }
 };
+
+const authController = {
+  createAccount,
+  login,
+  logout,
+  protect
+};
+export default authController;
+
