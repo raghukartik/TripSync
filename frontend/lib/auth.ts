@@ -1,7 +1,19 @@
-// Update the import path below if your auth module is located elsewhere
-import { auth } from "./auth"; // Adjust the path as needed to point to your auth module
+export async function getUserInfo(){
+  try {
+    const res = await fetch('http://localhost:8000/api/user/me', {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      }
+    })
 
-export async function getCurrentUser() {
-  const session = await auth();
-  return session?.user;
+    if(!res.ok) throw new Error("failed to fetch user info");
+
+    const data = await res.json();
+    return data.user;
+  } catch (error) {
+    console.error("Error fetching user info:", error);
+    return null;
+  }
 }

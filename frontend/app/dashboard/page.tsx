@@ -6,6 +6,7 @@ import {
   BreadcrumbPage,
 } from "@/components/ui/breadcrumb"
 import { Separator } from "@/components/ui/separator"
+import { getUserInfo } from "@/lib/auth"
 import {
   SidebarInset,
   SidebarProvider,
@@ -13,8 +14,24 @@ import {
 } from "@/components/ui/sidebar"
 import DashboardClient from "@/components/user-dashboard"
 
+interface User{
+  name: string;
+}
+
 // This would typically fetch data from your database/API
-function getDashboardData() {
+async function getDashboardData() {
+  const [user, setUser] = React.useState<User|null>(null);
+  React.useEffect(()=>{
+    async function fetchUser() {
+          const data = await getUserInfo();
+          if (data) {
+            setUser({
+              name: data.name,
+            });
+          }
+        }
+        fetchUser();
+  }, [])
   // Mock data for demonstration - replace with actual data fetching
   const upcomingTrips = [
     {
@@ -59,9 +76,6 @@ function getDashboardData() {
     { label: "Days Traveled", value: 180, icon: "CalendarDays" }
   ]
 
-  const user = {
-    name: "Kartik"
-  }
 
   return {
     upcomingTrips,
