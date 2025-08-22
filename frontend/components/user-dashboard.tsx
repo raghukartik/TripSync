@@ -64,7 +64,7 @@ export default function DashboardClient({
   user 
 }: DashboardClientProps) {
   const [isAddingTrip, setIsAddingTrip] = useState(false)
-
+  const router = useRouter();
   // Handler for adding a new trip
   const handleAddTrip = () => {
     setIsAddingTrip(true)

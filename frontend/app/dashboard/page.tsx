@@ -1,3 +1,4 @@
+import React from "react"
 import { AppSidebar } from "@/components/app-sidebar"
 import {
   Breadcrumb,
@@ -17,21 +18,22 @@ import DashboardClient from "@/components/user-dashboard"
 interface User{
   name: string;
 }
-
 // This would typically fetch data from your database/API
-async function getDashboardData() {
-  const [user, setUser] = React.useState<User|null>(null);
-  React.useEffect(()=>{
+function useDashboardData() {
+  const [user, setUser] = React.useState<User | null>(null);
+
+  React.useEffect(() => {
     async function fetchUser() {
-          const data = await getUserInfo();
-          if (data) {
-            setUser({
-              name: data.name,
-            });
-          }
-        }
-        fetchUser();
-  }, [])
+      const data = await getUserInfo();
+      if (data) {
+        setUser({
+          name: data.name,
+        });
+      }
+    }
+    fetchUser();
+  }, []);
+
   // Mock data for demonstration - replace with actual data fetching
   const upcomingTrips = [
     {
@@ -50,7 +52,7 @@ async function getDashboardData() {
       status: "Booked",
       image: "🇫🇷"
     }
-  ]
+  ];
 
   const recentTrips = [
     {
@@ -67,26 +69,24 @@ async function getDashboardData() {
       rating: 4,
       image: "🇺🇸"
     }
-  ]
+  ];
 
   const stats = [
     { label: "Countries Visited", value: 12, icon: "MapPin" },
     { label: "Total Trips", value: 28, icon: "Plane" },
     { label: "Travel Stories", value: 15, icon: "Camera" },
     { label: "Days Traveled", value: 180, icon: "CalendarDays" }
-  ]
-
+  ];
 
   return {
     upcomingTrips,
     recentTrips,
     stats,
     user
-  }
+  };
 }
-
 export default function Page() {
-  const dashboardData = getDashboardData()
+  const dashboardData = useDashboardData();
 
   return (
     <SidebarProvider>
@@ -109,13 +109,16 @@ export default function Page() {
           </div>
         </header>
         
-        <DashboardClient 
-          upcomingTrips={dashboardData.upcomingTrips}
-          recentTrips={dashboardData.recentTrips}
-          stats={dashboardData.stats}
-          user={dashboardData.user}
-        />
+        {dashboardData.user && (
+          <DashboardClient 
+            upcomingTrips={dashboardData.upcomingTrips}
+            recentTrips={dashboardData.recentTrips}
+            stats={dashboardData.stats}
+            user={dashboardData.user}
+          />
+        )}
       </SidebarInset>
     </SidebarProvider>
   )
 }
+  
