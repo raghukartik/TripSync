@@ -120,13 +120,6 @@ Feel free to open a pull request or start a discussion in the [issues](https://g
 
 ---
 
-## 📜 License
-
-This project is licensed under the **MIT License**.  
-See [LICENSE](LICENSE) for details.
-
----
-
 ## 👤 Author
 
 - **Kartik Raghuwanshi**  
