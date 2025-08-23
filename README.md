@@ -15,12 +15,11 @@ Plan your itinerary, share resources, and document your journey — all in one p
 - 💰 **Expense Tracking** – Split and manage expenses across the group.
 - 👥 **Collaborator Management** – Invite collaborators to your trip and allocate roles.
 - ✅ **Task Management** – Create tasks, set priorities, and assign them to collaborators.
-- 
+- 📊 **User Dashboard** – Personalized dashboard to track trips and stories.
 ---
 
 ## 🚀 Upcoming Features
 
-- 📊 **User Dashboard** – Personalized dashboard to track trips and stories.  
 - 🤝 **Real-time Collaboration** – Collaborative editing and **group chat** for seamless coordination.  
 - ⚡ **Scalable Backend** – Optimized with Redis and BullMQ for handling live updates (planned).  
 
@@ -72,7 +71,7 @@ Follow these steps to run TripSync locally:
 ### 1. Clone the repo
 ```bash
 git clone https://github.com/raghukartik/TripSync.git
-cd tripsync
+cd TripSync
 ```
 
 ### 2. Install dependencies
