@@ -122,7 +122,7 @@ npm run dev
 ## 🤝 Contributing
 
 Contributions, issues, and feature requests are welcome!  
-Feel free to open a pull request or start a discussion in the [issues](https://github.com/your-username/tripsync/issues).
+Feel free to open a pull request or start a discussion in the [issues](https://github.com/raghukartik/TripSync/issues).
 
 ---
 
