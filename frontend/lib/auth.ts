@@ -1,14 +1,21 @@
+import { cookies } from "next/headers";
 export async function getUserInfo(){
   try {
+    const cookieStore = await cookies();
     const res = await fetch('http://localhost:8000/api/user/me', {
       method: "GET",
       credentials: "include",
       headers: {
+        Cookie: cookieStore.toString(),
         "Content-Type": "application/json",
-      }
+      },
+      cache: "no-store",
     })
 
-    if(!res.ok) throw new Error("failed to fetch user info");
+    if (!res.ok) {
+      console.error("User info fetch failed:", res.status);
+      throw new Error("failed to fetch user info");
+    }
 
     const data = await res.json();
     return data.user;

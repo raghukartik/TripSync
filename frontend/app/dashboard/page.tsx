@@ -7,7 +7,7 @@ import {
   BreadcrumbPage,
 } from "@/components/ui/breadcrumb"
 import { Separator } from "@/components/ui/separator"
-import { getUserInfo } from "@/lib/auth"
+import { getUserInfo, getUserCompletedTrips, getUserUpcomingTrips } from "@/lib/auth"
 import {
   SidebarInset,
   SidebarProvider,
@@ -19,20 +19,12 @@ interface User{
   name: string;
 }
 // This would typically fetch data from your database/API
-function useDashboardData() {
-  const [user, setUser] = React.useState<User | null>(null);
-
-  React.useEffect(() => {
-    async function fetchUser() {
-      const data = await getUserInfo();
-      if (data) {
-        setUser({
-          name: data.name,
-        });
-      }
-    }
-    fetchUser();
-  }, []);
+async function fetchDashboardData() {
+  const user: User = { name: "" }; 
+  const data = await getUserInfo();
+  if (data) {
+    user.name = data.name;
+  }
 
   // Mock data for demonstration - replace with actual data fetching
   const upcomingTrips = [
@@ -85,8 +77,8 @@ function useDashboardData() {
     user
   };
 }
-export default function Page() {
-  const dashboardData = useDashboardData();
+export default async function Page() {
+  const dashboardData = await fetchDashboardData();
 
   return (
     <SidebarProvider>
@@ -109,14 +101,14 @@ export default function Page() {
           </div>
         </header>
         
-        {dashboardData.user && (
+        {/* {dashboardData.user && (
           <DashboardClient 
             upcomingTrips={dashboardData.upcomingTrips}
             recentTrips={dashboardData.recentTrips}
             stats={dashboardData.stats}
             user={dashboardData.user}
           />
-        )}
+        )} */}
       </SidebarInset>
     </SidebarProvider>
   )
