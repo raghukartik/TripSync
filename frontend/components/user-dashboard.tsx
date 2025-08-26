@@ -19,18 +19,32 @@ import {
   Users,
   CheckCircle2,
   Plus,
-  LucideIcon
+  LucideIcon,
+  DollarSign,
+  CheckSquare,
+  FileText
 } from "lucide-react"
 import { useState } from "react"
 
-interface Trip {
-  id: number
+interface UpcomingTrip {
+  id: string
   destination: string
+  description?: string
   dates: string
   daysLeft?: number
   status?: string
-  rating?: number
-  image: string
+  collaborators: number
+  tasksProgress: string
+  totalExpenses: number
+}
+
+interface RecentTrip {
+  id: string
+  destination: string
+  dates: string
+  collaborators: number
+  hasStory: boolean
+  totalExpenses: number
 }
 
 interface Stat {
@@ -44,8 +58,8 @@ interface User {
 }
 
 interface DashboardClientProps {
-  upcomingTrips: Trip[]
-  recentTrips: Trip[]
+  upcomingTrips: UpcomingTrip[]
+  recentTrips: RecentTrip[]
   stats: Stat[]
   user: User
 }
@@ -64,11 +78,18 @@ export default function DashboardClient({
   user 
 }: DashboardClientProps) {
   const [isAddingTrip, setIsAddingTrip] = useState(false)
-  const router = useRouter();
+  const router = useRouter()
+
   // Handler for adding a new trip
   const handleAddTrip = () => {
     setIsAddingTrip(true)
-    // Implementation would go here
+    // Navigate to trip creation page
+    router.push('/trips/new')
+  }
+
+  // Handler for viewing a trip
+  const handleViewTrip = (tripId: string) => {
+    router.push(`/trips/${tripId}`)
   }
 
   return (
@@ -118,29 +139,62 @@ export default function DashboardClient({
             </Button>
           </CardHeader>
           <CardContent className="space-y-4">
-            {upcomingTrips.map((trip) => (
-              <div key={trip.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors">
-                <div className="flex items-center space-x-4">
-                  <div className="text-2xl">{trip.image}</div>
-                  <div>
-                    <h4 className="font-semibold">{trip.destination}</h4>
-                    <p className="text-sm text-muted-foreground flex items-center gap-1">
-                      <CalendarDays className="h-3 w-3" />
-                      {trip.dates}
-                    </p>
+            {upcomingTrips.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                <Plane className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p>No upcoming trips planned</p>
+                <Button variant="outline" onClick={handleAddTrip} className="mt-4">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Plan Your First Trip
+                </Button>
+              </div>
+            ) : (
+              upcomingTrips.map((trip) => (
+                <div 
+                  key={trip.id} 
+                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
+                  onClick={() => handleViewTrip(trip.id)}
+                >
+                  <div className="flex items-center space-x-4">
+                    <div className="text-2xl">✈️</div>
+                    <div>
+                      <h4 className="font-semibold">{trip.destination}</h4>
+                      <p className="text-sm text-muted-foreground flex items-center gap-1">
+                        <CalendarDays className="h-3 w-3" />
+                        {trip.dates}
+                      </p>
+                      <div className="flex items-center gap-3 mt-1">
+                        <span className="text-xs text-muted-foreground flex items-center gap-1">
+                          <Users className="h-3 w-3" />
+                          {trip.collaborators + 1} people
+                        </span>
+                        <span className="text-xs text-muted-foreground flex items-center gap-1">
+                          <CheckSquare className="h-3 w-3" />
+                          {trip.tasksProgress} tasks
+                        </span>
+                        {trip.totalExpenses > 0 && (
+                          <span className="text-xs text-muted-foreground flex items-center gap-1">
+                            <DollarSign className="h-3 w-3" />
+                            ${trip.totalExpenses}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-right space-y-1">
+                    <Badge variant={trip.status === 'Ready' ? 'default' : 'secondary'}>
+                      {trip.status}
+                    </Badge>
+                    {trip.daysLeft !== undefined && (
+                      <p className="text-xs text-muted-foreground flex items-center gap-1">
+                        <Clock className="h-3 w-3" />
+                        {trip.daysLeft > 0 ? `${trip.daysLeft} days left` : 'Started'}
+                      </p>
+                    )}
                   </div>
                 </div>
-                <div className="text-right space-y-1">
-                  <Badge variant={trip.status === 'Booked' ? 'default' : 'secondary'}>
-                    {trip.status}
-                  </Badge>
-                  <p className="text-xs text-muted-foreground flex items-center gap-1">
-                    <Clock className="h-3 w-3" />
-                    {trip.daysLeft} days left
-                  </p>
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </CardContent>
         </Card>
 
@@ -155,15 +209,15 @@ export default function DashboardClient({
               <Plus className="h-4 w-4 mr-2" />
               Plan New Trip
             </Button>
-            <Button className="w-full justify-start" variant="outline">
+            <Button className="w-full justify-start" variant="outline" onClick={() => router.push('/trips')}>
+              <Plane className="h-4 w-4 mr-2" />
+              View All Trips
+            </Button>
+            <Button className="w-full justify-start" variant="outline" onClick={() => router.push('/stories')}>
               <Camera className="h-4 w-4 mr-2" />
               Write Travel Story
             </Button>
-            <Button className="w-full justify-start" variant="outline">
-              <Users className="h-4 w-4 mr-2" />
-              Start Trip Chat
-            </Button>
-            <Button className="w-full justify-start" variant="outline">
+            <Button className="w-full justify-start" variant="outline" onClick={() => router.push('/resources')}>
               <MapPin className="h-4 w-4 mr-2" />
               Browse Resources
             </Button>
@@ -180,23 +234,44 @@ export default function DashboardClient({
             <CardDescription>Your latest adventures</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {recentTrips.map((trip) => (
-              <div key={trip.id} className="flex items-center space-x-3 p-3 border rounded-lg">
-                <div className="text-xl">{trip.image}</div>
-                <div className="flex-1 min-w-0">
-                  <h4 className="font-medium truncate">{trip.destination}</h4>
-                  <p className="text-sm text-muted-foreground">{trip.dates}</p>
-                </div>
-                <div className="flex">
-                  {[...Array(5)].map((_, i) => (
-                    <span key={i} className={`text-xs ${i < (trip.rating || 0) ? 'text-yellow-500' : 'text-gray-300'}`}>
-                      ★
-                    </span>
-                  ))}
-                </div>
+            {recentTrips.length === 0 ? (
+              <div className="text-center py-4 text-muted-foreground">
+                <CheckCircle2 className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                <p className="text-sm">No completed trips yet</p>
               </div>
-            ))}
-            <Button variant="ghost" size="sm" className="w-full">
+            ) : (
+              recentTrips.map((trip) => (
+                <div 
+                  key={trip.id} 
+                  className="flex items-center space-x-3 p-3 border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
+                  onClick={() => handleViewTrip(trip.id)}
+                >
+                  <div className="text-xl">🏖️</div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-medium truncate">{trip.destination}</h4>
+                    <p className="text-sm text-muted-foreground">{trip.dates}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      {trip.hasStory && (
+                        <Badge variant="outline" className="text-xs">
+                          <FileText className="h-3 w-3 mr-1" />
+                          Story
+                        </Badge>
+                      )}
+                      <span className="text-xs text-muted-foreground">
+                        {trip.collaborators + 1} people
+                      </span>
+                    </div>
+                  </div>
+                  {trip.totalExpenses > 0 && (
+                    <div className="text-right">
+                      <p className="text-sm font-medium">${trip.totalExpenses}</p>
+                      <p className="text-xs text-muted-foreground">spent</p>
+                    </div>
+                  )}
+                </div>
+              ))
+            )}
+            <Button variant="ghost" size="sm" className="w-full" onClick={() => router.push('/trips')}>
               View All Trips
             </Button>
           </CardContent>
@@ -214,35 +289,44 @@ export default function DashboardClient({
           <CardContent className="space-y-4">
             <div>
               <div className="flex justify-between text-sm mb-1">
-                <span>Countries Visited</span>
-                <span>2/5</span>
+                <span>Destinations</span>
+                <span>{Math.min(stats[0]?.value || 0, 10)}/10</span>
               </div>
               <div className="w-full bg-muted rounded-full h-2">
-                <div className="bg-blue-500 h-2 rounded-full" style={{width: '40%'}}></div>
+                <div 
+                  className="bg-blue-500 h-2 rounded-full" 
+                  style={{width: `${Math.min((stats[0]?.value || 0) * 10, 100)}%`}}
+                ></div>
               </div>
             </div>
             <div>
               <div className="flex justify-between text-sm mb-1">
                 <span>Travel Stories</span>
-                <span>3/12</span>
+                <span>{Math.min(stats[2]?.value || 0, 12)}/12</span>
               </div>
               <div className="w-full bg-muted rounded-full h-2">
-                <div className="bg-green-500 h-2 rounded-full" style={{width: '25%'}}></div>
+                <div 
+                  className="bg-green-500 h-2 rounded-full" 
+                  style={{width: `${Math.min((stats[2]?.value || 0) * 8.33, 100)}%`}}
+                ></div>
               </div>
             </div>
             <div>
               <div className="flex justify-between text-sm mb-1">
                 <span>Days Traveled</span>
-                <span>15/60</span>
+                <span>{Math.min(stats[3]?.value || 0, 60)}/60</span>
               </div>
               <div className="w-full bg-muted rounded-full h-2">
-                <div className="bg-purple-500 h-2 rounded-full" style={{width: '25%'}}></div>
+                <div 
+                  className="bg-purple-500 h-2 rounded-full" 
+                  style={{width: `${Math.min((stats[3]?.value || 0) * 1.67, 100)}%`}}
+                ></div>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Activity Feed */}
+        {/* Recent Activity */}
         <Card>
           <CardHeader>
             <CardTitle>Recent Activity</CardTitle>
@@ -250,30 +334,36 @@ export default function DashboardClient({
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-3">
-              <div className="flex items-start space-x-3 text-sm">
-                <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
-                <div>
-                  <p><strong>Tokyo trip</strong> itinerary updated</p>
-                  <p className="text-muted-foreground text-xs">2 hours ago</p>
+              {upcomingTrips.slice(0, 2).map((trip, index) => (
+                <div key={trip.id} className="flex items-start space-x-3 text-sm">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+                  <div>
+                    <p><strong>{trip.destination}</strong> trip planning in progress</p>
+                    <p className="text-muted-foreground text-xs">
+                      Tasks: {trip.tasksProgress}
+                    </p>
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-start space-x-3 text-sm">
-                <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
-                <div>
-                  <p>New travel story <strong>&quot;Bali Adventures&quot;</strong> published</p>
-                  <p className="text-muted-foreground text-xs">1 day ago</p>
+              ))}
+              {recentTrips.slice(0, 1).map((trip, index) => (
+                <div key={trip.id} className="flex items-start space-x-3 text-sm">
+                  <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
+                  <div>
+                    <p><strong>{trip.destination}</strong> trip completed</p>
+                    <p className="text-muted-foreground text-xs">
+                      {trip.hasStory ? 'Story written' : 'No story yet'}
+                    </p>
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-start space-x-3 text-sm">
-                <div className="w-2 h-2 bg-purple-500 rounded-full mt-2"></div>
-                <div>
-                  <p><strong>Paris hotels</strong> research saved</p>
-                  <p className="text-muted-foreground text-xs">3 days ago</p>
+              ))}
+              {upcomingTrips.length === 0 && recentTrips.length === 0 && (
+                <div className="text-center py-4 text-muted-foreground">
+                  <p className="text-sm">No recent activity</p>
                 </div>
-              </div>
+              )}
             </div>
-            <Button variant="ghost" size="sm" className="w-full">
-              View All Activity
+            <Button variant="ghost" size="sm" className="w-full" onClick={() => router.push('/trips')}>
+              View All Trips
             </Button>
           </CardContent>
         </Card>

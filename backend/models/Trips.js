@@ -38,6 +38,11 @@ const tripSchema = new Schema({
       message: "End date must be after start date",
     },
   },
+  
+  destination: {
+    type: String,
+    required: true
+  },
 
   createdOn: {
     type: Date,

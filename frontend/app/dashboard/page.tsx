@@ -15,71 +15,148 @@ import {
 } from "@/components/ui/sidebar"
 import DashboardClient from "@/components/user-dashboard"
 
-interface User{
+
+interface User {
   name: string;
 }
-// This would typically fetch data from your database/API
+
+interface Trip {
+  id: string;
+  title: string;
+  description?: string;
+  startDate: Date;
+  endDate: Date;
+  collaborators: number;
+  totalTasks: number;
+  completedTasks: number;
+  totalExpenses: number;
+  hasStory: boolean;
+  createdOn: Date;
+  destinations:[string]
+}
+
+// Helper function to calculate days between dates
+function daysBetween(date1: Date, date2: Date): number {
+  const oneDay = 24 * 60 * 60 * 1000;
+  return Math.round((date2.getTime() - date1.getTime()) / oneDay);
+}
+
+// Helper function to format date range
+function formatDateRange(startDate: Date, endDate: Date): string {
+  const options: Intl.DateTimeFormatOptions = { 
+    month: 'short', 
+    day: 'numeric',
+    year: 'numeric'
+  };
+  
+  const start = startDate.toLocaleDateString('en-US', options);
+  const end = endDate.toLocaleDateString('en-US', options);
+  
+  if (startDate.getFullYear() === endDate.getFullYear()) {
+    const startMonth = startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    return `${startMonth} - ${end}`;
+  }
+  
+  return `${start} - ${end}`;
+}
+
+// Thifrom your databases fetches actual data 
 async function fetchDashboardData() {
-  const user: User = { name: "" }; 
+  const user: User = { name: "" };
   const data = await getUserInfo();
   if (data) {
     user.name = data.name;
   }
 
-  // Mock data for demonstration - replace with actual data fetching
-  const upcomingTrips = [
-    {
-      id: 1,
-      destination: "Tokyo, Japan",
-      dates: "Mar 15 - Mar 22, 2025",
-      daysLeft: 24,
-      status: "Planning",
-      image: "🇯🇵"
-    },
-    {
-      id: 2,
-      destination: "Paris, France", 
-      dates: "Jun 10 - Jun 17, 2025",
-      daysLeft: 112,
-      status: "Booked",
-      image: "🇫🇷"
-    }
-  ];
+  const currentDate = new Date();
+  
+  try {
+    // Fetch upcoming trips (trips with end date in the future)
+    const upcomingTripsData = await getUserUpcomingTrips();
 
-  const recentTrips = [
-    {
-      id: 1,
-      destination: "Bali, Indonesia",
-      dates: "Dec 2024",
-      rating: 5,
-      image: "🇮🇩"
-    },
-    {
-      id: 2,
-      destination: "New York, USA",
-      dates: "Oct 2024", 
-      rating: 4,
-      image: "🇺🇸"
-    }
-  ];
+    // Fetch recent trips (completed trips, sorted by end date)
+    const recentTripsData = await getUserCompletedTrips();
 
-  const stats = [
-    { label: "Countries Visited", value: 12, icon: "MapPin" },
-    { label: "Total Trips", value: 28, icon: "Plane" },
-    { label: "Travel Stories", value: 15, icon: "Camera" },
-    { label: "Days Traveled", value: 180, icon: "CalendarDays" }
-  ];
+    // Transform upcoming trips data
+    const upcomingTrips = upcomingTripsData.map((trip) => ({
+      id: trip._id.toString(),
+      destination: trip.title,
+      description: trip.description || '',
+      dates: formatDateRange(new Date(trip.startDate), new Date(trip.endDate)),
+      daysLeft: daysBetween(currentDate, new Date(trip.startDate)),
+      status: trip.tasks.filter(task => task.completed).length === trip.tasks.length ? 'Ready' : 'Planning',
+      collaborators: trip.collaborators.length,
+      tasksProgress: trip.tasks.length > 0 ? 
+        `${trip.tasks.filter(task => task.completed).length}/${trip.tasks.length}` : '0/0',
+      totalExpenses: trip.expenses.reduce((sum, expense) => sum + expense.amount, 0)
+    }));
 
-  return {
-    upcomingTrips,
-    recentTrips,
-    stats,
-    user
-  };
+    // Transform recent trips data
+    const recentTrips = recentTripsData.map((trip) => ({
+      id: trip._id.toString(),
+      destination: trip.title,
+      dates: formatDateRange(new Date(trip.startDate), new Date(trip.endDate)),
+      collaborators: trip.collaborators.length,
+      hasStory: trip.story && Object.keys(trip.story.content).length > 0,
+      totalExpenses: trip.expenses.reduce((sum, expense) => sum + expense.amount, 0)
+    }));
+
+    // Calculate statistics
+    const allUserTrips = await TripModel.find({
+      $or: [
+        { owner: data?.id },
+        { collaborators: data?.id }
+      ]
+    });
+
+    // Get unique locations (trip titles as destinations)
+    const uniqueDestinations = new Set(allUserTrips.map(trip => trip.destinations));
+    
+    // Calculate total days traveled
+    const totalDaysTraveled = allUserTrips.reduce((total, trip) => {
+      return total + daysBetween(new Date(trip.startDate), new Date(trip.endDate)) + 1;
+    }, 0);
+
+    // Count stories written
+    const storiesWritten = allUserTrips.filter(trip => 
+      trip.story && Object.keys(trip.story.content).length > 0
+    ).length;
+
+    const stats = [
+      { label: "Destinations Visited", value: uniqueDestinations.size, icon: "MapPin" },
+      { label: "Total Trips", value: allUserTrips.length, icon: "Plane" },
+      { label: "Travel Stories", value: storiesWritten, icon: "Camera" },
+      { label: "Days Traveled", value: totalDaysTraveled, icon: "CalendarDays" }
+    ];
+
+    return {
+      upcomingTrips,
+      recentTrips,
+      stats,
+      user
+    };
+
+  } catch (error) {
+    console.error('Error fetching dashboard data:', error);
+    
+    // Return empty data structure if database fetch fails
+    return {
+      upcomingTrips: [],
+      recentTrips: [],
+      stats: [
+        { label: "Destinations Visited", value: 0, icon: "MapPin" },
+        { label: "Total Trips", value: 0, icon: "Plane" },
+        { label: "Travel Stories", value: 0, icon: "Camera" },
+        { label: "Days Traveled", value: 0, icon: "CalendarDays" }
+      ],
+      user
+    };
+  }
 }
+
 export default async function Page() {
   const dashboardData = await fetchDashboardData();
-
+  
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -100,17 +177,16 @@ export default async function Page() {
             </Breadcrumb>
           </div>
         </header>
-        
-        {/* {dashboardData.user && (
-          <DashboardClient 
+       
+        {dashboardData.user && (
+          <DashboardClient
             upcomingTrips={dashboardData.upcomingTrips}
             recentTrips={dashboardData.recentTrips}
             stats={dashboardData.stats}
             user={dashboardData.user}
           />
-        )} */}
+        )}
       </SidebarInset>
     </SidebarProvider>
   )
 }
-  
