@@ -36,7 +36,7 @@ export async function getUserUpcomingTrips(){
       }
     })
 
-    if(!res.ok) throw new Error("failed to fetch user info");
+    if(!res.ok) throw new Error("failed to fetch upcoming trips");
     const data = await res.json();
     return data.upcomingTrips;
   }catch(error){
@@ -55,7 +55,7 @@ export async function getUserCompletedTrips(){
       }
     })
 
-    if(!res.ok) throw new Error("failed to fetch user info");
+    if(!res.ok) throw new Error("failed to fetch user's completed trips");
     const data = await res.json();
     return data.completedTrips;
   }catch(error){
