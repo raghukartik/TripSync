@@ -28,17 +28,20 @@ export async function getUserInfo(){
 
 export async function getUserUpcomingTrips(){
   try{
+    const cookieStore = await cookies();
     const res = await fetch('http://localhost:8000/api/user/upcoming-trips', {
       method: "GET",
       credentials: "include",
       headers: {
+        Cookie: cookieStore.toString(),
         "Content-Type": "application/json",
-      }
+      },
+      cache: "no-store",
     })
 
     if(!res.ok) throw new Error("failed to fetch upcoming trips");
     const data = await res.json();
-    return data.upcomingTrips;
+    return data.data;
   }catch(error){
     console.error("Error fetching user's upcoming trips:", error);
     return null;
@@ -47,17 +50,20 @@ export async function getUserUpcomingTrips(){
 
 export async function getUserCompletedTrips(){
   try{
+    const cookieStore = await cookies();
     const res = await fetch('http://localhost:8000/api/user/completed-trips', {
       method: "GET",
       credentials: "include",
       headers: {
+        Cookie: cookieStore.toString(),
         "Content-Type": "application/json",
-      }
+      },
+      cache: "no-store",
     })
 
     if(!res.ok) throw new Error("failed to fetch user's completed trips");
     const data = await res.json();
-    return data.completedTrips;
+    return data.data;
   }catch(error){
     console.error("Error fetching user's completed trips:", error);
     return null;

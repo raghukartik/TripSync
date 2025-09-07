@@ -20,14 +20,19 @@ interface User {
   name: string;
 }
 
+interface Task {
+  _id: string;
+  completed: boolean;
+}
 interface Trip {
-  id: string;
+  _id: string;
   title: string;
   description?: string;
   startDate: Date;
   endDate: Date;
   collaborators: number;
   totalTasks: number;
+  tasks: [Task];
   completedTasks: number;
   totalExpenses: number;
   hasStory: boolean;
@@ -72,15 +77,15 @@ async function fetchDashboardData() {
   
   try {
     // Fetch upcoming trips (trips with end date in the future)
-    const upcomingTripsData = await getUserUpcomingTrips();
+    const {upComingTrips} = await getUserUpcomingTrips();
 
     // Fetch recent trips (completed trips, sorted by end date)
-    const recentTripsData = await getUserCompletedTrips();
-
+    const {completedTrips} = await getUserCompletedTrips();
+    // console.log(recentTripsData);
     // Transform upcoming trips data
-    const upcomingTrips = upcomingTripsData.map((trip) => ({
+    const upcomingTrips = upComingTrips.map((trip: Trip) => ({
       id: trip._id.toString(),
-      destination: trip.title,
+      destination: trip.destinations,
       description: trip.description || '',
       dates: formatDateRange(new Date(trip.startDate), new Date(trip.endDate)),
       daysLeft: daysBetween(currentDate, new Date(trip.startDate)),
@@ -92,7 +97,7 @@ async function fetchDashboardData() {
     }));
 
     // Transform recent trips data
-    const recentTrips = recentTripsData.map((trip) => ({
+    const recentTrips = completedTrips.map((trip) => ({
       id: trip._id.toString(),
       destination: trip.title,
       dates: formatDateRange(new Date(trip.startDate), new Date(trip.endDate)),
