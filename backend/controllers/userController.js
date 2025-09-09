@@ -161,7 +161,7 @@ const completedTrips = async (req, res, next) => {
       },
     });
   } catch (error) {
-    console.error("upcoming error:", error);
+    console.error("completetd error:", error);
     return res.status(500).json({
       message: "Something went wrong.",
       error: error.message,
@@ -169,6 +169,35 @@ const completedTrips = async (req, res, next) => {
   }
 };
 
+const allUserTrips = async(req, res, next) => {
+  try {
+    const {userId} = req.user;
+    const allTrips = await TripModel.find({
+      $or: [{ owner: userId }, { collaborators: userId }]
+    })
+
+    if (!allTrips || allTrips.length === 0) {
+      return res.status(400).json({
+        message: "No upcoming trips found!",
+      });
+    }
+
+    res.status(200).json({
+      status: "success",
+      results: allTrips.length,
+      data: {
+        allTrips,
+      },
+    });
+
+  } catch (error) {
+    console.error("error fetching All Trips:", error);
+    return res.status(500).json({
+      message: "Something went wrong.",
+      error: error.message,
+    });
+  }
+}
 
 export const getUserInfo = (req, res) => {
   res.json({
@@ -182,7 +211,8 @@ const userController = {
   respondToInvite,
   upComingTrips,
   completedTrips,
-  getUserInfo
+  getUserInfo,
+  allUserTrips
 };
 
 export default userController;

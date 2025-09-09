@@ -7,7 +7,7 @@ import {
   BreadcrumbPage,
 } from "@/components/ui/breadcrumb"
 import { Separator } from "@/components/ui/separator"
-import { getUserInfo, getUserCompletedTrips, getUserUpcomingTrips } from "@/lib/auth"
+import { getUserInfo, getUserCompletedTrips, getUserUpcomingTrips, getAllUserTrips } from "@/lib/auth"
 import {
   SidebarInset,
   SidebarProvider,
@@ -33,7 +33,7 @@ interface Trip {
   collaborators: number;
   totalTasks: number;
   tasks: [Task];
-  completedTasks: number;
+  completedTasks: [string];
   totalExpenses: number;
   hasStory: boolean;
   createdOn: Date;
@@ -81,6 +81,8 @@ async function fetchDashboardData() {
 
     // Fetch recent trips (completed trips, sorted by end date)
     const {completedTrips} = await getUserCompletedTrips();
+
+    const {allTrips} = await getAllUserTrips();
     // console.log(recentTripsData);
     // Transform upcoming trips data
     const upcomingTrips = upComingTrips.map((trip: Trip) => ({
@@ -90,47 +92,41 @@ async function fetchDashboardData() {
       dates: formatDateRange(new Date(trip.startDate), new Date(trip.endDate)),
       daysLeft: daysBetween(currentDate, new Date(trip.startDate)),
       status: trip.tasks.filter(task => task.completed).length === trip.tasks.length ? 'Ready' : 'Planning',
-      collaborators: trip.collaborators.length,
+      // collaborators: trip.collaborators.length,
       tasksProgress: trip.tasks.length > 0 ? 
         `${trip.tasks.filter(task => task.completed).length}/${trip.tasks.length}` : '0/0',
-      totalExpenses: trip.expenses.reduce((sum, expense) => sum + expense.amount, 0)
+      // totalExpenses: trip.expenses.reduce((sum, expense) => sum + expense.amount, 0)
     }));
 
     // Transform recent trips data
-    const recentTrips = completedTrips.map((trip) => ({
+    const recentTrips = completedTrips.map((trip:Trip) => ({
       id: trip._id.toString(),
       destination: trip.title,
       dates: formatDateRange(new Date(trip.startDate), new Date(trip.endDate)),
-      collaborators: trip.collaborators.length,
-      hasStory: trip.story && Object.keys(trip.story.content).length > 0,
-      totalExpenses: trip.expenses.reduce((sum, expense) => sum + expense.amount, 0)
+      // collaborators: trip.collaborators.length,
+      // hasStory: trip.story && Object.keys(trip.story.content).length > 0,
+      // totalExpenses: trip.expenses.reduce((sum, expense) => sum + expense.amount, 0)
     }));
 
     // Calculate statistics
-    const allUserTrips = await TripModel.find({
-      $or: [
-        { owner: data?.id },
-        { collaborators: data?.id }
-      ]
-    });
-
+    
     // Get unique locations (trip titles as destinations)
-    const uniqueDestinations = new Set(allUserTrips.map(trip => trip.destinations));
+    const uniqueDestinations = new Set(allTrips.map((trip: Trip) => trip.destinations));
     
     // Calculate total days traveled
-    const totalDaysTraveled = allUserTrips.reduce((total, trip) => {
+    const totalDaysTraveled = allTrips.reduce((total:number, trip:Trip) => {
       return total + daysBetween(new Date(trip.startDate), new Date(trip.endDate)) + 1;
     }, 0);
 
     // Count stories written
-    const storiesWritten = allUserTrips.filter(trip => 
-      trip.story && Object.keys(trip.story.content).length > 0
-    ).length;
+    // const storiesWritten = allUserTrips.filter((trip: Trip) => 
+    //   trip.story && Object.keys(trip.story.content).length > 0
+    // ).length;
 
     const stats = [
       { label: "Destinations Visited", value: uniqueDestinations.size, icon: "MapPin" },
-      { label: "Total Trips", value: allUserTrips.length, icon: "Plane" },
-      { label: "Travel Stories", value: storiesWritten, icon: "Camera" },
+      { label: "Total Trips", value: allTrips.length, icon: "Plane" },
+      // { label: "Travel Stories", value: storiesWritten, icon: "Camera" },
       { label: "Days Traveled", value: totalDaysTraveled, icon: "CalendarDays" }
     ];
 

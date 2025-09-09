@@ -26,6 +26,28 @@ export async function getUserInfo(){
   }
 }
 
+export async function getAllUserTrips(){
+  try{
+    const cookieStore = await cookies();
+    const res = await fetch('http://localhost:8000/api/user/all-trips', {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        Cookie: cookieStore.toString(),
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    })
+
+    if(!res.ok) throw new Error("failed to fetch all trips");
+    const data = await res.json();
+    return data.data;
+  }catch(error){
+    console.error("Error fetching user's all trips:", error);
+    return null;
+  }
+}
+
 export async function getUserUpcomingTrips(){
   try{
     const cookieStore = await cookies();
