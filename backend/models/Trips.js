@@ -178,5 +178,11 @@ const tripSchema = new Schema({
   ],
 });
 
+tripSchema.index({owner: 1, startDate: 1});
+tripSchema.index({collaborators: 1, startDate: 1});
+
+tripSchema.index({owner: 1, endDate: 1});
+tripSchema.index({collaborators: 1, endDate: 1});
+
 const TripModel = mongoose.model("TripModel", tripSchema);
 export default TripModel;

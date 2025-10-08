@@ -3,7 +3,6 @@ import User from "../models/User.js";
 import TripModel from "../models/Trips.js";
 import Notification from "../models/Notification.js";
 
-
 const getAllUsers = async (req, res, next) => {
   try {
     const users = await userSchema.find({});
@@ -111,7 +110,7 @@ const upComingTrips = async (req, res, next) => {
           startDate: { $gte: new Date() },
         },
       ],
-    }).populate("collaborators", "name email") // 👈 populates name & email
+    }).populate("collaborators", "name email");
 
     if (!upComingTrips) {
       return res.status(400).json({
