@@ -41,7 +41,7 @@ const tripSchema = new Schema({
   
   destination: {
     type: String,
-    required: true
+    required: [true, "destination chaiye"]
   },
 
   createdOn: {

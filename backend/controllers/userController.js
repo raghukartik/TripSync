@@ -133,6 +133,41 @@ const upComingTrips = async (req, res, next) => {
   }
 };
 
+const upComingTripsDashboard = async (req, res, next) => {
+  try {
+    const { userId } = req.user;
+    const upComingTrips = await TripModel.find({
+      $and: [
+        {
+          $or: [{ owner: userId }, { collaborators: userId }],
+        },
+        {
+          startDate: { $gte: new Date() },
+        },
+      ],
+    }).populate("collaborators", "name email").sort({startDate: 1}).limit(3);
+
+    if (!upComingTrips) {
+      return res.status(400).json({
+        message: "No upcoming trips found!",
+      });
+    }
+    res.status(200).json({
+      status: "success",
+      results: upComingTrips.length,
+      data: {
+        upComingTrips,
+      },
+    });
+  } catch (error) {
+    console.error("upcoming error:", error);
+    return res.status(500).json({
+      message: "Something went wrong.",
+      error: error.message,
+    });
+  }
+};
+
 const completedTrips = async (req, res, next) => {
   try {
     const { userId } = req.user;
@@ -146,6 +181,41 @@ const completedTrips = async (req, res, next) => {
         },
       ],
     });
+
+    if (!completedTrips) {
+      return res.status(400).json({
+        message: "No upcoming trips found!",
+      });
+    }
+    res.status(200).json({
+      status: "success",
+      results: completedTrips.length,
+      data: {
+        completedTrips,
+      },
+    });
+  } catch (error) {
+    console.error("completetd error:", error);
+    return res.status(500).json({
+      message: "Something went wrong.",
+      error: error.message,
+    });
+  }
+};
+
+const completedTripsDashboard = async (req, res, next) => {
+  try {
+    const { userId } = req.user;
+    const completedTrips = await TripModel.find({
+      $and: [
+        {
+          $or: [{ owner: userId }, { collaborators: userId }],
+        },
+        {
+          endDate: { $lte: new Date() },
+        },
+      ],
+    }).sort({endDate: -1}).limit(3);
 
     if (!completedTrips) {
       return res.status(400).json({
@@ -211,7 +281,9 @@ const userController = {
   upComingTrips,
   completedTrips,
   getUserInfo,
-  allUserTrips
+  allUserTrips,
+  upComingTripsDashboard, 
+  completedTripsDashboard
 };
 
 export default userController;

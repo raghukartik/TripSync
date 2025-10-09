@@ -1,6 +1,7 @@
 // app/[tripId]/expenses/add/page.tsx
 import { ExpenseForm } from "@/components/add-tripExpenses";
 import { cookies } from 'next/headers';
+import { getUserInfo } from "@/lib/auth";
 interface PageProps {
   params: {
     tripId: string;
@@ -13,9 +14,14 @@ interface Collaborator{
   email?: string;
 }
 
+interface User{
+  _id: string;
+}
+
+
 export async function getTripCollaborators(tripId: string): Promise<Collaborator[]>{
   try {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const res = await fetch(`http://localhost:8000/api/trips/${tripId}/collaborators`, {
       method: "GET",
       headers: {
@@ -38,10 +44,15 @@ export async function getTripCollaborators(tripId: string): Promise<Collaborator
 
 export default async function AddExpensePage({ params }: PageProps) {
   const {tripId} = await params;
+  const user: User= await getUserInfo();
+  const data = await getUserInfo();
+  if (data) {
+    user._id = data._id;
+  }
   const collaborators = await getTripCollaborators(tripId);
   return (
     <div className="container mx-auto py-8">
-      <ExpenseForm tripId={tripId} collaborators={collaborators} />
+      <ExpenseForm tripId={tripId} collaborators={collaborators} currentUserId={user._id}/>
     </div>
   );
 }

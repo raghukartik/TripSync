@@ -51,7 +51,7 @@ export async function getAllUserTrips(){
 export async function getUserUpcomingTrips(){
   try{
     const cookieStore = await cookies();
-    const res = await fetch('http://localhost:8000/api/user/upcoming-trips', {
+    const res = await fetch('http://localhost:8000/api/user/upcoming-trips-dashboard', {
       method: "GET",
       credentials: "include",
       headers: {
@@ -73,7 +73,7 @@ export async function getUserUpcomingTrips(){
 export async function getUserCompletedTrips(){
   try{
     const cookieStore = await cookies();
-    const res = await fetch('http://localhost:8000/api/user/completed-trips', {
+    const res = await fetch('http://localhost:8000/api/user/completed-trips-dashboard', {
       method: "GET",
       credentials: "include",
       headers: {

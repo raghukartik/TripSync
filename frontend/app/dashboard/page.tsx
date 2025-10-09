@@ -20,21 +20,32 @@ interface User {
   name: string;
 }
 
+interface Collaborators{
+  _id: string;
+  name: string;
+  email: string;
+}
+
 interface Task {
   _id: string;
   completed: boolean;
 }
+
+interface Expenses{
+  amount: number;
+}
+
 interface Trip {
   _id: string;
   title: string;
   description?: string;
   startDate: Date;
   endDate: Date;
-  collaborators: number;
+  collaborators: [Collaborators];
   totalTasks: number;
   tasks: [Task];
   completedTasks: [string];
-  totalExpenses: number;
+  expenses: [Expenses];
   hasStory: boolean;
   createdOn: Date;
   destinations:[string]
@@ -83,7 +94,7 @@ async function fetchDashboardData() {
     const {completedTrips} = await getUserCompletedTrips();
 
     const {allTrips} = await getAllUserTrips();
-    // console.log(recentTripsData);
+   
     // Transform upcoming trips data
     const upcomingTrips = upComingTrips.map((trip: Trip) => ({
       id: trip._id.toString(),
@@ -92,10 +103,10 @@ async function fetchDashboardData() {
       dates: formatDateRange(new Date(trip.startDate), new Date(trip.endDate)),
       daysLeft: daysBetween(currentDate, new Date(trip.startDate)),
       status: trip.tasks.filter(task => task.completed).length === trip.tasks.length ? 'Ready' : 'Planning',
-      // collaborators: trip.collaborators.length,
+      collaborators: trip.collaborators.length,
       tasksProgress: trip.tasks.length > 0 ? 
         `${trip.tasks.filter(task => task.completed).length}/${trip.tasks.length}` : '0/0',
-      // totalExpenses: trip.expenses.reduce((sum, expense) => sum + expense.amount, 0)
+      totalExpenses: trip.expenses.reduce((sum, expense) => sum + expense.amount, 0)
     }));
 
     // Transform recent trips data
@@ -103,9 +114,9 @@ async function fetchDashboardData() {
       id: trip._id.toString(),
       destination: trip.title,
       dates: formatDateRange(new Date(trip.startDate), new Date(trip.endDate)),
-      // collaborators: trip.collaborators.length,
+      collaborators: trip.collaborators.length,
       // hasStory: trip.story && Object.keys(trip.story.content).length > 0,
-      // totalExpenses: trip.expenses.reduce((sum, expense) => sum + expense.amount, 0)
+      totalExpenses: trip.expenses.reduce((sum, expense) => sum + expense.amount, 0)
     }));
 
     // Calculate statistics
