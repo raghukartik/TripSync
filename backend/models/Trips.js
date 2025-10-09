@@ -40,8 +40,8 @@ const tripSchema = new Schema({
   },
   
   destination: {
-    type: String,
-    required: [true, "destination chaiye"]
+    type: [String],
+    default: []
   },
 
   createdOn: {

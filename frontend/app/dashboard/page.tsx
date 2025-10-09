@@ -48,7 +48,7 @@ interface Trip {
   expenses: [Expenses];
   hasStory: boolean;
   createdOn: Date;
-  destinations:[string]
+  destination:[string]
 }
 
 // Helper function to calculate days between dates
@@ -98,7 +98,7 @@ async function fetchDashboardData() {
     // Transform upcoming trips data
     const upcomingTrips = upComingTrips.map((trip: Trip) => ({
       id: trip._id.toString(),
-      destination: trip.destinations,
+      destination: trip.destination,
       description: trip.description || '',
       dates: formatDateRange(new Date(trip.startDate), new Date(trip.endDate)),
       daysLeft: daysBetween(currentDate, new Date(trip.startDate)),
@@ -122,7 +122,7 @@ async function fetchDashboardData() {
     // Calculate statistics
     
     // Get unique locations (trip titles as destinations)
-    const uniqueDestinations = new Set(allTrips.map((trip: Trip) => trip.destinations));
+    const uniqueDestinations = new Set(allTrips.map((trip: Trip) => trip.destination));
     
     // Calculate total days traveled
     const totalDaysTraveled = allTrips.reduce((total:number, trip:Trip) => {
