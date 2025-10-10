@@ -131,7 +131,7 @@ export function TasksList({ tasks, tripId }: TasksListProps) {
           <p className="text-gray-500 mb-6 max-w-sm mx-auto">
             Get organized by creating your first task for this trip. Track progress and assign responsibilities.
           </p>
-          <button className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium">
+          <button className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium" onClick={() => router.push(`/add-tasks/${tripId}`)}>
             <Plus className="h-4 w-4 mr-2" />
             Create First Task
           </button>

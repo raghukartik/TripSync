@@ -17,7 +17,7 @@ interface AddTaskProps {
 
 export async function getTripCollaborators(tripId: string): Promise<Collaborator[]>{
   try {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const res = await fetch(`http://localhost:8000/api/trips/${tripId}/collaborators`, {
       method: "GET",
       headers: {

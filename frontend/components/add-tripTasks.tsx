@@ -20,10 +20,17 @@ interface User {
 interface AddTaskProps {
   tripId: string;
   users: User[];
-  onTaskAdded?: (task: any) => void;
 }
 
-export default function AddTask({ tripId, users, onTaskAdded }: AddTaskProps) {
+interface FormData {
+  text: string;
+  assignedTo: string;
+  completed: boolean;
+  dueDate: string;
+  priority: string;
+}
+
+export default function AddTask({ tripId, users}: AddTaskProps) {
   // Demo users for the example
   const demoUsers = users?.length > 0 ? users : [
     { _id: '1', name: 'John Smith', email: 'john@example.com' },
@@ -35,12 +42,12 @@ export default function AddTask({ tripId, users, onTaskAdded }: AddTaskProps) {
   const [error, setError] = useState<string | null>(null);
   
   // Form state
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     text: "",
     assignedTo: "",
     completed: false,
     dueDate: "",
-    priority: "medium" as "low" | "medium" | "high"
+    priority: "medium"
   });
 
   const resetForm = useCallback(() => {
@@ -55,13 +62,16 @@ export default function AddTask({ tripId, users, onTaskAdded }: AddTaskProps) {
     setSuccess(false);
   }, []);
 
-  const handleInputChange = useCallback((field: string, value: any) => {
+  const handleInputChange = useCallback(
+  <K extends keyof FormData>(field: K, value: FormData[K]) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }));
     if (error) setError(null);
-  }, [error]);
+  },
+  [error]
+);
 
   const validateForm = useCallback(() => {
     if (!formData.text.trim()) {
@@ -103,17 +113,10 @@ export default function AddTask({ tripId, users, onTaskAdded }: AddTaskProps) {
         const errorData = await response.json().catch(() => null);
         throw new Error(errorData?.message || `Failed to create task (${response.status})`);
       }
-
-      const newTask = await response.json();
       
       // Show success state
       setSuccess(true);
       
-      // Call the callback if provided
-      if (onTaskAdded) {
-        onTaskAdded(newTask);
-      }
-
       // Reset form after success
       setTimeout(() => {
         resetForm();
@@ -125,7 +128,7 @@ export default function AddTask({ tripId, users, onTaskAdded }: AddTaskProps) {
     } finally {
       setIsSubmitting(false);
     }
-  }, [formData, tripId, validateForm, onTaskAdded, resetForm]);
+  }, [formData, tripId, validateForm, resetForm]);
 
   const getInitials = useCallback((name: string) => {
     return name.split(' ').map(n => n[0]).join('').toUpperCase();
