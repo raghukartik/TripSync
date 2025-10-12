@@ -334,7 +334,7 @@ export default function DashboardClient({
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-3">
-              {upcomingTrips.slice(0, 2).map((trip, index) => (
+              {upcomingTrips.slice(0, 2).map((trip) => (
                 <div key={trip.id} className="flex items-start space-x-3 text-sm">
                   <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
                   <div>
@@ -345,7 +345,7 @@ export default function DashboardClient({
                   </div>
                 </div>
               ))}
-              {recentTrips.slice(0, 1).map((trip, index) => (
+              {recentTrips.slice(0, 1).map((trip) => (
                 <div key={trip.id} className="flex items-start space-x-3 text-sm">
                   <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
                   <div>
