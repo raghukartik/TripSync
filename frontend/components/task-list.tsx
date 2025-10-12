@@ -5,17 +5,19 @@ import {
   CheckCircle2, 
   Circle, 
   Edit3, 
-  User, 
   Plus,
   Filter,
   Search,
   MoreHorizontal,
-  Clock
 } from "lucide-react";
 
 interface AssignedTo {
   _id: string;
   name: string;
+}
+
+interface Status{
+  status: string;
 }
 
 interface Tasks {
@@ -24,8 +26,6 @@ interface Tasks {
   assignedTo: AssignedTo;
   completed: boolean;
   _id: string;
-  dueDate?: string;
-  priority?: 'low' | 'medium' | 'high';
 }
 
 interface TasksListProps {
@@ -37,8 +37,9 @@ interface TasksListProps {
 export function TasksList({ tasks, tripId }: TasksListProps) {
   const [localTasks, setLocalTasks] = useState<Tasks[]>(tasks || []);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState<"all" | "pending" | "completed">("all");
-  const [filterPriority, setFilterPriority] = useState<"all" | "high" | "medium" | "low">("all");
+  const [filterStatus, setFilterStatus] = useState<Status>({
+    status: "all"
+  });
   const router = useRouter();
   const handleToggleComplete = useCallback((taskId: string) => {
     setLocalTasks(prevTasks => 
@@ -55,65 +56,21 @@ export function TasksList({ tasks, tripId }: TasksListProps) {
     // Will be implemented with edit modal
   }, []);
 
-  const getPriorityColor = useCallback((priority: string) => {
-    switch (priority) {
-      case 'high': return 'bg-red-100 text-red-800 border-red-200';
-      case 'medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'low': return 'bg-green-100 text-green-800 border-green-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
-    }
-  }, []);
-
   const getInitials = useCallback((name: string) => {
     return name.split(' ').map(n => n[0]).join('').toUpperCase();
-  }, []);
-
-  const formatDueDate = useCallback((dateString?: string) => {
-    if (!dateString) return '';
-    const date = new Date(dateString);
-    const today = new Date();
-    const diffTime = date.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    if (diffDays === 0) return 'Due today';
-    if (diffDays === 1) return 'Due tomorrow';
-    if (diffDays < 0) return `Overdue by ${Math.abs(diffDays)} days`;
-    if (diffDays <= 7) return `Due in ${diffDays} days`;
-    
-    return date.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric',
-      year: date.getFullYear() !== today.getFullYear() ? 'numeric' : undefined
-    });
-  }, []);
-
-  const isDueSoon = useCallback((dateString?: string) => {
-    if (!dateString) return false;
-    const date = new Date(dateString);
-    const today = new Date();
-    const diffTime = date.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays <= 3 && diffDays >= 0;
-  }, []);
-
-  const isOverdue = useCallback((dateString?: string) => {
-    if (!dateString) return false;
-    const date = new Date(dateString);
-    const today = new Date();
-    return date < today;
   }, []);
 
   const filteredTasks = localTasks.filter(task => {
     const matchesSearch = task.text.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          task.assignedTo.name.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesStatus = filterStatus === "all" || 
-                         (filterStatus === "completed" && task.completed) ||
-                         (filterStatus === "pending" && !task.completed);
+    const matchesStatus = filterStatus.status === "all" || 
+                         (filterStatus.status === "completed" && task.completed) ||
+                         (filterStatus.status === "pending" && !task.completed);
     
-    const matchesPriority = filterPriority === "all" || task.priority === filterPriority;
     
-    return matchesSearch && matchesStatus && matchesPriority;
+    
+    return matchesSearch && matchesStatus;
   });
 
   const completedCount = localTasks.filter(task => task.completed).length;
@@ -190,29 +147,18 @@ export function TasksList({ tasks, tripId }: TasksListProps) {
           
           <div className="flex gap-2">
             <select
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value as any)}
+              value={filterStatus.status}
+              onChange={(e) => setFilterStatus({status: e.target.value})}
               className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
               <option value="all">All Status</option>
               <option value="pending">Pending</option>
               <option value="completed">Completed</option>
             </select>
-            
-            <select
-              value={filterPriority}
-              onChange={(e) => setFilterPriority(e.target.value as any)}
-              className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="all">All Priority</option>
-              <option value="high">High Priority</option>
-              <option value="medium">Medium Priority</option>
-              <option value="low">Low Priority</option>
-            </select>
           </div>
         </div>
         
-        {(searchTerm || filterStatus !== "all" || filterPriority !== "all") && (
+        {(searchTerm || filterStatus.status !== "all") && (
           <div className="mt-3 flex items-center gap-2">
             <span className="text-sm text-gray-600">
               Showing {filteredTasks.length} of {totalCount} tasks
@@ -220,8 +166,7 @@ export function TasksList({ tasks, tripId }: TasksListProps) {
             <button 
               onClick={() => {
                 setSearchTerm("");
-                setFilterStatus("all");
-                setFilterPriority("all");
+                setFilterStatus({status: "all"});
               }}
               className="text-xs text-blue-600 hover:text-blue-800 font-medium"
             >
@@ -234,18 +179,7 @@ export function TasksList({ tasks, tripId }: TasksListProps) {
       {/* Tasks List */}
       <div className="space-y-3">
         {filteredTasks.map((task) => (
-          <div
-            key={task._id}
-            className={`bg-white rounded-xl shadow-sm border transition-all duration-200 hover:shadow-md ${
-              task.completed 
-                ? "border-green-200 bg-gradient-to-r from-green-50 to-transparent" 
-                : isOverdue(task.dueDate)
-                ? "border-red-200 bg-gradient-to-r from-red-50 to-transparent"
-                : isDueSoon(task.dueDate)
-                ? "border-yellow-200 bg-gradient-to-r from-yellow-50 to-transparent"
-                : "border-gray-200 hover:border-gray-300"
-            }`}
-          >
+          <div key={task._id}>
             <div className="p-5">
               <div className="flex items-start gap-4">
                 {/* Checkbox */}
@@ -289,27 +223,6 @@ export function TasksList({ tasks, tripId }: TasksListProps) {
                             {task.assignedTo.name}
                           </span>
                         </div>
-
-                        {/* Priority Badge */}
-                        {task.priority && (
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getPriorityColor(task.priority)}`}>
-                            {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)} Priority
-                          </span>
-                        )}
-
-                        {/* Due Date */}
-                        {task.dueDate && (
-                          <div className={`flex items-center gap-1 text-xs font-medium ${
-                            isOverdue(task.dueDate) && !task.completed
-                              ? "text-red-600"
-                              : isDueSoon(task.dueDate) && !task.completed
-                              ? "text-yellow-700"
-                              : "text-gray-500"
-                          }`}>
-                            <Clock className="h-3 w-3" />
-                            {formatDueDate(task.dueDate)}
-                          </div>
-                        )}
                       </div>
                     </div>
 
