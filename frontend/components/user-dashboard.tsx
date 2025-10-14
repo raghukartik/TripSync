@@ -67,7 +67,7 @@ interface DashboardClientProps {
 const iconMap: Record<string, LucideIcon> = {
   MapPin: MapPin,
   Plane: Plane,
-  Camera: Camera,
+  DollarSign: DollarSign,
   CalendarDays: CalendarDays
 }
 
@@ -84,7 +84,7 @@ export default function DashboardClient({
   const handleAddTrip = () => {
     setIsAddingTrip(true)
     // Navigate to trip creation page
-    router.push('/trips/new')
+    router.push('/dashboard/create-trip')
   }
 
   // Handler for viewing a trip

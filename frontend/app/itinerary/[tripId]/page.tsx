@@ -66,6 +66,7 @@ async function fetchItinerary(tripId: string): Promise<ItineraryDay[]> {
   }
 
   const json = await res.json();
+  console.log(json.data);
   return json.data || [];
 }
 
@@ -125,7 +126,7 @@ export default async function ItineraryPage({ params }: ItineraryPageProps) {
                 Share
               </Button>
               <Button asChild className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-                <Link href={`/itinerary/${tripId}/edit`}>
+                <Link href={`/itinerary/${tripId}/edit/}`}>
                   <Plus className="h-4 w-4 mr-2" />
                   Add Activities
                 </Link>
@@ -282,6 +283,12 @@ export default async function ItineraryPage({ params }: ItineraryPageProps) {
                   <Badge variant="secondary" className="bg-blue-100 text-blue-800 border-blue-200">
                     Day {getDayNumber(day.date, startDate)}
                   </Badge>
+                  <Button asChild className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                    <Link href={`/itinerary/${tripId}/edit/${day._id}`}>
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Activity
+                    </Link>
+                  </Button>
                 </div>
 
                 {/* Activities */}

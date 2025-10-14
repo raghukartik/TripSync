@@ -14,7 +14,6 @@ import {
   MessageCircle,
   ChevronRight,
   AlertCircle,
-  User,
   CalendarDays,
   MoreHorizontal,
   Share2,

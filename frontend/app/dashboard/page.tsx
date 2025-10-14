@@ -129,15 +129,15 @@ async function fetchDashboardData() {
       return total + daysBetween(new Date(trip.startDate), new Date(trip.endDate)) + 1;
     }, 0);
 
-    // Count stories written
-    // const storiesWritten = allUserTrips.filter((trip: Trip) => 
-    //   trip.story && Object.keys(trip.story.content).length > 0
-    // ).length;
+    const totalExpenses = allTrips.reduce((total:number, trip:Trip) => {
+      const tripExpense = trip.expenses?.reduce((sum, exp) => sum + exp.amount, 0) || 0;
+      return total + tripExpense;
+    }, 0);
 
     const stats = [
       { label: "Destinations Visited", value: uniqueDestinations.size, icon: "MapPin" },
       { label: "Total Trips", value: allTrips.length, icon: "Plane" },
-      // { label: "Travel Stories", value: storiesWritten, icon: "Camera" },
+      { label: "Total Expense", value: totalExpenses, icon: "DollarSign" },
       { label: "Days Traveled", value: totalDaysTraveled, icon: "CalendarDays" }
     ];
 
@@ -150,15 +150,13 @@ async function fetchDashboardData() {
 
   } catch (error) {
     console.error('Error fetching dashboard data:', error);
-    
-    // Return empty data structure if database fetch fails
     return {
       upcomingTrips: [],
       recentTrips: [],
       stats: [
         { label: "Destinations Visited", value: 0, icon: "MapPin" },
         { label: "Total Trips", value: 0, icon: "Plane" },
-        { label: "Travel Stories", value: 0, icon: "Camera" },
+        { label: "Total Expense", value: 0, icon: "DollarSign" },
         { label: "Days Traveled", value: 0, icon: "CalendarDays" }
       ],
       user
