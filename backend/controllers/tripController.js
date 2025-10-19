@@ -33,7 +33,7 @@ const getAllUserTrips = async (req, res, next) => {
 
 const createTrip = async (req, res) => {
   try {
-    const { title, description, startDate, endDate } = req.body;
+    const { title, description, startDate, endDate, destination } = req.body;
     const { userId: ownerId } = req.user || {};
 
     // Validate userId presence
@@ -42,8 +42,8 @@ const createTrip = async (req, res) => {
     }
 
     // Validate required fields
-    if (!title || !startDate || !endDate) {
-      return res.status(400).json({ status: "error", message: "Title, start date, and end date are required" });
+    if (!title || !startDate || !endDate || !destination) {
+      return res.status(400).json({ status: "error", message: "Title, start date, end date and destination are required" });
     }
 
     // Validate date format
@@ -63,6 +63,7 @@ const createTrip = async (req, res) => {
       description,
       startDate,
       endDate,
+      destination,
       owner: ownerId,
     });
 
