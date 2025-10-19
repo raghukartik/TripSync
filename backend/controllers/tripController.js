@@ -473,7 +473,7 @@ const addItineraryActivity = async (req, res, next) => {
     const { userId } = req.user;
     const { tripId, itineraryId } = req.params;
     const { time, title, location, notes } = req.body;
-
+    console.log(tripId, itineraryId, userId);
     // Validate inputs
     if (!tripId || !itineraryId) {
       return res
@@ -487,7 +487,7 @@ const addItineraryActivity = async (req, res, next) => {
     }
 
     // Find the trip and ensure the user owns it
-    const trip = await Trip.findOne({ _id: tripId, userId });
+    const trip = await TripModel.findOne({ _id: tripId, owner: userId });
     if (!trip) {
       return res
         .status(404)
@@ -495,8 +495,8 @@ const addItineraryActivity = async (req, res, next) => {
     }
 
     // Find the itinerary within the trip
-    const itinerary = trip.itineraries.find(
-      (i) => i.itineraryId === itineraryId
+    const itinerary = trip.itinerary.find(
+      (i) => i._id.toString() === itineraryId
     );
     if (!itinerary) {
       return res.status(404).json({ message: "Itinerary not found" });

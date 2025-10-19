@@ -102,7 +102,7 @@ export default function EditActivityClient({
     try {
       const url = isEditing
         ? `http://localhost:8000/api/trips/${tripId}/itinerary/${itineraryId}/activities/${activityId}`
-        : `http://localhost:8000/api/trips/${tripId}/itinerary/${itineraryId}/activities`;
+        : `http://localhost:8000/api/trips/${tripId}/itinerary/${itineraryId}`;
 
       const method = isEditing ? 'PUT' : 'POST';
 

@@ -30,6 +30,7 @@ router
 
 router
   .route("/trips/:tripId/itinerary/:itineraryId")
+  .post(authController.protect, tripController.addItineraryActivity)
   .put(authController.protect, tripController.editItinerary);
 
 router
