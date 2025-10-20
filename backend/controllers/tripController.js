@@ -305,11 +305,11 @@ const addItinerary = async (req, res, next) => {
   try {
     const { tripId } = req.params;
     const { userId } = req.user;
-    const { date, activities } = req.body;
+    const { date } = req.body;
 
-    if (!date || !Array.isArray(activities)) {
+    if (!date) {
       return res.status(400).json({
-        message: "Date and activities array are required",
+        message: "Date is required to create a new itinerary day",
       });
     }
 
@@ -328,29 +328,22 @@ const addItinerary = async (req, res, next) => {
     const existingDay = trip.itinerary.find((item) => item.date === date);
 
     if (existingDay) {
-      // Add new activities to existing date
-      for (const activity of activities) {
-        existingDay.activities.push({
-          activityId: new mongoose.Types.ObjectId().toString(),
-          ...activity,
-        });
-      }
-    } else {
-      // Add a new date with activities
-      trip.itinerary.push({
-        date,
-        activities: activities.map((act) => ({
-          activityId: new mongoose.Types.ObjectId().toString(),
-          ...act,
-        })),
+      return res.status(400).json({
+        message: "Itinerary for this date already exists",
       });
     }
 
+    // Create a new itinerary day with empty activities
+    trip.itinerary.push({
+      date,
+      activities: [],
+    });
+
     await trip.save();
 
-    res.status(200).json({
+    res.status(201).json({
       status: "success",
-      message: "Itinerary updated",
+      message: "New itinerary day created",
       itinerary: trip.itinerary,
     });
   } catch (error) {

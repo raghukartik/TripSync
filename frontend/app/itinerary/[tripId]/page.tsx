@@ -151,9 +151,9 @@ export default async function ItineraryPage({ params }: ItineraryPageProps) {
               
               <div className="space-y-4">
                 <Button size="lg" asChild className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-                  <Link href={`/itinerary/${tripId}/edit`}>
+                  <Link href={`/itinerary/${tripId}/add`}>
                     <Plus className="h-5 w-5 mr-2" />
-                    Create Your First Activity
+                    Create Your First Itinerary
                   </Link>
                 </Button>
                 
@@ -207,9 +207,9 @@ export default async function ItineraryPage({ params }: ItineraryPageProps) {
               Share
             </Button>
             <Button asChild className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-              <Link href={`/itinerary/${tripId}/edit`}>
+              <Link href={`/itinerary/${tripId}/add`}>
                 <Plus className="h-4 w-4 mr-2" />
-                Add Activity
+                New Itinerary Day
               </Link>
             </Button>
           </div>
@@ -402,9 +402,9 @@ export default async function ItineraryPage({ params }: ItineraryPageProps) {
                 </p>
               </div>
               <Button asChild className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-                <Link href={`/itinerary/${tripId}/edit`}>
+                <Link href={`/itinerary/${tripId}/add`}>
                   <Plus className="h-4 w-4 mr-2" />
-                  Add New Activity
+                  Add New Itinerary Day
                 </Link>
               </Button>
             </div>
