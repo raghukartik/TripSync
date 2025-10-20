@@ -25,7 +25,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import FooterSection from "./footer";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 
 type Activity = {
   activityId: string;
@@ -65,7 +65,7 @@ type ChatMessage = {
 type PendingInvite = {
   user: string;
   invitedAt: string;
-  status: 'pending' | 'accepted' | 'rejected';
+  status: "pending" | "accepted" | "rejected";
 };
 
 type Collaborator = {
@@ -101,15 +101,15 @@ const TripCard = ({ trip }: { trip: Trip }) => {
   const today = new Date();
   const startDate = new Date(trip.startDate);
   const endDate = new Date(trip.endDate);
-  
+
   const durationInDays = Math.ceil(
     (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
   );
-  
+
   const daysUntilTrip = Math.ceil(
     (startDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
   );
-  
+
   const isStartingSoon = daysUntilTrip <= 7 && daysUntilTrip > 0;
   const isStartingToday = daysUntilTrip === 0;
   const isOverdue = daysUntilTrip < 0;
@@ -117,22 +117,32 @@ const TripCard = ({ trip }: { trip: Trip }) => {
   const collaboratorsCount = trip.collaborators?.length || 0;
   const totalParticipants = collaboratorsCount + 1; // +1 for owner
   const tasksCount = trip.tasks?.length || 0;
-  const completedTasksCount = trip.tasks?.filter((task) => task.completed).length || 0;
-  const expensesTotal = trip.expenses?.reduce((sum, expense) => sum + expense.amount, 0) || 0;
+  const completedTasksCount =
+    trip.tasks?.filter((task) => task.completed).length || 0;
+  const expensesTotal =
+    trip.expenses?.reduce((sum, expense) => sum + expense.amount, 0) || 0;
   const itineraryDays = trip.itinerary?.length || 0;
-  const pendingInvitesCount = trip.pendingInvites?.filter(invite => invite.status === 'pending').length || 0;
+  const pendingInvitesCount =
+    trip.pendingInvites?.filter((invite) => invite.status === "pending")
+      .length || 0;
   const unreadMessages = trip.chatMessages?.length || 0;
-  
+
   // Calculate completion percentage
   const completionItems = [
     { completed: itineraryDays > 0, weight: 30 },
     { completed: tasksCount > 0, weight: 25 },
-    { completed: completedTasksCount === tasksCount && tasksCount > 0, weight: 25 },
-    { completed: collaboratorsCount > 0, weight: 20 }
+    {
+      completed: completedTasksCount === tasksCount && tasksCount > 0,
+      weight: 25,
+    },
+    { completed: collaboratorsCount > 0, weight: 20 },
   ];
-  
+
   const completionPercentage = Math.round(
-    completionItems.reduce((acc, item) => acc + (item.completed ? item.weight : 0), 0)
+    completionItems.reduce(
+      (acc, item) => acc + (item.completed ? item.weight : 0),
+      0
+    )
   );
 
   const getStatusColor = () => {
@@ -151,12 +161,14 @@ const TripCard = ({ trip }: { trip: Trip }) => {
   };
 
   return (
-    <Card className="hover:shadow-lg transition-all duration-300 border-0 bg-gradient-to-br from-white to-gray-50/50 relative group overflow-hidden">
-      {/* Status Indicator */}
-      <div className={`absolute top-0 left-0 right-0 h-1 ${getStatusColor()}`}></div>
-      
+    <Card className="hover:shadow-xl transition-all duration-300 border border-gray-200 bg-white relative group overflow-hidden mb-6">
+      {/* Colored Top Border for Status */}
+      <div
+        className={`absolute top-0 left-0 right-0 h-1.5 ${getStatusColor()}`}
+      ></div>
+
       {/* Trip Header */}
-      <CardHeader className="pb-4">
+      <CardHeader className="pb-4 pt-6">
         <div className="flex justify-between items-start mb-3">
           <div className="flex-1 min-w-0">
             <CardTitle className="text-xl font-bold line-clamp-2 mb-2 text-gray-900">
@@ -169,12 +181,19 @@ const TripCard = ({ trip }: { trip: Trip }) => {
             )}
           </div>
           <div className="flex flex-col items-end gap-2 ml-4">
-            <Badge variant="secondary" className={`${getStatusColor()} text-white border-0 font-medium`}>
+            <Badge
+              variant="secondary"
+              className={`${getStatusColor()} text-white border-0 font-medium px-3 py-1`}
+            >
               {getStatusText()}
             </Badge>
             {pendingInvitesCount > 0 && (
-              <Badge variant="outline" className="text-xs bg-amber-50 text-amber-700 border-amber-200">
-                {pendingInvitesCount} pending invite{pendingInvitesCount !== 1 ? 's' : ''}
+              <Badge
+                variant="outline"
+                className="text-xs bg-amber-50 text-amber-700 border-amber-200 px-2 py-1"
+              >
+                {pendingInvitesCount} pending invite
+                {pendingInvitesCount !== 1 ? "s" : ""}
               </Badge>
             )}
           </div>
@@ -193,38 +212,46 @@ const TripCard = ({ trip }: { trip: Trip }) => {
               {endDate.toLocaleDateString("en-US", {
                 month: "short",
                 day: "numeric",
-                year: startDate.getFullYear() !== endDate.getFullYear() ? "numeric" : undefined,
+                year:
+                  startDate.getFullYear() !== endDate.getFullYear()
+                    ? "numeric"
+                    : undefined,
               })}
             </span>
           </div>
           <div className="flex items-center gap-2">
             <Clock className="h-4 w-4 text-purple-500" />
-            <span>{durationInDays} {durationInDays === 1 ? "day" : "days"}</span>
+            <span>
+              {durationInDays} {durationInDays === 1 ? "day" : "days"}
+            </span>
           </div>
         </div>
       </CardHeader>
 
-      <CardContent className="pt-0">
+      <CardContent className="pt-0 pb-6">
         {/* Collaborators */}
         {collaboratorsCount > 0 && (
-          <div className="flex items-center gap-3 mb-4 pb-4 border-b border-gray-100">
+          <div className="flex items-center gap-3 mb-5 pb-5 border-b border-gray-100">
             <div className="flex items-center gap-2">
               <Users className="h-4 w-4 text-blue-500" />
               <span className="text-sm font-medium text-gray-700">
-                {totalParticipants} traveler{totalParticipants !== 1 ? 's' : ''}
+                {totalParticipants} traveler{totalParticipants !== 1 ? "s" : ""}
               </span>
             </div>
             <div className="flex -space-x-2">
               {trip.collaborators.slice(0, 4).map((collaborator) => (
-                <Avatar key={collaborator._id} className="h-8 w-8 border-2 border-white">
+                <Avatar
+                  key={collaborator._id}
+                  className="h-8 w-8 border-2 border-white ring-1 ring-gray-200"
+                >
                   <AvatarImage src={collaborator.avatar} />
-                  <AvatarFallback className="text-xs bg-blue-100 text-blue-700">
+                  <AvatarFallback className="text-xs bg-blue-100 text-blue-700 font-medium">
                     {collaborator.name.charAt(0).toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
               ))}
               {collaboratorsCount > 4 && (
-                <div className="h-8 w-8 rounded-full bg-gray-200 border-2 border-white flex items-center justify-center">
+                <div className="h-8 w-8 rounded-full bg-gray-200 border-2 border-white ring-1 ring-gray-200 flex items-center justify-center">
                   <span className="text-xs font-medium text-gray-600">
                     +{collaboratorsCount - 4}
                   </span>
@@ -235,25 +262,31 @@ const TripCard = ({ trip }: { trip: Trip }) => {
         )}
 
         {/* Trip Progress */}
-        <div className="mb-4">
+        <div className="mb-5">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-gray-700">Trip Planning</span>
-            <span className="text-sm text-gray-600">{completionPercentage}%</span>
+            <span className="text-sm font-medium text-gray-700">
+              Trip Planning
+            </span>
+            <span className="text-sm font-semibold text-gray-900">
+              {completionPercentage}%
+            </span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
-            <div 
-              className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-500"
+          <div className="w-full bg-gray-100 rounded-full h-2.5 overflow-hidden">
+            <div
+              className="bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-600 h-2.5 rounded-full transition-all duration-500 shadow-sm"
               style={{ width: `${completionPercentage}%` }}
             ></div>
           </div>
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          <div className="bg-blue-50 rounded-lg p-3 border border-blue-100">
-            <div className="flex items-center gap-2 mb-1">
+        <div className="grid grid-cols-2 gap-3 mb-5">
+          <div className="bg-blue-50 rounded-xl p-3.5 border border-blue-100 hover:border-blue-200 transition-colors">
+            <div className="flex items-center gap-2 mb-1.5">
               <List className="h-4 w-4 text-blue-600" />
-              <span className="text-xs font-medium text-blue-800">Itinerary</span>
+              <span className="text-xs font-semibold text-blue-800 uppercase tracking-wide">
+                Itinerary
+              </span>
             </div>
             <div className="text-lg font-bold text-blue-900">
               {itineraryDays}
@@ -263,105 +296,124 @@ const TripCard = ({ trip }: { trip: Trip }) => {
             </div>
           </div>
 
-          <div className="bg-green-50 rounded-lg p-3 border border-green-100">
-            <div className="flex items-center gap-2 mb-1">
+          <div className="bg-green-50 rounded-xl p-3.5 border border-green-100 hover:border-green-200 transition-colors">
+            <div className="flex items-center gap-2 mb-1.5">
               <CheckCircle className="h-4 w-4 text-green-600" />
-              <span className="text-xs font-medium text-green-800">Tasks</span>
+              <span className="text-xs font-semibold text-green-800 uppercase tracking-wide">
+                Tasks
+              </span>
             </div>
             <div className="text-lg font-bold text-green-900">
               {completedTasksCount}/{tasksCount}
-              <span className="text-sm font-normal text-green-700 ml-1">completed</span>
+              <span className="text-sm font-normal text-green-700 ml-1">
+                completed
+              </span>
             </div>
           </div>
 
-          <div className="bg-purple-50 rounded-lg p-3 border border-purple-100">
-            <div className="flex items-center gap-2 mb-1">
+          <div className="bg-purple-50 rounded-xl p-3.5 border border-purple-100 hover:border-purple-200 transition-colors">
+            <div className="flex items-center gap-2 mb-1.5">
               <DollarSign className="h-4 w-4 text-purple-600" />
-              <span className="text-xs font-medium text-purple-800">Budget</span>
+              <span className="text-xs font-semibold text-purple-800 uppercase tracking-wide">
+                Budget
+              </span>
             </div>
             <div className="text-lg font-bold text-purple-900">
               ${expensesTotal.toFixed(0)}
-              <span className="text-sm font-normal text-purple-700 ml-1">planned</span>
+              <span className="text-sm font-normal text-purple-700 ml-1">
+                planned
+              </span>
             </div>
           </div>
 
-          <div className="bg-amber-50 rounded-lg p-3 border border-amber-100">
-            <div className="flex items-center gap-2 mb-1">
+          <div className="bg-amber-50 rounded-xl p-3.5 border border-amber-100 hover:border-amber-200 transition-colors">
+            <div className="flex items-center gap-2 mb-1.5">
               <MessageSquare className="h-4 w-4 text-amber-600" />
-              <span className="text-xs font-medium text-amber-800">Activity</span>
+              <span className="text-xs font-semibold text-amber-800 uppercase tracking-wide">
+                Activity
+              </span>
             </div>
             <div className="text-lg font-bold text-amber-900">
               {unreadMessages}
               <span className="text-sm font-normal text-amber-700 ml-1">
-                message{unreadMessages !== 1 ? 's' : ''}
+                message{unreadMessages !== 1 ? "s" : ""}
               </span>
             </div>
           </div>
         </div>
 
         {/* Quick Actions */}
-        <div className="flex flex-wrap gap-2 pt-4 border-t border-gray-100">
+        <div className="flex flex-wrap gap-2 pt-5 border-t border-gray-100">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => router.push(`/itinerary/${trip._id}`)}
-            className="flex items-center gap-2 hover:bg-blue-50 hover:text-blue-700"
+            className="flex items-center gap-1.5 hover:bg-blue-50 hover:text-blue-700 transition-colors rounded-lg px-3"
           >
             <List className="h-4 w-4" />
-            Itinerary
-            <ChevronRight className="h-3 w-3" />
+            <span className="font-medium">Itinerary</span>
+            <ChevronRight className="h-3.5 w-3.5" />
           </Button>
-          
+
           <Button
             variant="ghost"
             size="sm"
             onClick={() => router.push(`/expenses/${trip._id}`)}
-            className="flex items-center gap-2 hover:bg-purple-50 hover:text-purple-700"
+            className="flex items-center gap-1.5 hover:bg-purple-50 hover:text-purple-700 transition-colors rounded-lg px-3"
           >
             <DollarSign className="h-4 w-4" />
-            Expenses
-            <ChevronRight className="h-3 w-3" />
+            <span className="font-medium">Expenses</span>
+            <ChevronRight className="h-3.5 w-3.5" />
           </Button>
-          
+
           <Button
             variant="ghost"
             size="sm"
             onClick={() => router.push(`/tasks/${trip._id}`)}
-            className="flex items-center gap-2 hover:bg-green-50 hover:text-green-700"
+            className="flex items-center gap-1.5 hover:bg-green-50 hover:text-green-700 transition-colors rounded-lg px-3"
           >
             <CheckCircle className="h-4 w-4" />
-            Tasks
-            <ChevronRight className="h-3 w-3" />
+            <span className="font-medium">Tasks</span>
+            <ChevronRight className="h-3.5 w-3.5" />
           </Button>
-          
+
           <Button
             variant="ghost"
             size="sm"
-            className="flex items-center gap-2 hover:bg-orange-50 hover:text-orange-700"
+            className="flex items-center gap-1.5 hover:bg-orange-50 hover:text-orange-700 transition-colors rounded-lg px-3"
           >
             <BookOpen className="h-4 w-4" />
-            Story
-            <ChevronRight className="h-3 w-3" />
+            <span className="font-medium">Story</span>
+            <ChevronRight className="h-3.5 w-3.5" />
           </Button>
+
           <Button
             variant="ghost"
             size="sm"
-            className="flex items-center gap-2 hover:bg-orange-50 hover:text-orange-700"
+            className="flex items-center gap-1.5 hover:bg-orange-50 hover:text-orange-700 transition-colors rounded-lg px-3"
           >
             <MessageCircle className="h-4 w-4" />
-            Chat
-            <ChevronRight className="h-3 w-3" />
+            <span className="font-medium">Chat</span>
+            <ChevronRight className="h-3.5 w-3.5" />
           </Button>
         </div>
       </CardContent>
 
       {/* Hover Actions */}
-      <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
-        <Button variant="ghost" size="icon" className="h-8 w-8 bg-white shadow-sm">
-          <Share2 className="h-4 w-4" />
+      <div className="absolute top-6 right-4 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-9 w-9 bg-white shadow-md hover:shadow-lg rounded-lg border border-gray-200"
+        >
+          <Share2 className="h-4 w-4 text-gray-600" />
         </Button>
-        <Button variant="ghost" size="icon" className="h-8 w-8 bg-white shadow-sm">
-          <MoreHorizontal className="h-4 w-4" />
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-9 w-9 bg-white shadow-md hover:shadow-lg rounded-lg border border-gray-200"
+        >
+          <MoreHorizontal className="h-4 w-4 text-gray-600" />
         </Button>
       </div>
     </Card>
@@ -376,13 +428,16 @@ const UpcomingTrips: React.FC = () => {
   useEffect(() => {
     const getUpcomingTrips = async () => {
       try {
-        const res = await fetch("http://localhost:8000/api/user/upcoming-trips", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        });
+        const res = await fetch(
+          "http://localhost:8000/api/user/upcoming-trips",
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+          }
+        );
 
         if (!res.ok) throw new Error("Failed to fetch upcoming trips");
 
@@ -448,18 +503,24 @@ const UpcomingTrips: React.FC = () => {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 mt-8 px-6 py-6 max-w-7xl mx-auto">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Upcoming Adventures</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Upcoming Adventures
+          </h1>
           <p className="text-gray-600">
-            {trips.length > 0 
-              ? `You have ${trips.length} upcoming ${trips.length === 1 ? 'trip' : 'trips'}`
-              : 'No upcoming trips planned'
-            }
+            {trips.length > 0
+              ? `You have ${trips.length} upcoming ${
+                  trips.length === 1 ? "trip" : "trips"
+                }`
+              : "No upcoming trips planned"}
           </p>
         </div>
-        <Button className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700" onClick={() => router.push('/dashboard/create-trip')}>
+        <Button
+          className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+          onClick={() => router.push("/dashboard/create-trip")}
+        >
           <Plus className="h-4 w-4" />
           New Trip
         </Button>
@@ -471,11 +532,17 @@ const UpcomingTrips: React.FC = () => {
             <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6">
               <Calendar className="h-8 w-8 text-blue-600" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">Ready for your next adventure?</h3>
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              Ready for your next adventure?
+            </h3>
             <p className="text-gray-600 text-center max-w-md mb-6">
-              Create your first trip and start planning an amazing journey with friends and family.
+              Create your first trip and start planning an amazing journey with
+              friends and family.
             </p>
-            <Button size="lg" className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+            <Button
+              size="lg"
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+            >
               <Plus className="h-4 w-4 mr-2" />
               Create Your First Trip
             </Button>
