@@ -1055,6 +1055,37 @@ const inviteCollaborator = async (req, res, next) => {
   }
 };
 
+const getTripStory = async(req, res, next) => {
+  try {
+    const {userId} = req.user;
+    const {tripId, storyId} = req.params;
+
+    if(!tripId || storyId){
+      return res.status(400).json({
+        message: "TripId and storyId required!"
+      })
+    }
+
+    const trip = TripModel.find({_id: tripId, $or: [{owner: userId}, {collaborators: userId}]})
+    if(!trip){
+      return res.status(400).json({
+        message: "Trip not found or access denied"
+      })
+    }
+
+    res.status(200).json({
+      status: "success",
+      data: trip.story
+    })
+
+  } catch (error) {
+    console.error("Get Story error:", error);
+    return res.status(500).json({
+      message: "Something went wrong.",
+      error: error.message,
+    });
+  }
+}
 
 const tripController = {
   getAllUserTrips,
@@ -1079,6 +1110,7 @@ const tripController = {
   addExpenses,
   editExpenses,
   inviteCollaborator,
+  getTripStory
 };
 
 export default tripController;
