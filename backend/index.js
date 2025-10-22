@@ -10,6 +10,7 @@ import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import cookieParser from "cookie-parser";
 import { Server } from "socket.io";
+import {createServer} from "http";
 import http from "http";
 import path from "path";
 import { fileURLToPath } from 'url';
@@ -31,6 +32,7 @@ mongoose.connect(process.env.MONGO_URI)
 .catch(err => console.error("MongoDB connection error:", err));
 
 const app = express();
+const server = createServer(app);
 app.use(cookieParser());
 app.use(express.json());
 app.use(
@@ -45,13 +47,14 @@ app.use(session({
     saveUninitialized: false,
     cookie: { secure: false }, // true if using HTTPS
 }))
-const server = http.createServer(app);
+
+
 app.use(express.urlencoded({ extended: true }));
 // app.use(passport.initialize());
 
 const io = new Server(server, {
   cors: {
-    origin: '*', // Use your frontend URL in production
+    origin: 'http://localhost:3000', // Use your frontend URL in production
     methods: ['GET', 'POST']
   }
 });
