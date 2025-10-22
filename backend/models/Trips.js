@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 const Schema = mongoose.Schema;
 
 const tripSchema = new Schema({
@@ -38,10 +38,10 @@ const tripSchema = new Schema({
       message: "End date must be after start date",
     },
   },
-  
+
   destination: {
     type: [String],
-    default: []
+    default: [],
   },
 
   createdOn: {
@@ -163,6 +163,22 @@ const tripSchema = new Schema({
         },
       },
     ],
+    isEditing: {
+      type: Boolean,
+      default: false,
+    },
+    activeUsers: [
+      {
+        userId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        },
+        joinedAt: {
+          type: Date,
+          default: Date.now,
+        },
+      },
+    ],
   },
 
   pendingInvites: [
@@ -178,11 +194,11 @@ const tripSchema = new Schema({
   ],
 });
 
-tripSchema.index({owner: 1, startDate: 1});
-tripSchema.index({collaborators: 1, startDate: 1});
+tripSchema.index({ owner: 1, startDate: 1 });
+tripSchema.index({ collaborators: 1, startDate: 1 });
 
-tripSchema.index({owner: 1, endDate: 1});
-tripSchema.index({collaborators: 1, endDate: 1});
+tripSchema.index({ owner: 1, endDate: 1 });
+tripSchema.index({ collaborators: 1, endDate: 1 });
 
 const TripModel = mongoose.model("TripModel", tripSchema);
 export default TripModel;

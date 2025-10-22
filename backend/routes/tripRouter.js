@@ -62,4 +62,6 @@ router
   .route("/trips/:tripId/invite")
   .post(authController.protect, tripController.inviteCollaborator);
 
+router.route("/trips/:tripId/story").get(authController.protect, tripController.getTripStory);
+
 export default router;
