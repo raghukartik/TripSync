@@ -119,50 +119,14 @@ global.io = io;
 
 
 io.on('connection', (socket) => {
-  console.log('🟢 A user connected:', socket.id);
-
-  socket.on('disconnect', () => {
-    console.log('🔴 User disconnected:', socket.id);
-  });
-
-  // Join user room
-  socket.on('joinUserRoom', (userId) => {
-    socket.join(`user:${userId}`);
-    console.log(`Socket ${socket.id} joined user room user:${userId}`);
-  });
-
-  // Join trip chat room
-  socket.on('joinTripRoom', (tripId) => {
-    socket.join(`trip:${tripId}`);
-    console.log(`Socket ${socket.id} joined trip room trip:${tripId}`);
-  });
-
-  // Send message to trip chat
-  socket.on('sendMessage', async ({ tripId, sender, message }) => {
-    try {
-      const msgData = {
-        sender,
-        message,
-        sentAt: new Date(),
-      };
-
-      // ✅ Save message in DB
-      await TripModel.findByIdAndUpdate(tripId, {
-        $push: { chatMessages: msgData }
-      });
-
-      // ✅ Optionally fetch sender's name (if you want to show it)
-      const user = await User.findById(sender).select('name');
-      msgData.senderName = user?.name || "Unknown";
-
-      // ✅ Broadcast message
-      io.to(`trip:${tripId}`).emit('newMessage', msgData);
-    } catch (err) {
-      console.error("❌ Error sending message:", err.message);
-    }
-  });
+  console.log("user connected");
+  console.log("Id", socket.id);;
+  socket.emit("welcome", {message: "Welcome to the TripSync"});
+  socket.on("message", (data) => {
+    console.log(data.message);
+    io.to(data.room).emit("recieve-msg", data.message);
+  })
 });
-
 
 
 app.use("/api", tripRouter);
