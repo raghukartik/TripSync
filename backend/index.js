@@ -58,7 +58,7 @@ const io = new Server(server, {
     methods: ['GET', 'POST']
   }
 });
-global.io = io;
+
 
 // passport.use(
 //   new GoogleStrategy(
@@ -125,9 +125,13 @@ io.on('connection', (socket) => {
   socket.on("message", (data) => {
     console.log(data.message);
     io.to(data.room).emit("recieve-msg", data.message);
+    io.emit("recieve-msg", data.message);
+  })
+  socket.on("join-room", (room) => {
+    socket.join(room);
+    console.log(`${socket.id} joined ${room}`);
   })
 });
-
 
 app.use("/api", tripRouter);
 app.use("/api", userRouter);
