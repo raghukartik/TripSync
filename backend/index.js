@@ -25,6 +25,7 @@ import { authenticateToken } from "./utilities.js";
 import tripRouter from "./routes/tripRouter.js";
 import userRouter from "./routes/userRouter.js";
 import authRouter from "./routes/authRouter.js";
+import { socketController } from "./controllers/socketController.js";
 
 
 mongoose.connect(process.env.MONGO_URI)
@@ -117,21 +118,7 @@ const io = new Server(server, {
 
 // Socket.IO connection handler
 
-
-io.on('connection', (socket) => {
-  console.log("user connected");
-  console.log("Id", socket.id);;
-  socket.emit("welcome", {message: "Welcome to the TripSync"});
-  socket.on("message", (data) => {
-    console.log(data.message);
-    io.to(data.room).emit("recieve-msg", data.message);
-    io.emit("recieve-msg", data.message);
-  })
-  socket.on("join-room", (room) => {
-    socket.join(room);
-    console.log(`${socket.id} joined ${room}`);
-  })
-});
+socketController(io);
 
 app.use("/api", tripRouter);
 app.use("/api", userRouter);

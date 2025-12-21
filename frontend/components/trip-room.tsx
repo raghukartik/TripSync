@@ -3,7 +3,13 @@ import React, { useMemo } from "react";
 import { useState, useEffect } from "react";
 import { io } from "socket.io-client";
 
-const TripRoom = () => {
+interface TripRoomProps {
+  tripId: string;
+  userId: string;
+}
+
+const TripRoom = ({tripId, userId}: TripRoomProps) => {
+  
   const socket = useMemo(
     () =>
       io("http://localhost:8000", {
@@ -14,13 +20,12 @@ const TripRoom = () => {
   );
   const [message, setMessage] = useState("");
   const [room, setRoom] = useState("");
-  const [allmsg, setAllMsg] = useState([]);
+  const [allmsg, setAllMsg] = useState<string[]>([]);
   const [roomName, setRoomName] = useState("");
 
   const handleSubmit = (e:React.FormEvent) => {
     e.preventDefault();
-    console.log(message);
-    socket.emit("message", {message, room})
+    socket.emit("message", {message, tripId, userId})
   }
 
   const handleJoinRoom = (e:React.FormEvent) => {
@@ -39,12 +44,12 @@ const TripRoom = () => {
       console.log(msgrcv);
       setAllMsg((allmsg) => [...allmsg, msgrcv]);
     })
-    socket.emit("message", {msg: "Hy from kartik"})
   }, []);
 
   return (
     <div>
       <h1>TripRoom</h1>
+      <h2>{userId} logged in in {tripId}</h2>
       <form onSubmit={handleSubmit}>
         <input value={message} type="text" onChange={(e) => setMessage(e.target.value)} className="bg-amber-500 mr-2" placeholder="message"/>
         <input value={room} type="text" onChange={(e) => setRoom(e.target.value)} className="bg-amber-500 mr-2" placeholder="Room Id"/>
