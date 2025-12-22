@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
+    "bullmq": "^5.66.2",
     "cloudinary": "^1.41.3",
     "cookie-parser": "^1.4.7",
     "cookie-session": "^2.1.0",
