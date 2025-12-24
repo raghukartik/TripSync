@@ -2,6 +2,7 @@ import express from "express";
 import authController from "../controllers/authController.js";
 import upload from "../utils/multer.js";
 import tripController from "../controllers/tripController.js";
+import tripRoomController from "../controllers/tripRoomController.js";
 
 const router = express.Router();
 
@@ -63,5 +64,9 @@ router
   .post(authController.protect, tripController.inviteCollaborator);
 
 router.route("/trips/:tripId/story").get(authController.protect, tripController.getTripStory);
+
+// TripRoom routes
+router.route("/trips/tripRooms/:tripId/messages").get(authController.protect, tripRoomController.getTripRoomMessage);
+
 
 export default router;

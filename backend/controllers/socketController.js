@@ -1,13 +1,6 @@
 import Redis from "ioredis";
-import { messageQueue } from "../queues/messageQueue";
-const redis = new Redis({
-  username: "default",
-  password: "*******",
-  socket: {
-    host: "redis-13271.crce263.ap-south-1-1.ec2.cloud.redislabs.com",
-    port: 6379,
-  },
-});
+import { messageQueue } from "../queues/messageQueue.js";
+import { redis } from "../utils/redis.js";
 
 redis.on("connect", () => {
   console.log("redis connected");
@@ -39,12 +32,11 @@ export const socketController = (io) => {
         text: message,
         timeStamp: Date.now(),
       });
-     
 
       await redis.rpush(redisKey, payload);
 
       const messages = await redis.lrange(redisKey, 0, -1);
-      const parsed = messages.map(m => JSON.parse(m));
+      const parsed = messages.map((m) => JSON.parse(m));
 
       console.log("msg from redis: ", parsed);
 
@@ -53,8 +45,23 @@ export const socketController = (io) => {
         await redis.expire(redisKey, 3600);
       }
 
-      console.log(redis.options.host, redis.options.port, redis.options.db);
+      await messageQueue.add(
+        "flush-tripRoom-messages",
+        { tripId },
+        {
+          jobId: `trip-${tripId}`,
+          removeOnComplete: true,
+        }
+      );
+      
+      const counts = await messageQueue.getJobCounts();
+      console.log(counts);
 
+
+      const jobs = await messageQueue.getWaiting();
+      jobs.forEach((job) => {
+        console.log(job.id, job.name, job.data);
+      });
     });
 
     // Handle joining a room

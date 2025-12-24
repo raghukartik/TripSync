@@ -26,11 +26,9 @@ import tripRouter from "./routes/tripRouter.js";
 import userRouter from "./routes/userRouter.js";
 import authRouter from "./routes/authRouter.js";
 import { socketController } from "./controllers/socketController.js";
+import { connectDB } from "./utils/db.js";
 
-
-mongoose.connect(process.env.MONGO_URI)
-.then(() => console.log("MongoDB connected"))
-.catch(err => console.error("MongoDB connection error:", err));
+await connectDB();
 
 const app = express();
 const server = createServer(app);
