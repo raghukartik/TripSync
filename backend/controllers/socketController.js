@@ -16,20 +16,21 @@ export const socketController = (io) => {
 
     // Handle message events
     socket.on("message", async (data) => {
-      const { tripId, userId, message } = data;
-
+      console.log(data);
+      const { tripId, sender, text } = data;
+      
       io.to(tripId).emit("recieve-msg", {
-        message,
-        userId,
+        text,
         tripId,
+        sender
       });
 
       const redisKey = `trip:${tripId}:messages`;
 
       const payload = JSON.stringify({
         tripId,
-        sender: userId,
-        text: message,
+        sender: sender._id,
+        text,
         timeStamp: Date.now(),
       });
 
@@ -57,6 +58,16 @@ export const socketController = (io) => {
       const counts = await messageQueue.getJobCounts();
       console.log(counts);
 
+      const failedJobs = await messageQueue.getFailed();
+
+      for (const job of failedJobs) {
+        console.log({
+          id: job.id,
+          name: job.name,
+          data: job.data,
+          failedReason: job.failedReason,
+        });
+      }
 
       const jobs = await messageQueue.getWaiting();
       jobs.forEach((job) => {

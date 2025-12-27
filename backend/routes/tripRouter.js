@@ -67,6 +67,7 @@ router.route("/trips/:tripId/story").get(authController.protect, tripController.
 
 // TripRoom routes
 router.route("/trips/tripRooms/:tripId/messages").get(authController.protect, tripRoomController.getTripRoomMessage);
+router.route("/trips/tripRooms/:tripId/collaborators").get(authController.protect, tripController.getTripCollaborators);
 
 
 export default router;
