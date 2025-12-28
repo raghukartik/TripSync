@@ -1,6 +1,6 @@
 import express from "express";
 import TripModel from "../models/Trips.js";
-import Notification from "../models/Notification.js";
+import Notification from "../models/Invitation.js";
 import mongoose from "mongoose";
 import User from "../models/User.js";
 
@@ -968,13 +968,13 @@ const editExpenses = async (req, res, next) => {
 
 const inviteCollaborator = async (req, res, next) => {
   try {
-    const { userId } = req.user; // authenticated user (owner)
+    const { userId } = req.user; 
     const { tripId } = req.params;
-    const { collabId } = req.body;
+    const { email } = req.body;
 
-    if (!tripId || !collabId) {
+    if (!tripId || !email) {
       return res.status(400).json({
-        message: "TripId or collabId is required.",
+        message: "TripId or email is required.",
       });
     }
 

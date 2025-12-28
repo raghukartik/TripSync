@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { Map, BookOpen, FolderOpen, Settings2, PlusCircle } from "lucide-react";
-import { getUserInfo } from "@/lib/auth";
+import { getUserInfo } from "@/lib/api";
 import { NavMain } from "@/components/nav-main";
 import { NavProjects } from "@/components/nav-projects";
 import { NavUser } from "@/components/nav-user";
@@ -19,7 +19,6 @@ interface User {
   email: string;
   avatar?: string;
 }
-
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [user, setUser] = React.useState<User | null>(null);

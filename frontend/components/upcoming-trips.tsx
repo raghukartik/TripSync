@@ -397,6 +397,17 @@ const TripCard = ({ trip }: { trip: Trip }) => {
             <span className="font-medium">Chat</span>
             <ChevronRight className="h-3.5 w-3.5" />
           </Button>
+
+          <Button
+            variant="ghost"
+            size="sm"
+            className="flex items-center gap-1.5 hover:bg-orange-50 hover:text-orange-700 transition-colors rounded-lg px-3"
+            onClick={() => router.push(`/tripCollaborators/${trip._id}`)}
+          >
+            <Users className="h-4 w-4" />
+            <span className="font-medium">Collaborators</span>
+            <ChevronRight className="h-3.5 w-3.5" />
+          </Button>
         </div>
       </CardContent>
 

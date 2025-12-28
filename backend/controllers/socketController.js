@@ -45,7 +45,7 @@ export const socketController = (io) => {
       if (ttl === -1) {
         await redis.expire(redisKey, 3600);
       }
-
+      await messageQueue.retryJobs({ state: "failed" });
       await messageQueue.add(
         "flush-tripRoom-messages",
         { tripId },

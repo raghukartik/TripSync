@@ -6,7 +6,7 @@ import ChatHeader from "./ChatHeader";
 import ChatBody from "./ChatBody";
 import ChatInput from "./ChatInput";
 import CollaboratorsSidebar from "./CollaboratorsSidebar";
-import { getUserInfo } from "@/lib/auth";
+import { getUserInfo } from "@/lib/api";
 
 interface User {
   _id: string;
@@ -63,12 +63,12 @@ const TripRoom = ({
 
     socket.on("recieve-msg", (data) => {
       console.log(data);
-      
+
       const normalizedMessage: Message = {
         text: data.text,
         timestamp: new Date(),
-        sender: data.sender
-      }
+        sender: data.sender,
+      };
 
       setMessages((prev) => [...prev, normalizedMessage]);
     });
@@ -82,15 +82,15 @@ const TripRoom = ({
     const sender: User = {
       _id: userId,
       name: userDetails.name,
-      email: userDetails.email
-    }
+      email: userDetails.email,
+    };
     socket.emit("message", { text, tripId, sender });
   };
 
   return (
     <div className="flex h-screen bg-gray-100">
       <CollaboratorsSidebar collaborators={roomCollab} />
-      
+
       <div className="flex flex-col flex-1">
         <ChatHeader memberCount={roomCollab.length} />
         <ChatBody messages={messages} userId={userId} />
@@ -114,7 +114,6 @@ const TripRoom = ({
       `}</style>
     </div>
   );
-
 };
 
 export default TripRoom;

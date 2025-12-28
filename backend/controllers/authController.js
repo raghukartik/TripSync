@@ -84,8 +84,6 @@ const logout = (req, res) => {
   res.json({ message: "Logged out successfully" });
 };
 
-
-
 const protect = async (req, res, next) => {
   try {
     const token = req.cookies.token;

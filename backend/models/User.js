@@ -23,7 +23,7 @@ const userSchema = new mongoose.Schema({
   },
 
   avatarUrl: {
-    type: String, // Optional profile picture
+    type: String, 
     default: '',
   },
 
@@ -38,13 +38,6 @@ const userSchema = new mongoose.Schema({
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'TripModel',
-    }
-  ],
-
-  notifications: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'Notification'
     }
   ],
 

@@ -91,3 +91,17 @@ export async function getUserCompletedTrips(){
     return null;
   }
 }
+
+
+export async function getRoomCollab(tripId: string){
+  const cookieStore = await cookies();
+  const res = await fetch(`http://localhost:8000/api/trips/tripRooms/${tripId}/collaborators`, {
+    headers: {
+      Cookie: cookieStore.toString(),
+    },
+    next: { tags: ['messages'] },
+  });
+  if(!res.ok) return null;
+  const data = await res.json();
+  return data.collaborators;
+}
