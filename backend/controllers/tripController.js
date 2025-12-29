@@ -1,9 +1,10 @@
 import express from "express";
 import TripModel from "../models/Trips.js";
-import Notification from "../models/Invitation.js";
 import mongoose from "mongoose";
 import User from "../models/User.js";
-
+import InvitationModel from "../models/Invitation.js";
+import { sendInvitationEmail } from "./invitationController.js";
+import { randomBytes } from "crypto";
 // get all the stories
 
 const getAllUserTrips = async (req, res, next) => {
@@ -966,94 +967,91 @@ const editExpenses = async (req, res, next) => {
   }
 };
 
-const inviteCollaborator = async (req, res, next) => {
+const inviteCollaborator = async (req, res) => {
   try {
-    const { userId } = req.user; 
+    const { userId } = req.user;
     const { tripId } = req.params;
     const { email } = req.body;
 
     if (!tripId || !email) {
-      return res.status(400).json({
-        message: "TripId or email is required.",
-      });
+      return res.status(400).json({ message: "TripId and email are required." });
     }
 
     const trip = await TripModel.findById(tripId);
-
     if (!trip) {
-      return res.status(404).json({
-        message: "Trip not found.",
-      });
+      return res.status(404).json({ message: "Trip not found." });
     }
 
     if (trip.owner.toString() !== userId.toString()) {
       return res.status(403).json({
-        message: "Only the trip owner can invite collaborators.",
+        message: "Only the trip owner can invite collaborators."
       });
     }
 
-    const isAlreadyCollaborator = trip.collaborators.some(
-      (id) => id.toString() === collabId
-    );
-    if (isAlreadyCollaborator) {
-      return res.status(400).json({
-        message: "User is already a collaborator.",
+    const user = await User.findOne({ email });
+    const inviter = await User.findOne({_id: userId})
+    const isUserAccExist = !!user;
+
+    if (user) {
+      const isAlreadyCollaborator = trip.collaborators.some(
+        (c) => c.toString() === user._id.toString()
+      );
+
+      if (isAlreadyCollaborator) {
+        return res.status(409).json({
+          message: "User is already a collaborator."
+        });
+      }
+    }
+
+    const existingInvite = await InvitationModel.findOne({
+      tripId,
+      email,
+      status: "PENDING"
+    });
+
+    if (existingInvite) {
+      return res.status(409).json({
+        message: "User has already been invited."
       });
     }
 
-    const isAlreadyInvited = trip.pendingInvites?.some(
-      (inv) => inv.user.toString() === collabId
-    );
-    if (isAlreadyInvited) {
-      return res.status(400).json({
-        message: "User has already been invited.",
-      });
-    }
+    // Generate secure token
+    const token = randomBytes(32).toString("hex");
 
-    // Add to pendingInvites
-    trip.pendingInvites = trip.pendingInvites || [];
-    trip.pendingInvites.push({
-      user: collabId,
-      invitedAt: new Date(),
-      status: "pending",
+    const invitation = await InvitationModel.create({
+      invitedBy: userId,
+      tripId,
+      email,
+      token,
+      status: "PENDING",
+      expiresAt: new Date(Date.now() + 48 * 60 * 60 * 1000), // 48h
+      acceptedAt: null
     });
 
-    await trip.save();
-
-    // Create notification
-    const recipient = await User.findById(collabId);
-    if (!recipient) {
-      return res.status(404).json({ message: "Collaborator user not found." });
-    }
-
-    const notification = new Notification({
-      recipient: recipient._id,
-      sender: userId,
-      trip: trip._id,
-      type: "trip-invite",
-      message: `You have been invited to join the trip "${trip.title}".`,
-    });
-
-    await notification.save();
-
-    io.to(collabId).emit("notification", {
-      type: "trip-invite",
-      message: `You have been invited to join the trip "${trip.title}".`,
-      tripId: trip._id,
-    });
+    // Send email (non-blocking)
+    await sendInvitationEmail({
+      email,
+      token,
+      tripName: trip.title,
+      inviterName: inviter.name,
+      expiresAt: invitation.expiresAt
+    }).catch(console.error);
 
     return res.status(200).json({
-      message: "Collaborator invited successfully.",
-      notificationId: notification._id,
+      message: "Invitation sent successfully.",
+      isUserAccExist
     });
+
   } catch (error) {
     console.error("inviteCollaborator error:", error);
     return res.status(500).json({
       message: "Something went wrong.",
-      error: error.message,
+      error: error.message
     });
   }
 };
+
 
 const getTripStory = async(req, res, next) => {
   try {

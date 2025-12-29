@@ -1,7 +1,6 @@
 import express from "express";
 import User from "../models/User.js";
 import TripModel from "../models/Trips.js";
-import Notification from "../models/Notification.js";
 
 const getAllUsers = async (req, res, next) => {
   try {
@@ -71,17 +70,7 @@ const respondToInvite = async (req, res, next) => {
     await user.save();
 
     // Update related notification
-    await Notification.findOneAndUpdate(
-      {
-        trip: tripId,
-        recipient: userId,
-        type: "trip-invite",
-      },
-      {
-        $set: { isAccepted: true },
-      }
-    );
-
+    
     // Optional real-time event
     // io.to(trip.owner.toString()).emit("trip:inviteResponse", { userId, tripId, status });
 

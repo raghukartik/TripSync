@@ -11,12 +11,14 @@
     "start": "nodemon index.js"
   },
   "dependencies": {
+    "@emailjs/nodejs": "^5.0.2",
     "bcrypt": "^6.0.0",
     "bullmq": "^5.66.2",
     "cloudinary": "^1.41.3",
     "cookie-parser": "^1.4.7",
     "cookie-session": "^2.1.0",
     "cors": "^2.8.5",
+    "crypto": "^1.0.1",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "express-session": "^1.18.1",
@@ -25,6 +27,7 @@
     "mongoose": "^8.16.0",
     "multer": "^2.0.1",
     "multer-storage-cloudinary": "^4.0.0",
+    "nodemailer": "^7.0.12",
     "nodemon": "^3.1.10",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
