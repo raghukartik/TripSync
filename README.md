@@ -14,7 +14,7 @@ Plan your itinerary, chat together, and document your journey — all in one pla
 - ✅ **Task Management** – Create tasks, set priorities, and assign them to collaborators.
 - 📊 **User Dashboard** – Personalized dashboard to track trips and stories.
 - 🤝 **Real-time Collaboration** –  Real-time group chat and collaboration using Socket.io
-⚡ **Scalable Backend** – Optimized with Redis and BullMQ for processing background jobs
+- ⚡ **Scalable Backend** – Optimized with Redis and BullMQ for processing background jobs
 ---
 
 ## 🛠️ Tech Stack
