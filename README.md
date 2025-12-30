@@ -1,34 +1,26 @@
 # 🌍 TripSync
 
 TripSync is a collaborative platform for **trip planning** and **story writing**, designed to make travel coordination seamless and fun.  
-Plan your itinerary, share resources, and document your journey — all in one place.
-
-⚠️ **Note:** This project is currently **under development** and not deployed yet. Stay tuned for updates!
+Plan your itinerary, chat together, and document your journey — all in one place.
 
 ---
 
 ## ✨ Features
 
-- 📝 **Trip Planning** – Create and manage detailed itineraries.  
-- 📂 **Resource Sharing** – Store and share important travel resources.  
+- 📝 **Trip Planning** – Create and manage detailed itineraries.    
 - 📖 **Travel Stories** – Write and share stories about your trips.  
 - 💰 **Expense Tracking** – Split and manage expenses across the group.
 - 👥 **Collaborator Management** – Invite collaborators to your trip and allocate roles.
 - ✅ **Task Management** – Create tasks, set priorities, and assign them to collaborators.
 - 📊 **User Dashboard** – Personalized dashboard to track trips and stories.
----
-
-## 🚀 Upcoming Features
-
-- 🤝 **Real-time Collaboration** – Collaborative editing and **group chat** for seamless coordination.  
-- ⚡ **Scalable Backend** – Optimized with Redis and BullMQ for handling live updates (planned).  
-
+- 🤝 **Real-time Collaboration** –  Real-time group chat and collaboration using Socket.io
+⚡ **Scalable Backend** – Optimized with Redis and BullMQ for processing background jobs
 ---
 
 ## 🛠️ Tech Stack
 
 - **Frontend:** TypeScript, Next.js, shadcn/ui, Tailwind CSS  
-- **Backend:** Node.js, ExpressJs, MongoDB  
+- **Backend:** Node.js, ExpressJs, MongoDB, Redis, BullMQ
 - **Realtime:** Socket.io  
 - **Other Tools:** Vercel (for deployment), Git & GitHub (version control)  
 
