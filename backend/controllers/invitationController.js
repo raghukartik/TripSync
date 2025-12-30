@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-dotenv.config({ path: "../.env" });
+dotenv.config();
 import { mailer } from "../utils/mailer.js";
 import InvitationModel from "../models/Invitation.js";
 import User from "../models/User.js";
@@ -13,7 +13,7 @@ export const sendInvitationEmail = async ({
   expiresAt,
 }) => {
   const inviteLink = `${process.env.CLIENT_URL}/invite/accept?token=${token}`;
-
+  console.log(process.env.CLIENT_URL)
   const html = inviteEmailTemplate({
     appLink: process.env.CLIENT_URL,
     inviterName,
@@ -61,11 +61,12 @@ export const validateInvitationRequest = async (req, res) => {
     }
 
     const user = await User.findOne({ email: invitation.email });
-
+    const isAuthenticated = !!req.user;
     return res.status(200).json({
       valid: true,
       email: invitation.email,
       accountExists: !!user,
+      isAuthenticated: !!req.user,
       tripId: invitation.tripId,
     });
   } catch (error) {
@@ -76,3 +77,4 @@ export const validateInvitationRequest = async (req, res) => {
     });
   }
 };
+
