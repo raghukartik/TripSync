@@ -3,55 +3,68 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
 import userSchema from "../models/User.js";
-
+import tripController from "./tripController.js";
 
 const createAccount = async(req, res, next) => {
-  const { name, email, password } = req.body;
+  try {
+    const { name, email, password } = req.body;
+    const {invite: inviteToken} = req.query;
+    if (!name || !email || !password) {
+      return res.status(400).json({
+        error: true,
+        message: "All fields required",
+      });
+    }
+    
 
-  if (!name || !email || !password) {
-    return res.status(400).json({
-      error: true,
-      message: "All fields required",
+    const isUser = await userSchema.findOne({ email });
+    if (isUser) {
+      return res.status(400).json({
+        error: true,
+        message: "User already exists",
+      });
+    }
+  
+    const hashedPassword = await bcrypt.hash(password, 10);
+  
+    const user = new userSchema({
+      name,
+      email,
+      password: hashedPassword,
+    });
+  
+    await user.save();
+    
+    const accessToken = jwt.sign(
+      { userId: user._id },
+      process.env.ACCESS_TOKEN_SECRET,
+      { expiresIn: "72h" }
+    );
+  
+    // ✅ Set JWT as an HTTP-only cookie
+    res.cookie("token", accessToken, {
+      httpOnly: true,
+      secure: false, // set to true in production (HTTPS)
+      sameSite: "Lax",
+      maxAge: 72 * 60 * 60 * 1000, // 72 hours
+    });
+    
+    if(inviteToken){
+      await tripController.acceptInvitation(inviteToken);
+    }
+    
+    return res.status(201).json({
+      error: false,
+      user: { fullName: user.fullName, email: user.email },
+      message: "Registration Successful",
+    });
+    
+  } catch (error) {
+    console.error("createAccount error:", error);
+    return res.status(500).json({
+      message: "Failed to create account"
     });
   }
-
-  const isUser = await userSchema.findOne({ email });
-  if (isUser) {
-    return res.status(400).json({
-      error: true,
-      message: "User already exists",
-    });
-  }
-
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  const user = new userSchema({
-    name,
-    email,
-    password: hashedPassword,
-  });
-
-  await user.save();
-
-  const accessToken = jwt.sign(
-    { userId: user._id },
-    process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: "72h" }
-  );
-
-  // ✅ Set JWT as an HTTP-only cookie
-  res.cookie("token", accessToken, {
-    httpOnly: true,
-    secure: false, // set to true in production (HTTPS)
-    sameSite: "Lax",
-    maxAge: 72 * 60 * 60 * 1000, // 72 hours
-  });
-
-  return res.status(201).json({
-    error: false,
-    user: { fullName: user.fullName, email: user.email },
-    message: "Registration Successful",
-  });
 };
 
 const login = async (req, res) => {

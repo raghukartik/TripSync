@@ -17,7 +17,6 @@ export function SignupForm({
 }: React.ComponentProps<"div">) {
   const searchParams = useSearchParams();
   const token = searchParams.get("invite");
-  const [invitationEmail, setInvitationEmail] = useState<string>("");
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -31,7 +30,7 @@ export function SignupForm({
 
     try {
 
-      const res = await fetch("http://localhost:8000/api/auth/create-account", {
+      const res = await fetch(`http://localhost:8000/api/auth/create-account${token ? `?invite=${token}`: ""}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -39,14 +38,12 @@ export function SignupForm({
         credentials: "include",
         body: JSON.stringify({ name, email, password }),
       })
-  
       if(res.ok){
         router.push("/dashboard");
       }else{
         const errorData = await res.json();
         setError(errorData.message || "Login failed. Please try again.");
       }
-      
     } catch{
         setError("Network error. Please try again later.");
     } finally{
@@ -68,7 +65,7 @@ export function SignupForm({
 
           if (res.ok) {
             const data = await res.json();
-            setInvitationEmail(data.email || "");
+            setEmail(data.email || "");
           }
         } catch (error) {
           console.error("Error fetching invitation data:", error);
@@ -119,7 +116,7 @@ export function SignupForm({
                   type="email"
                   placeholder="jane@example.com"
                   required
-                  value={(token ? invitationEmail : email)}
+                  value={(email)}
                   onChange={(e) => {
                     // Only allow changes if there's no token
                     if (!token) {
