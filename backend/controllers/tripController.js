@@ -1052,6 +1052,77 @@ const inviteCollaborator = async (req, res) => {
   }
 };
 
+const acceptInvitation = async (req, res) => {
+  try {
+    const { token } = req.query;
+
+    if (!token) {
+      return res.status(400).json({
+        message: "Token is required"
+      });
+    }
+
+    const invitation = await InvitationModel.findOne({
+      token,
+      status: "PENDING"
+    });
+
+    if (!invitation) {
+      return res.status(404).json({
+        message: "Invalid or already used invitation"
+      });
+    }
+
+    if (invitation.expiresAt < new Date()) {
+      return res.status(410).json({
+        message: "Invitation expired"
+      });
+    }
+
+    const user = await User.findOne({ email: invitation.email });
+    if (!user) {
+      return res.status(404).json({
+        message: "User account not found"
+      });
+    }
+
+    const trip = await TripModel.findById(invitation.tripId);
+    if (!trip) {
+      return res.status(404).json({
+        message: "Trip not found"
+      });
+    }
+
+    const alreadyCollaborator = trip.collaborators.some(
+      (c) => c.toString() === user._id.toString()
+    );
+
+    if (alreadyCollaborator) {
+      return res.status(409).json({
+        message: "User already a collaborator"
+      });
+    }
+
+    trip.collaborators.push(user._id);
+
+    await trip.save();
+
+    invitation.status = "ACCEPTED";
+    invitation.acceptedAt = new Date();
+    await invitation.save();
+
+    return res.status(200).json({
+      message: "Invitation accepted successfully",
+      tripId: trip._id
+    });
+  } catch (error) {
+    console.error("acceptInvitation error:", error);
+    return res.status(500).json({
+      message: "Failed to accept invitation"
+    });
+  }
+};
+
 
 const getTripStory = async(req, res, next) => {
   try {
@@ -1116,7 +1187,8 @@ const tripController = {
   addExpenses,
   editExpenses,
   inviteCollaborator,
-  getTripStory
+  getTripStory,
+  acceptInvitation
 };
 
 export default tripController;

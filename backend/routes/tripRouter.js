@@ -71,5 +71,6 @@ router.route("/trips/tripRooms/:tripId/collaborators").get(authController.protec
 
 // Trip invitation
 
-router.route("/trips/invitations/validate").post(validateInvitationRequest);
+router.route("/trips/invitations/validate").get(validateInvitationRequest);
+router.route("/trips/invitations/accept").get(tripController.acceptInvitation);
 export default router;
