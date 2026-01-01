@@ -1,5 +1,5 @@
 import CollaboratorsClient from '@/components/collaborators/CollaboratorsClient';
-import { getRoomCollab } from '@/lib/api';
+import { getReceivedInvitations, getRoomCollab } from '@/lib/api';
 
 interface pageProps{
     params: {
@@ -10,11 +10,12 @@ interface pageProps{
 const page = async({params}: pageProps) => {
     const {tripId} = params;
     const collab = await getRoomCollab(tripId);
-    
+    const receivedInvitations = await getReceivedInvitations();
     return (
         <CollaboratorsClient 
             collaborators={collab.collaborators}
-            pendingInvitations={collab.pendingInvitations} // optional
+            pendingInvitations={pendingInvitations} 
+            receivedInvitations={receivedInvitations}
             tripId={tripId}
         />
     )

@@ -5,10 +5,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ExclamationTriangleIcon, EyeClosedIcon, EyeOpenIcon } from "@radix-ui/react-icons";
+import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 
 export function LoginForm({
@@ -20,7 +21,10 @@ export function LoginForm({
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [invitedTripId, setInvitedTripId] = useState<string>("");
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const token = searchParams.get("invite");
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -38,7 +42,7 @@ export function LoginForm({
       });
 
       if (res.ok) {
-        router.push("/dashboard");
+        router.push(`/collaborators/${invitedTripId}`);
       } else {
         const errorData = await res.json();
         setError(errorData.message || "Login failed. Please try again.");
@@ -49,6 +53,35 @@ export function LoginForm({
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    const fetchInvitationData = async () => {
+      if (token) {
+        setIsLoading(true);
+        try {
+          const res = await fetch(
+            `http://localhost:8000/api/trips/invitations/validate?token=${token}`,
+            {
+              credentials: "include",
+            }
+          );
+
+          if (res.ok) {
+            const data = await res.json();
+            setEmail(data.email || "");
+            setInvitedTripId(data.tripId);
+          }
+        } catch (error) {
+          console.error("Error fetching invitation data:", error);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    fetchInvitationData();
+  }, [token]);
+
 
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -78,9 +111,10 @@ export function LoginForm({
                   placeholder="m@example.com"
                   required
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => {if(!token) setEmail(e.target.value)}}
                   disabled={isLoading}
                   autoComplete="email"
+                  readOnly={!!token}
                   aria-describedby="email-error"
                 />
               </div>

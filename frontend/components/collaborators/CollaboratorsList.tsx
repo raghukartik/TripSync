@@ -1,3 +1,5 @@
+"use client";
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Users, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -9,7 +11,7 @@ interface Collaborator {
   email: string;
 }
 
-const CollaboratorsList = ({ collaborators }: { collaborators: Collaborator[] }) => {
+const CollaboratorsList = (collaborators: Collaborator[]) => {
   const handleRemove = (id: string, name: string) => {
     if (confirm(`Remove ${name} from this trip?`)) {
       // Handle removal logic

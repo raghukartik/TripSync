@@ -78,3 +78,38 @@ export const validateInvitationRequest = async (req, res) => {
   }
 };
 
+export const getPendingInvitation = async(req, res) => {
+  try{
+    const {userId} = req.user;
+    console.log(userId);
+    if(!userId){
+      return res.status("404").json({
+        message: "user is not logged in!"
+      })
+    }
+
+    const user = await User.findOne({_id: userId});
+    
+    const invitation = await InvitationModel.find({email: user.email, status: "PENDING"}).populate({
+      path: "invitedBy",
+      select: "name email"
+    });
+
+    if(!invitation){
+      res.status(200).json({
+        message: "No pending invitations found"
+      })
+    }
+
+    return res.status(200).json({
+      invitation
+    })
+
+  }catch(error){
+    console.error("validateInvitationRequest error:", error);
+    return res.status(500).json({
+      valid: false,
+      message: "Error validating invitation",
+    });
+  }
+}

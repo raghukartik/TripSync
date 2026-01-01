@@ -1,12 +1,45 @@
+"use client";
+
 import SendInvitation from "./SendInvitation";
 import PendingInvitations from "./PendingInvitations";
 import CollaboratorsList from "./CollaboratorsList";
+import ReceivedPendingInvitations from "./RecievedInvitation";
+
+interface Collaborators{
+  _id: string;
+  name: string, 
+  email: string,
+}
+
+interface PendingInvitation {
+  _id: string;
+  email: string;
+  sentAt: string;
+}
+
+interface ReceivedInvitation {
+  _id: string;
+  tripId: string;
+  tripName: string;
+  inviterName: string;
+  inviterEmail: string;
+  receivedAt: string;
+}
+
+interface CollabClientProps{
+  collaborators: Collaborators[],
+  pendingInvitations: PendingInvitation[],
+  receivedInvitations: ReceivedInvitation[];
+  tripId: string
+}
+
 
 const CollaboratorsClient = ({ 
-  collaborators, 
+  collaborators = [],
   pendingInvitations = [],
+  receivedInvitations = [],
   tripId 
-}: CollaboratorsClientProps) => {
+}: CollabClientProps) => {
   return (
     <div className="container max-w-4xl mx-auto p-6 space-y-6">
       <div className="space-y-2">
@@ -18,8 +51,9 @@ const CollaboratorsClient = ({
 
       <div className="grid gap-6">
         <SendInvitation tripId={tripId} />
+         <ReceivedPendingInvitations invitations={receivedInvitations} />
         <PendingInvitations invitations={pendingInvitations} />
-        <CollaboratorsList collaborators={collaborators} />
+        <CollaboratorsList {...collaborators} />
       </div>
     </div>
   );

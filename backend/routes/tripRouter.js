@@ -3,7 +3,7 @@ import authController from "../controllers/authController.js";
 import upload from "../utils/multer.js";
 import tripController from "../controllers/tripController.js";
 import tripRoomController from "../controllers/tripRoomController.js";
-import { validateInvitationRequest } from "../controllers/invitationController.js";
+import { validateInvitationRequest, getPendingInvitation } from "../controllers/invitationController.js";
 const router = express.Router();
 
 router
@@ -72,4 +72,5 @@ router.route("/trips/tripRooms/:tripId/collaborators").get(authController.protec
 // Trip invitation
 
 router.route("/trips/invitations/validate").get(validateInvitationRequest);
+router.route("/trips/invitations/pending").get(authController.protect, getPendingInvitation);
 export default router;

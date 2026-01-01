@@ -105,3 +105,15 @@ export async function getRoomCollab(tripId: string){
   const data = await res.json();
   return data.collaborators;
 }
+
+export async function getReceivedInvitations(){
+  const cookieStore = await cookies();
+  const res = await fetch('http://localhost:8000/api/trips/invitations/pending', {
+    headers: {
+      Cookie: cookieStore.toString()
+    }
+  })
+  if(!res.ok) return null;
+  const data = await res.json();
+  return data.invitation;
+}
