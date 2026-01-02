@@ -69,7 +69,7 @@ const createAccount = async(req, res, next) => {
 
 const login = async (req, res) => {
   const { email, password } = req.body;
-
+  const {invite: inviteToken} = req.query;
   const user = await userSchema.findOne({ email });
   if (!user) return res.status(400).json({ message: "User not found" });
 
@@ -89,7 +89,11 @@ const login = async (req, res) => {
     maxAge: 72 * 60 * 60 * 1000,
   });
 
-  res.json({ message: "Login successful" });
+  if(inviteToken){
+    await tripController.acceptInvitation(inviteToken);
+  }
+  
+  return res.json({ message: "Login successful" });
 };
 
 const logout = (req, res) => {

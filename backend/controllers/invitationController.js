@@ -3,6 +3,7 @@ dotenv.config();
 import { mailer } from "../utils/mailer.js";
 import InvitationModel from "../models/Invitation.js";
 import User from "../models/User.js";
+import TripModel from "../models/Trips.js";
 import { inviteEmailTemplate } from "../utils/inviteEmailTemplate.js";
 
 export const sendInvitationEmail = async ({
@@ -61,7 +62,7 @@ export const validateInvitationRequest = async (req, res) => {
     }
 
     const user = await User.findOne({ email: invitation.email });
-    const isAuthenticated = !!req.user;
+    console.log(!!req.user);
     return res.status(200).json({
       valid: true,
       email: invitation.email,
@@ -150,4 +151,149 @@ export const getSentInvitation = async(req, res) => {
   }
 }
 
+export const acceptReceivedInvitation = async (req, res) => {
+  try {
+    const { tripId, invitationId } = req.params;
+    const { userId } = req.user;
+
+    if (!userId) {
+      return res.status(401).json({
+        message: "User is not authenticated",
+      });
+    }
+
+    if (!tripId || !invitationId) {
+      return res.status(400).json({
+        message: "tripId and invitationId are required",
+      });
+    }
+
+    const invitation = await InvitationModel.findById(invitationId);
+    if (!invitation) {
+      return res.status(404).json({
+        message: "No invitation found with given invitationId",
+      });
+    }
+
+    if (invitation.tripId.toString() !== tripId) {
+      return res.status(400).json({
+        message: "Invitation does not belong to this trip",
+      });
+    }
+
+    if (invitation.status !== "PENDING") {
+      return res.status(400).json({
+        message: `Invitation already ${invitation.status.toLowerCase()}`,
+      });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    if (invitation.email !== user.email) {
+      return res.status(403).json({
+        message: "This invitation is not meant for you",
+      });
+    }
+
+    const trip = await TripModel.findById(tripId);
+    if (!trip) {
+      return res.status(404).json({
+        message: "Trip not found",
+      });
+    }
+
+    const alreadyCollaborator = trip.collaborators.some(
+      (id) => id.toString() === userId
+    );
+
+    if (!alreadyCollaborator) {
+      trip.collaborators.push(userId);
+      await trip.save();
+    }
+
+    invitation.status = "ACCEPTED";
+    await invitation.save();
+
+    return res.status(200).json({
+      message: "Invitation accepted successfully",
+      tripId,
+    });
+
+  } catch (error) {
+    console.error("acceptReceivedInvitation error:", error);
+    return res.status(500).json({
+      message: "Failed to accept invitation",
+    });
+  }
+};
+
+export const rejectReceivedInvitation = async (req, res) => {
+  try {
+    const { tripId, invitationId } = req.params;
+    const { userId } = req.user;
+
+    if (!userId) {
+      return res.status(401).json({
+        message: "User is not authenticated",
+      });
+    }
+
+    if (!tripId || !invitationId) {
+      return res.status(400).json({
+        message: "tripId and invitationId are required",
+      });
+    }
+
+    const invitation = await InvitationModel.findById(invitationId);
+    if (!invitation) {
+      return res.status(404).json({
+        message: "No invitation found with given invitationId",
+      });
+    }
+
+    if (invitation.tripId.toString() !== tripId) {
+      return res.status(400).json({
+        message: "Invitation does not belong to this trip",
+      });
+    }
+
+    if (invitation.status !== "PENDING") {
+      return res.status(400).json({
+        message: `Invitation already ${invitation.status.toLowerCase()}`,
+      });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    if (invitation.email !== user.email) {
+      return res.status(403).json({
+        message: "This invitation is not meant for you",
+      });
+    }
+
+    invitation.status = "REJECTED";
+    await invitation.save();
+
+    return res.status(200).json({
+      message: "Invitation rejected successfully",
+      tripId,
+    });
+
+  } catch (error) {
+    console.error("rejectReceivedInvitation error:", error);
+    return res.status(500).json({
+      message: "Failed to reject invitation",
+    });
+  }
+};
 

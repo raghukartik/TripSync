@@ -1,9 +1,11 @@
 import React from 'react'
 import InvitationPage from '@/components/invitation/InvitationPage';
+import { cookies } from 'next/headers';
 
-const page = () => {
+const page = async() => {
+  const cookieStore = await cookies();
   return (
-    <InvitationPage></InvitationPage>
+    <InvitationPage cookie={cookieStore.toString()}></InvitationPage>
   )
 }
 

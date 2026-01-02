@@ -1,9 +1,10 @@
 "use server";
 import { cookies } from "next/headers";
-export async function getUserInfo(){
+
+export async function getUserInfo() {
   try {
     const cookieStore = await cookies();
-    const res = await fetch('http://localhost:8000/api/user/me', {
+    const res = await fetch("http://localhost:8000/api/user/me", {
       method: "GET",
       credentials: "include",
       headers: {
@@ -11,7 +12,7 @@ export async function getUserInfo(){
         "Content-Type": "application/json",
       },
       cache: "no-store",
-    })
+    });
 
     if (!res.ok) {
       console.error("User info fetch failed:", res.status);
@@ -26,10 +27,10 @@ export async function getUserInfo(){
   }
 }
 
-export async function getAllUserTrips(){
-  try{
+export async function getAllUserTrips() {
+  try {
     const cookieStore = await cookies();
-    const res = await fetch('http://localhost:8000/api/user/all-trips', {
+    const res = await fetch("http://localhost:8000/api/user/all-trips", {
       method: "GET",
       credentials: "include",
       headers: {
@@ -37,95 +38,162 @@ export async function getAllUserTrips(){
         "Content-Type": "application/json",
       },
       cache: "no-store",
-    })
+    });
 
-    if(!res.ok) throw new Error("failed to fetch all trips");
+    if (!res.ok) throw new Error("failed to fetch all trips");
     const data = await res.json();
     return data.data;
-  }catch(error){
+  } catch (error) {
     console.error("Error fetching user's all trips:", error);
     return null;
   }
 }
 
-export async function getUserUpcomingTrips(){
-  try{
+export async function getUserUpcomingTrips() {
+  try {
     const cookieStore = await cookies();
-    const res = await fetch('http://localhost:8000/api/user/upcoming-trips-dashboard', {
-      method: "GET",
-      credentials: "include",
-      headers: {
-        Cookie: cookieStore.toString(),
-        "Content-Type": "application/json",
-      },
-      cache: "no-store",
-    })
+    const res = await fetch(
+      "http://localhost:8000/api/user/upcoming-trips-dashboard",
+      {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          Cookie: cookieStore.toString(),
+          "Content-Type": "application/json",
+        },
+        cache: "no-store",
+      }
+    );
 
-    if(!res.ok) throw new Error("failed to fetch upcoming trips");
+    if (!res.ok) throw new Error("failed to fetch upcoming trips");
     const data = await res.json();
     return data.data;
-  }catch(error){
+  } catch (error) {
     console.error("Error fetching user's upcoming trips:", error);
     return null;
   }
 }
 
-export async function getUserCompletedTrips(){
-  try{
+export async function getUserCompletedTrips() {
+  try {
     const cookieStore = await cookies();
-    const res = await fetch('http://localhost:8000/api/user/completed-trips-dashboard', {
-      method: "GET",
-      credentials: "include",
-      headers: {
-        Cookie: cookieStore.toString(),
-        "Content-Type": "application/json",
-      },
-      cache: "no-store",
-    })
+    const res = await fetch(
+      "http://localhost:8000/api/user/completed-trips-dashboard",
+      {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          Cookie: cookieStore.toString(),
+          "Content-Type": "application/json",
+        },
+        cache: "no-store",
+      }
+    );
 
-    if(!res.ok) throw new Error("failed to fetch user's completed trips");
+    if (!res.ok) throw new Error("failed to fetch user's completed trips");
     const data = await res.json();
     return data.data;
-  }catch(error){
+  } catch (error) {
     console.error("Error fetching user's completed trips:", error);
     return null;
   }
 }
 
-
-export async function getRoomCollab(tripId: string){
+export async function getRoomCollab(tripId: string) {
   const cookieStore = await cookies();
-  const res = await fetch(`http://localhost:8000/api/trips/tripRooms/${tripId}/collaborators`, {
-    headers: {
-      Cookie: cookieStore.toString(),
-    },
-    next: { tags: ['messages'] },
-  });
-  if(!res.ok) return null;
+  const res = await fetch(
+    `http://localhost:8000/api/trips/tripRooms/${tripId}/collaborators`,
+    {
+      headers: {
+        Cookie: cookieStore.toString(),
+      },
+      next: { tags: ["messages"] },
+    }
+  );
+  if (!res.ok) return null;
   const data = await res.json();
   return data.collaborators;
 }
 
-export async function getReceivedInvitations(){
+export async function getReceivedInvitations() {
   const cookieStore = await cookies();
-  const res = await fetch('http://localhost:8000/api/trips/invitations/recieved', {
-    headers: {
-      Cookie: cookieStore.toString()
+  const res = await fetch(
+    "http://localhost:8000/api/trips/invitations/recieved",
+    {
+      headers: {
+        Cookie: cookieStore.toString(),
+      },
     }
-  })
-  if(!res.ok) return null;
+  );
+  if (!res.ok) return null;
   const data = await res.json();
   return data.invitation;
 }
 
-export async function getSentInvitations(){
+export async function getSentInvitations() {
   const cookieStore = await cookies();
-  const res = await fetch('http://localhost:8000/api/trips/invitations/sent', {
+  const res = await fetch("http://localhost:8000/api/trips/invitations/sent", {
     headers: {
-      Cookie: cookieStore.toString()
-    }
-  })
-  if(!res.ok) return null;
+      Cookie: cookieStore.toString(),
+    },
+  });
+  if (!res.ok) return null;
   const data = await res.json();
   return data.invitation;
+}
+
+export async function inviteCollaborator(tripId: string, email: string) {
+  try {
+    const cookieStore = await cookies();
+    const res = await fetch(
+      `http://localhost:8000/api/trips/${tripId}/invite`,
+      {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          Cookie: cookieStore.toString(),
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+        }),
+      }
+    );
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.message || "Invite failed");
+    }
+
+    const data = await res.json();
+    return data.message;
+  } catch (err) {
+    throw err;
+  }
+}
+
+export async function acceptInvitation(tripId: string, invitationId: string) {
+  try {
+    const cookieStore = await cookies();
+    const res = await fetch(
+      `http://localhost:8000/api/trips/${tripId}/invitations/${invitationId}`,
+      {
+        method: "PATCH",
+        headers: {
+          Cookie: cookieStore.toString(),
+          "Content-type": "application/json",
+        },
+      }
+    );
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.message || "Invite failed");
+    }
+
+    const data = await res.json();
+    return data.message;
+  } catch (err) {
+    throw err;
+  }
 }

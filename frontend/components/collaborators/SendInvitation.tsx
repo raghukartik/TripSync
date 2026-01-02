@@ -1,41 +1,45 @@
 "use client";
 
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { UserPlus, Mail, Check, Send } from "lucide-react";
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { inviteCollaborator } from "@/lib/api";
 
 const SendInvitation = ({ tripId }: { tripId: string }) => {
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const handleSendInvite = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setError('Please enter a valid email address');
+      setError("Please enter a valid email address");
       return;
     }
 
     setLoading(true);
-    setError('');
+    setError("");
     setSuccess(false);
 
     try {
-      const res = fetch(`http://localhost:8000/api/trips/${tripId}/invite`,{
-        
-      })
-      
+      await inviteCollaborator(tripId, email);
+
       setSuccess(true);
-      setEmail('');
+      setEmail("");
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
-      setError('Failed to send invitation. Please try again.');
+      setError("Failed to send invitation. Please try again.");
       console.log(err);
     } finally {
       setLoading(false);
@@ -97,5 +101,4 @@ const SendInvitation = ({ tripId }: { tripId: string }) => {
   );
 };
 
-
-export default SendInvitation
+export default SendInvitation;

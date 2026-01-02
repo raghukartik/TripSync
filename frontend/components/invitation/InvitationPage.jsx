@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 
-const InvitationPage = () => {
+const InvitationPage = (cookie) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
@@ -16,12 +16,12 @@ const InvitationPage = () => {
 
     const validateInvitation = async () => {
       try {
-        const res = await fetch(
-          `http://localhost:8000/api/trips/invitations/validate?token=${token}`,
-          {
-            credentials: "include"
-          }
-        );
+        const res = await fetch(`http://localhost:8000/api/trips/invitations/validate?token=${token}`, {
+          credentials: "include",
+          headers: {
+            Cookie: cookie
+          },
+        });
 
         const data = await res.json();
         console.log("Invite validation response:", data);
@@ -41,7 +41,7 @@ const InvitationPage = () => {
           return;
         }
 
-        router.replace(`/invite/confirm?token=${token}`);
+        router.replace(`/collaborators`);
       } catch (error) {
         console.error("Invite validation error:", error);
         router.replace("/invite/invalid");
