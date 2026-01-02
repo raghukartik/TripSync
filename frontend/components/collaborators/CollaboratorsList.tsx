@@ -11,7 +11,11 @@ interface Collaborator {
   email: string;
 }
 
-const CollaboratorsList = (collaborators: Collaborator[]) => {
+const CollaboratorsList = ({ 
+  collaborators 
+}: { 
+  collaborators: Collaborator[] 
+}) => {
   const handleRemove = (id: string, name: string) => {
     if (confirm(`Remove ${name} from this trip?`)) {
       // Handle removal logic

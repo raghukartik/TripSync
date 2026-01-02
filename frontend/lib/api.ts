@@ -108,7 +108,19 @@ export async function getRoomCollab(tripId: string){
 
 export async function getReceivedInvitations(){
   const cookieStore = await cookies();
-  const res = await fetch('http://localhost:8000/api/trips/invitations/pending', {
+  const res = await fetch('http://localhost:8000/api/trips/invitations/recieved', {
+    headers: {
+      Cookie: cookieStore.toString()
+    }
+  })
+  if(!res.ok) return null;
+  const data = await res.json();
+  return data.invitation;
+}
+
+export async function getSentInvitations(){
+  const cookieStore = await cookies();
+  const res = await fetch('http://localhost:8000/api/trips/invitations/sent', {
     headers: {
       Cookie: cookieStore.toString()
     }

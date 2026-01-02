@@ -33,7 +33,6 @@ interface CollabClientProps{
   tripId: string
 }
 
-
 const CollaboratorsClient = ({ 
   collaborators = [],
   pendingInvitations = [],
@@ -41,19 +40,48 @@ const CollaboratorsClient = ({
   tripId 
 }: CollabClientProps) => {
   return (
-    <div className="container max-w-4xl mx-auto p-6 space-y-6">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">Manage Collaborators</h1>
-        <p className="text-muted-foreground">
-          Invite people to collaborate on this trip and manage access
-        </p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-8">
+      <div className="container max-w-6xl mx-auto px-4 sm:px-6">
+        {/* Header Section */}
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold tracking-tight text-slate-900 mb-2">
+            Manage Collaborators
+          </h1>
+          <p className="text-lg text-slate-600">
+            Invite people to collaborate on this trip and manage access
+          </p>
+        </div>
 
-      <div className="grid gap-6">
-        <SendInvitation tripId={tripId} />
-         <ReceivedPendingInvitations invitations={receivedInvitations} />
-        <PendingInvitations invitations={pendingInvitations} />
-        <CollaboratorsList {...collaborators} />
+        {/* Two Column Layout */}
+        <div className="grid lg:grid-cols-3 gap-6">
+          {/* Left Column - Main Actions */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Current Collaborators - Most Important */}
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+              <CollaboratorsList collaborators={collaborators} />
+            </div>
+
+            {/* Send Invitation */}
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+              <SendInvitation tripId={tripId} />
+            </div>
+          </div>
+
+          {/* Right Column - Invitations */}
+          <div className="lg:col-span-1 space-y-6">
+            {/* Received Invitations */}
+            {receivedInvitations.length > 0 && (
+              <div className="bg-blue-50 rounded-xl shadow-sm border border-blue-200 p-6">
+                <ReceivedPendingInvitations invitations={receivedInvitations} />
+              </div>
+            )}
+
+            {/* Pending Invitations */}
+            <div className="bg-amber-50 rounded-xl shadow-sm border border-amber-200 p-6">
+              <PendingInvitations invitations={pendingInvitations} />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

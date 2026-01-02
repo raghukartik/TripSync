@@ -402,7 +402,7 @@ const TripCard = ({ trip }: { trip: Trip }) => {
             variant="ghost"
             size="sm"
             className="flex items-center gap-1.5 hover:bg-orange-50 hover:text-orange-700 transition-colors rounded-lg px-3"
-            onClick={() => router.push(`/tripCollaborators/${trip._id}`)}
+            onClick={() => router.push(`/collaborators/${trip._id}`)}
           >
             <Users className="h-4 w-4" />
             <span className="font-medium">Collaborators</span>

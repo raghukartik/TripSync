@@ -40,9 +40,12 @@ export function LoginForm({
         credentials: "include",
         body: JSON.stringify({ email, password }),
       });
-
-      if (res.ok) {
+      
+      if(res.ok && token){
         router.push(`/collaborators/${invitedTripId}`);
+      }
+      else if (res.ok) {
+        router.push('/dashboard');
       } else {
         const errorData = await res.json();
         setError(errorData.message || "Login failed. Please try again.");
