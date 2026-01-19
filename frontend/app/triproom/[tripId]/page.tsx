@@ -43,10 +43,9 @@ async function getMessHistory(
 }
 
 export default async function TripChat({ params }: TripRoomPageProps) {
-  const userInfo = await getUserInfo();
-  let userId;
-  if (userInfo) {
-    userId = userInfo._id;
+  const userDetails = await getUserInfo();
+  if (!userDetails) {
+    return <div>Unauthorized</div>;
   }
   const awaitedParams = await params;
   const messages = await getMessHistory(awaitedParams.tripId);
@@ -55,7 +54,7 @@ export default async function TripChat({ params }: TripRoomPageProps) {
     <div className="p-4">
       <TripRoom
         tripId={awaitedParams.tripId}
-        userId={userId}
+        userDetails={userDetails}
         chatMessage={messages || []}
         roomCollab={collab || []}
       />

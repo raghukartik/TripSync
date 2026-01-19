@@ -6,7 +6,6 @@ import ChatHeader from "./ChatHeader";
 import ChatBody from "./ChatBody";
 import ChatInput from "./ChatInput";
 import CollaboratorsSidebar from "./CollaboratorsSidebar";
-import { getUserInfo } from "@/lib/api";
 
 interface User {
   _id: string;
@@ -34,16 +33,15 @@ interface Message {
 
 interface TripRoomProps {
   tripId: string;
-  userId: string;
+  userDetails: User;
   chatMessage: Message[];
   roomCollab: Collaborator[];
 }
 
-const userDetails: User = await getUserInfo();
 
 const TripRoom = ({
   tripId,
-  userId,
+  userDetails,
   chatMessage,
   roomCollab,
 }: TripRoomProps) => {
@@ -56,7 +54,6 @@ const TripRoom = ({
     []
   );
   const [messages, setMessages] = useState<Message[]>(chatMessage);
-  console.log(userId);
 
   useEffect(() => {
     socket.emit("join-room", tripId);
@@ -73,14 +70,12 @@ const TripRoom = ({
       setMessages((prev) => [...prev, normalizedMessage]);
     });
 
-    return () => {
-      socket.disconnect();
-    };
   }, []);
 
   const sendMessage = (text: string) => {
+    console.log("called");
     const sender: User = {
-      _id: userId,
+      _id: userDetails._id,
       name: userDetails.name,
       email: userDetails.email,
     };
@@ -93,7 +88,7 @@ const TripRoom = ({
 
       <div className="flex flex-col flex-1">
         <ChatHeader memberCount={roomCollab.length} />
-        <ChatBody messages={messages} userId={userId} />
+        <ChatBody messages={messages} userId={userDetails._id} />
         <ChatInput onSend={sendMessage} />
       </div>
 

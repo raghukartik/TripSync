@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { Send } from "lucide-react";
+
 const ChatInput = ({ onSend }: { onSend: (text: string) => void }) => {
   const [text, setText] = useState("");
 
   const handleSubmit = () => {
     if (!text.trim()) return;
+    console.log(text);
     onSend(text);
+    console.log("executed");
     setText("");
   };
 
