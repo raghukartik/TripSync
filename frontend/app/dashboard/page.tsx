@@ -18,7 +18,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import DashboardClient from "@/components/user-dashboard";
+import DashboardClient from "@/components/dashboard/user-dashboard";
 
 interface User {
   name: string;

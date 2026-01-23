@@ -50,6 +50,7 @@ export default async function TripChat({ params }: TripRoomPageProps) {
   const awaitedParams = await params;
   const messages = await getMessHistory(awaitedParams.tripId);
   const collab = await getRoomCollab(awaitedParams.tripId);
+
   return (
     <div className="p-4">
       <TripRoom

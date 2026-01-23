@@ -32,7 +32,8 @@ router
 router
   .route("/trips/:tripId/itinerary/:itineraryId")
   .post(authController.protect, tripController.addItineraryActivity)
-  .put(authController.protect, tripController.editItinerary);
+  .put(authController.protect, tripController.editItinerary)
+  .delete(authController.protect, tripController.deleteItinerary);
 
 router
   .route("/trips/:tripId/itinerary/:itineraryId/activities/:activityId")

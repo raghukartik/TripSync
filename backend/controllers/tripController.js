@@ -5,6 +5,7 @@ import User from "../models/User.js";
 import InvitationModel from "../models/Invitation.js";
 import { sendInvitationEmail } from "./invitationController.js";
 import { randomBytes } from "crypto";
+import { tryCatch } from "bullmq";
 // get all the stories
 
 const getAllUserTrips = async (req, res, next) => {
@@ -281,11 +282,13 @@ const getTripItinerary = async (req, res, next) => {
       });
     }
 
-    if (trip.itinerary.length > 0) {
+    const activeItinerary = trip.itinerary.filter(day => day.is_deleted !== true);
+
+    if (activeItinerary.length > 0) {
       res.status(200).json({
         status: "success",
-        results: trip.itinerary.length,
-        data: trip.itinerary,
+        results: activeItinerary.length,
+        data: activeItinerary,
       });
     } else {
       res.status(200).json({
@@ -409,6 +412,58 @@ const editItinerary = async (req, res, next) => {
     });
   }
 };
+
+const deleteItinerary = async (req, res) => {
+  try {
+    const { tripId, itineraryId } = req.params;
+    const { userId } = req.user;
+
+    if (!tripId || !itineraryId) {
+      return res.status(400).json({
+        message: "tripId or itineraryId required",
+      });
+    }
+
+    const trip = await TripModel.findOne({
+      _id: tripId,
+      $or: [{ owner: userId }, { collaborators: userId }],
+    });
+
+    if (!trip) {
+      return res.status(404).json({
+        message: "Trip not found!",
+      });
+    }
+
+    const result = await TripModel.updateOne(
+      {
+        _id: tripId,
+        "itinerary._id": itineraryId,
+      },
+      {
+        $set: {
+          "itinerary.$.is_deleted": true,
+        },
+      }
+    );
+
+    if (result.matchedCount === 0) {
+      return res.status(404).json({
+        message: "Itinerary day not found",
+      });
+    }
+
+    return res.status(200).json({
+      message: "Itinerary day deleted successfully",
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
 
 const getItineraryActivity = async (req, res, next) => {
   try {
@@ -1148,6 +1203,7 @@ const tripController = {
   getTripItinerary,
   addItinerary,
   editItinerary,
+  deleteItinerary,
   getItineraryActivity,
   addItineraryActivity,
   editItineraryActivity,

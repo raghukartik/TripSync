@@ -55,6 +55,10 @@ const tripSchema = new Schema({
         type: String, // Format: 'YYYY-MM-DD'
         required: true,
       },
+      is_deleted: {
+        type: Boolean, 
+        default: false
+      },
       activities: [
         {
           activityId: {

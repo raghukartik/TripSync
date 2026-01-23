@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { io } from "socket.io-client";
+import { useEffect, useState } from "react";
 import ChatHeader from "./ChatHeader";
 import ChatBody from "./ChatBody";
 import ChatInput from "./ChatInput";
 import CollaboratorsSidebar from "./CollaboratorsSidebar";
+import { socket } from "@/lib/socket";
 
 interface User {
   _id: string;
@@ -38,29 +38,22 @@ interface TripRoomProps {
   roomCollab: Collaborator[];
 }
 
-
 const TripRoom = ({
   tripId,
   userDetails,
   chatMessage,
   roomCollab,
 }: TripRoomProps) => {
-  const socket = useMemo(
-    () =>
-      io("http://localhost:8000", {
-        transports: ["websocket"],
-        withCredentials: true,
-      }),
-    []
-  );
+
   const [messages, setMessages] = useState<Message[]>(chatMessage);
 
   useEffect(() => {
+    if (!socket.connected) {
+      socket.connect();
+    }
     socket.emit("join-room", tripId);
 
-    socket.on("recieve-msg", (data) => {
-      console.log(data);
-
+    const handleReceive = (data: Message) => {
       const normalizedMessage: Message = {
         text: data.text,
         timestamp: new Date(),
@@ -68,9 +61,15 @@ const TripRoom = ({
       };
 
       setMessages((prev) => [...prev, normalizedMessage]);
-    });
+    };
 
-  }, []);
+    socket.on("recieve-msg", handleReceive);
+
+    return () => {
+      socket.off("recieve-msg", handleReceive);
+      socket.disconnect();
+    };
+  }, [tripId]);
 
   const sendMessage = (text: string) => {
     console.log("called");

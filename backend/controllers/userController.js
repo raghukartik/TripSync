@@ -89,6 +89,10 @@ const respondToInvite = async (req, res, next) => {
 
 const upComingTrips = async (req, res, next) => {
   try {
+    await TripModel.updateMany(
+      { "itinerary.is_deleted": { $exists: false } },
+      { $set: { "itinerary.$[].is_deleted": false } }
+    );
     const { userId } = req.user;
     const upComingTrips = await TripModel.find({
       $and: [
