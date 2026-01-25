@@ -197,3 +197,20 @@ export async function acceptInvitation(tripId: string, invitationId: string) {
     throw err;
   }
 }
+
+export async function getTripTasks(tripId: string) {
+    const cookieStore = await cookies();
+    const res = await fetch(`http://localhost:8000/api/trips/${tripId}/tasks`, {
+        headers: {
+          Cookie: cookieStore.toString(),
+        },
+        next: { tags: ['tasks'] },
+    })
+
+    if(!res.ok){
+        throw new Error("Error while fetching Trip's Tasks");
+    }
+
+    const data = await res.json();
+    return data.data;
+}

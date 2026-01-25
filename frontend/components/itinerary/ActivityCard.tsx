@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Clock, MapPin, StickyNote, MoreVertical, Edit } from "lucide-react";
+import { Clock, MapPin, StickyNote, Edit } from "lucide-react";
 import Link from "next/link";
 import type { Activity } from "./ItineraryClient";
 
@@ -48,9 +48,6 @@ export function ActivityCard({
             </div>
             
             <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-              <Button variant="ghost" size="sm">
-                <MoreVertical className="h-4 w-4" />
-              </Button>
               <Button
                 variant="ghost"
                 size="sm"
