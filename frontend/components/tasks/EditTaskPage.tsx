@@ -24,7 +24,7 @@ export function EditTaskPage({
   const [isCompleted, setIsCompleted] = useState(tasks.completed);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
-
+  console.log("component called");
   const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
 

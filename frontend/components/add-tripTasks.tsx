@@ -1,5 +1,6 @@
 "use client";
 import { useState, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { 
   Plus, 
   User, 
@@ -31,7 +32,7 @@ interface FormData {
 }
 
 export default function AddTask({ tripId, users}: AddTaskProps) {
-  // Demo users for the example
+  const router = useRouter();
   const demoUsers = users?.length > 0 ? users : [
     { _id: '1', name: 'John Smith', email: 'john@example.com' },
     { _id: '2', name: 'Sarah Johnson', email: 'sarah@example.com' },
@@ -116,11 +117,8 @@ export default function AddTask({ tripId, users}: AddTaskProps) {
       
       // Show success state
       setSuccess(true);
+      router.push(`/tasks/${tripId}`);
       
-      // Reset form after success
-      setTimeout(() => {
-        resetForm();
-      }, 1500);
 
     } catch (err) {
       console.error('Error creating task:', err);

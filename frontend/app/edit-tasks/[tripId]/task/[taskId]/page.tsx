@@ -10,7 +10,8 @@ interface EditProps {
 }
 
 const EditTask = async ({ params }: EditProps) => {
-  const { tripId, taskId } = params;
+  const awaitedParams = await params;
+  const { tripId, taskId } = await awaitedParams;
 
   let response;
   try {
@@ -19,15 +20,15 @@ const EditTask = async ({ params }: EditProps) => {
     console.error(error);
     return null;
   }
-
-  const task = response.find((t: Tasks) => t._id === taskId);
+  console.log(response);
+  const task = response.find((t: Tasks) => t.taskId === taskId);
   if (!task) return null;
 
   const availableAssignees = response
     .map((t: Tasks) => t.assignedTo)
     .filter(
-      (v: AssignedTo, i: number, arr: Tasks[]) =>
-        arr.findIndex((x) => x._id === v._id) === i
+      (v: AssignedTo, i: number, arr: AssignedTo[]) =>
+        arr.findIndex((x) => x._id === v._id) === i,
     );
 
   return (

@@ -101,6 +101,7 @@ export function TasksList({ tasks, tripId}: TasksListProps) {
             <div key={task._id}>
               <TaskItem
                 task={task}
+                tripId={tripId}
                 onToggleComplete={handleToggleComplete}
               />
             </div>

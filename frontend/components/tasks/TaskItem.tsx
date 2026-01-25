@@ -1,6 +1,7 @@
 "use client";
-import { CheckCircle2, Circle, Edit3, MoreHorizontal } from "lucide-react";
+import { CheckCircle2, Circle, Edit3, Trash2} from "lucide-react";
 import { useRouter } from "next/navigation";
+
 interface AssignedTo {
   _id: string;
   name: string;
@@ -16,14 +17,33 @@ interface Task {
 
 interface TaskItemProps {
   task: Task;
+  tripId: string,
   onToggleComplete: (taskId: string) => void;
 }
 
-export function TaskItem({ task, onToggleComplete}: TaskItemProps) {
+export function TaskItem({ task, tripId, onToggleComplete}: TaskItemProps) {
   const router = useRouter();
   const getInitials = (name: string) => {
     return name.split(' ').map(n => n[0]).join('').toUpperCase();
   };
+
+  const handleDelete = async() => {
+    try {
+      const res = await fetch(`http://localhost:8000/api/trips/${tripId}/tasks/${task.taskId}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        }
+      );
+
+      if (res.ok) {
+        router.refresh();
+      }
+    } catch (error) {
+      console.error(error);
+    }
+    
+  }
 
   return (
     <div className="p-5">
@@ -75,15 +95,19 @@ export function TaskItem({ task, onToggleComplete}: TaskItemProps) {
             {/* Actions */}
             <div className="flex items-center gap-1 ml-4">
               <button
-                onClick={() => router.push(`/edit-tasks/${task.taskId}`)}
+                onClick={() => router.push(`/edit-tasks/${tripId}/task/${task.taskId}`)}
                 className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
                 aria-label={`Edit task: ${task.text}`}
               >
                 <Edit3 className="h-4 w-4" />
               </button>
-              <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
-                <MoreHorizontal className="h-4 w-4" />
-              </button>
+               <button
+                  onClick={handleDelete}
+                  className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                  aria-label={`Delete task: ${task.text}`}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
             </div>
           </div>
         </div>
