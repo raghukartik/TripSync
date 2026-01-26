@@ -8,7 +8,7 @@ import * as z from "zod";
 import { format } from "date-fns";
 import {
   CalendarIcon,
-  DollarSign,
+  IndianRupee,
   Receipt,
   Users,
   ArrowLeft,
@@ -273,7 +273,7 @@ export function ExpenseForm({ tripId, currentUserId, collaborators}: ExpenseForm
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="flex items-center gap-2">
-                          <DollarSign className="h-4 w-4" />
+                          <IndianRupee className="h-4 w-4" />
                           Amount
                         </FormLabel>
                         <FormControl>

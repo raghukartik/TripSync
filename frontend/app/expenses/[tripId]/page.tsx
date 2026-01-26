@@ -1,6 +1,5 @@
 import { cookies } from 'next/headers';
-import ExpenseList from '@/components/trip-expenses'
-
+import ExpenseList from '@/components/expenses/ExpenseList';
 interface User {
   _id: string;
   name: string;
