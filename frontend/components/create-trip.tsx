@@ -231,7 +231,7 @@ export default function CreateTripPage() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => router.push("/dashboard")}
+            onClick={() => router.back()}
             className="rounded-full hover:bg-white hover:shadow-sm"
           >
             <ChevronLeft className="h-5 w-5" />

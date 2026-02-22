@@ -74,6 +74,31 @@ export async function getUserUpcomingTrips() {
   }
 }
 
+export async function getOngoingTrips() {
+  try {
+    const cookieStore = await cookies();
+    const res = await fetch(
+      "http://localhost:8000/api/user/ongoing-trips",
+      {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          Cookie: cookieStore.toString(),
+          "Content-Type": "application/json",
+        },
+        cache: "no-store",
+      }
+    );
+
+    if (!res.ok) throw new Error("failed to fetch ongoing trips");
+    const data = await res.json();
+    return data.data;
+  } catch (error) {
+    console.error("Error fetching user's upcoming trips:", error);
+    return null;
+  }
+}
+
 export async function getUserCompletedTrips() {
   try {
     const cookieStore = await cookies();

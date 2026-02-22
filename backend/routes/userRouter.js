@@ -8,6 +8,7 @@ const router = express.Router();
 // router.route('/').get(userController.getAllUsers);
 router.route("/invitations/:tripId/respond").post(authController.protect, userController.respondToInvite);
 router.route("/user/upcoming-trips").get(authController.protect, userController.upComingTrips);
+router.route("/user/ongoing-trips").get(authController.protect, userController.ongoingTrips);
 router.route("/user/upcoming-trips-dashboard").get(authController.protect, userController.upComingTripsDashboard);
 router.route('/user/completed-trips').get(authController.protect, userController.completedTrips);
 router.route('/user/completed-trips-dashboard').get(authController.protect, userController.completedTripsDashboard);

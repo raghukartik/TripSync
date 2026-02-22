@@ -51,6 +51,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       isActive: true,
       items: [
         { title: "Upcoming", url: "/dashboard/trips/upcoming-trips" },
+        {title: "Ongoing", url: "/ongoing-trips"},
         { title: "Completed", url: "/completed-trips" },
         { title: "Create Trip", url: "/dashboard/create-trip" },
         { title: "Trip Chat", url: "/dashboard/trips/chat" },

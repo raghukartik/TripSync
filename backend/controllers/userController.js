@@ -126,6 +126,34 @@ const upComingTrips = async (req, res, next) => {
   }
 };
 
+
+const ongoingTrips = async(req, res) => {
+  const {userId} = req.user;
+  console.log(userId);
+  const trips = await TripModel.find({
+    $and: [
+      {$or: [{owner: userId}, {collaborators: userId}]},
+      {startDate: {$lte: new Date()}},
+      {endDate: {$gt: new Date()}}
+    ]
+  }).populate("collaborators", "name email");
+  
+  if(!trips.length){
+    return res.json({
+      message: 'No Ongoing Trips!'
+    })
+  }
+
+  res.status(200).json({
+    status: "success",
+    results: trips.length,
+    data: {
+      trips,
+    },
+  });
+
+}
+
 const upComingTripsDashboard = async (req, res, next) => {
   try {
     const { userId } = req.user;
@@ -276,7 +304,8 @@ const userController = {
   getUserInfo,
   allUserTrips,
   upComingTripsDashboard, 
-  completedTripsDashboard
+  completedTripsDashboard,
+  ongoingTrips
 };
 
 export default userController;

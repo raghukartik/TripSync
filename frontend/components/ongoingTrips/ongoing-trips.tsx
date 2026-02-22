@@ -1,6 +1,5 @@
 "use client";
-
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   Calendar,
   MessageSquare,
@@ -12,83 +11,20 @@ import {
   Clock,
   MessageCircle,
   ChevronRight,
-  AlertCircle,
   CalendarDays,
   MoreHorizontal,
   Share2,
 } from "lucide-react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
+import { Button } from "../ui/button";
+import { Badge } from "../ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 import { useRouter } from "next/navigation";
+import { Trip } from "../upcoming-trips";
 
-
-export type Activity = {
-  activityId: string;
-  time?: string;
-  title?: string;
-  location?: string;
-  notes?: string;
-};
-
-export type ItineraryDay = {
-  date: string;
-  activities: Activity[];
-};
-
-export type Task = {
-  taskId: string;
-  text: string;
-  assignedTo?: string;
-  completed: boolean;
-};
-
-export type Expense = {
-  amount: number;
-  category?: string;
-  spentBy?: string;
-  sharedWith?: string[];
-  note?: string;
-  date: string;
-};
-
-export type ChatMessage = {
-  sender: string;
-  message: string;
-  sentAt: string;
-};
-
-export type PendingInvite = {
-  user: string;
-  invitedAt: string;
-  status: "pending" | "accepted" | "rejected";
-};
-
-export type Collaborator = {
-  _id: string;
-  name: string;
-  email?: string;
-  avatar?: string;
-};
-
-export type Trip = {
-  _id: string;
-  title: string;
-  description?: string;
-  startDate: string;
-  endDate: string;
-  owner: string;
-  collaborators: Collaborator[];
-  tasks: Task[];
-  expenses: Expense[];
-  itinerary: ItineraryDay[];
-  chatMessages: ChatMessage[];
-  pendingInvites: PendingInvite[];
-  createdOn: string;
-};
+interface OngoingProps {
+  ongoingTrips: Trip[];
+}
 
 const TripCard = ({ trip }: { trip: Trip }) => {
   const router = useRouter();
@@ -97,11 +33,11 @@ const TripCard = ({ trip }: { trip: Trip }) => {
   const endDate = new Date(trip.endDate);
 
   const durationInDays = Math.ceil(
-    (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
+    (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24),
   );
 
   const daysUntilTrip = Math.ceil(
-    (startDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)
+    (startDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24),
   );
 
   const isStartingSoon = daysUntilTrip <= 7 && daysUntilTrip > 0;
@@ -116,6 +52,7 @@ const TripCard = ({ trip }: { trip: Trip }) => {
   const expensesTotal =
     trip.expenses?.reduce((sum, expense) => sum + expense.amount, 0) || 0;
   const itineraryDays = trip.itinerary?.length || 0;
+
   const pendingInvitesCount =
     trip.pendingInvites?.filter((invite) => invite.status === "pending")
       .length || 0;
@@ -135,8 +72,8 @@ const TripCard = ({ trip }: { trip: Trip }) => {
   const completionPercentage = Math.round(
     completionItems.reduce(
       (acc, item) => acc + (item.completed ? item.weight : 0),
-      0
-    )
+      0,
+    ),
   );
 
   const getStatusColor = () => {
@@ -416,99 +353,21 @@ const TripCard = ({ trip }: { trip: Trip }) => {
   );
 };
 
-const UpcomingTrips: React.FC = () => {
-  const [trips, setTrips] = useState<Trip[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+const OngoingTrips = ({ ongoingTrips }: OngoingProps) => {
+  console.log(ongoingTrips)
+ 
   const router = useRouter();
-  useEffect(() => {
-    const getUpcomingTrips = async () => {
-      try {
-        const res = await fetch(
-          "http://localhost:8000/api/user/upcoming-trips",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            credentials: "include",
-          }
-        );
-
-        if (!res.ok) throw new Error("Failed to fetch upcoming trips");
-
-        const data = await res.json();
-        setTrips(data.data.upComingTrips || []);
-      } catch (err: unknown) {
-        if (err instanceof Error) {
-          setError(err.message);
-        } else {
-          setError("Something went wrong");
-        }
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    getUpcomingTrips();
-  }, []);
-
-  if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <Skeleton className="h-10 w-[300px]" />
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {[...Array(3)].map((_, i) => (
-            <Card key={i} className="p-6">
-              <div className="space-y-4">
-                <div className="flex justify-between items-start">
-                  <Skeleton className="h-6 w-3/4" />
-                  <Skeleton className="h-6 w-20" />
-                </div>
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-2/3" />
-                <Skeleton className="h-2 w-full" />
-                <div className="grid grid-cols-2 gap-2">
-                  <Skeleton className="h-16 w-full" />
-                  <Skeleton className="h-16 w-full" />
-                  <Skeleton className="h-16 w-full" />
-                  <Skeleton className="h-16 w-full" />
-                </div>
-                <div className="flex gap-2 pt-2">
-                  <Skeleton className="h-8 w-20" />
-                  <Skeleton className="h-8 w-20" />
-                  <Skeleton className="h-8 w-16" />
-                </div>
-              </div>
-            </Card>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <Alert variant="destructive" className="max-w-2xl">
-        <AlertCircle className="h-4 w-4" />
-        <AlertDescription>
-          <strong>Error loading trips:</strong> {error}
-        </AlertDescription>
-      </Alert>
-    );
-  }
-
   return (
     <div className="space-y-8 mt-8 px-6 py-6 max-w-7xl mx-auto">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Upcoming Adventures
+            Ongoing Adventures
           </h1>
           <p className="text-gray-600">
-            {trips.length > 0
-              ? `You have ${trips.length} upcoming ${
-                  trips.length === 1 ? "trip" : "trips"
+            {ongoingTrips.length > 0
+              ? `You have ${ongoingTrips.length} upcoming ${
+                  ongoingTrips.length === 1 ? "trip" : "trips"
                 }`
               : "No upcoming trips planned"}
           </p>
@@ -522,7 +381,7 @@ const UpcomingTrips: React.FC = () => {
         </Button>
       </div>
 
-      {trips.length === 0 ? (
+      {ongoingTrips.length === 0 ? (
         <Card className="border-2 border-dashed border-gray-200 bg-gradient-to-br from-gray-50 to-blue-50/50">
           <CardContent className="flex flex-col items-center justify-center py-16">
             <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-6">
@@ -539,7 +398,7 @@ const UpcomingTrips: React.FC = () => {
               size="lg"
               className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
               onClick={() => router.replace('/dashboard/create-trip')}
-            >     
+            >
               <Plus className="h-4 w-4 mr-2" />
               Create Your First Trip
             </Button>
@@ -547,7 +406,7 @@ const UpcomingTrips: React.FC = () => {
         </Card>
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {trips.map((trip) => (
+          {ongoingTrips.map((trip) => (
             <TripCard key={trip._id} trip={trip} />
           ))}
         </div>
@@ -556,4 +415,4 @@ const UpcomingTrips: React.FC = () => {
   );
 };
 
-export default UpcomingTrips;
+export default OngoingTrips;
