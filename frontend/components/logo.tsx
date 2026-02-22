@@ -1,54 +1,26 @@
-import { cn } from '../lib/utils'
+import Image from "next/image"
+import { cn } from "../lib/utils"
 
-export const Logo = ({ className, uniColor }: { className?: string; uniColor?: boolean }) => {
-    return (
-        <svg
-            viewBox="0 0 140 28"  // Increased viewBox dimensions
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className={cn('text-foreground h-7 w-auto', className)}> 
-            {/* Travel sync icon - combining location pins with sync arrows */}
-            <g fill={uniColor ? 'currentColor' : 'url(#logo-gradient)'}>
-                {/* Location pin 1 */}
-                <path d="M6 3C4.35 3 3 4.35 3 6C3 9.75 6 12 6 12S9 9.75 9 6C9 4.35 7.65 3 6 3ZM6 7.5C5.1 7.5 4.5 6.9 4.5 6C4.5 5.1 5.1 4.5 6 4.5C6.9 4.5 7.5 5.1 7.5 6C7.5 6.9 6.9 7.5 6 7.5Z"/>
-                
-                {/* Location pin 2 */}
-                <path d="M21 15C18.9 15 17.25 16.65 17.25 18C17.25 21.75 21 24 21 24S24.75 21.75 24.75 18C24.75 16.65 23.1 15 21 15ZM21 19.5C20.1 19.5 19.5 18.9 19.5 18C19.5 17.1 20.1 16.5 21 16.5C21.9 16.5 22.5 17.1 22.5 18C22.5 18.9 21.9 19.5 21 19.5Z"/>
-                
-                {/* Sync arrows connecting the locations */}
-                <path d="M10.5 9L15 9L13.5 7.5L16.5 10.5L13.5 13.5L15 12L10.5 12C9.6 12 9 11.4 9 10.5C9 9.6 9.6 9 10.5 9Z"/>
-                <path d="M16.5 15L12 15L13.5 16.5L10.5 13.5L13.5 10.5L12 12L16.5 12C17.4 12 18 12.6 18 13.5C18 14.4 17.4 15 16.5 15Z"/>
-            </g>
-            {/* TripSync Text with gradient fill */}
-            <text
-                x="30"
-                y="20"
-                fontSize="20"  // Increased font size
-                fontFamily="system-ui, -apple-system, sans-serif"
-                fontWeight="600"
-                fill={uniColor ? 'currentColor' : 'url(#logo-gradient)'}  // Applied gradient to text
-            >
-                TripSync
-            </text>
-            <defs>
-                <linearGradient
-                    id="logo-gradient"
-                    x1="10"
-                    y1="0"
-                    x2="10"
-                    y2="20"
-                    gradientUnits="userSpaceOnUse">
-                    <stop stopColor="#9B99FE" />
-                    <stop
-                        offset="1"
-                        stopColor="#2BC8B7"
-                    />
-                </linearGradient>
-            </defs>
-        </svg>
-    )
+export const Logo = ({
+  className,
+  src,
+  alt = "Logo"
+}: {
+  className?: string
+  src: string
+  alt: string
+}) => {
+  return (
+    <Image
+      src={src}
+      alt={alt}
+      width={120}
+      height={100}
+      className={cn("object-contain", className)}
+      priority
+    />
+  )
 }
-
 export const LogoIcon = ({ className, uniColor }: { className?: string; uniColor?: boolean }) => {
     return (
         <svg

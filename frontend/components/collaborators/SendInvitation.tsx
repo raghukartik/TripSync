@@ -1,5 +1,5 @@
 "use client";
-
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import {
   Card,
@@ -19,7 +19,7 @@ const SendInvitation = ({ tripId }: { tripId: string }) => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
-
+  const router = useRouter();
   const handleSendInvite = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -38,6 +38,7 @@ const SendInvitation = ({ tripId }: { tripId: string }) => {
       setSuccess(true);
       setEmail("");
       setTimeout(() => setSuccess(false), 3000);
+      router.refresh();
     } catch (err) {
       setError("Failed to send invitation. Please try again.");
       console.log(err);

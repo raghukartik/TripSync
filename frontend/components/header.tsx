@@ -21,7 +21,7 @@ export const HeroHeader = () => {
         <header>
             <nav
                 data-state={menuState && 'active'}
-                className="bg-background/50 fixed z-20 w-full border-b backdrop-blur-3xl">
+                className="fixed top-0 left-0 w-full z-50 bg-background border-b">
                 <div className="mx-auto max-w-6xl px-6 transition-all duration-300">
                     <div className="relative flex flex-wrap items-center justify-between gap-6 py-3 lg:gap-0 lg:py-4">
                         <div className="flex w-full items-center justify-between gap-12 lg:w-auto">
@@ -29,7 +29,7 @@ export const HeroHeader = () => {
                                 href="/"
                                 aria-label="home"
                                 className="flex items-center space-x-2">
-                                <Logo />
+                                <Logo src="/logo.png" alt="TripSync"/>
                             </Link>
 
                             <button

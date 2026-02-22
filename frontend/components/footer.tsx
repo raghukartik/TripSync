@@ -36,7 +36,7 @@ export default function FooterSection() {
                     href="/"
                     aria-label="go home"
                     className="mx-auto block size-fit">
-                    <Logo />
+                    <Logo src="/logo.png" alt="TripSync"/>
                 </Link>
 
                 <div className="my-8 flex flex-wrap justify-center gap-6 text-sm">

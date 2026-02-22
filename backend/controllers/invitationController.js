@@ -5,6 +5,8 @@ import InvitationModel from "../models/Invitation.js";
 import User from "../models/User.js";
 import TripModel from "../models/Trips.js";
 import { inviteEmailTemplate } from "../utils/inviteEmailTemplate.js";
+import path from "path";
+
 
 export const sendInvitationEmail = async ({
   email,
@@ -15,6 +17,7 @@ export const sendInvitationEmail = async ({
 }) => {
   const inviteLink = `${process.env.CLIENT_URL}/invite/accept?token=${token}`;
   console.log(process.env.CLIENT_URL)
+
   const html = inviteEmailTemplate({
     appLink: process.env.CLIENT_URL,
     inviterName,
@@ -22,13 +25,20 @@ export const sendInvitationEmail = async ({
     inviteLink,
     expiryTime: expiresAt.toLocaleString(),
   });
-
+  
   await mailer.sendMail({
     from: `"TripSync" <${process.env.EMAIL_USER}>`,
     to: email,
     subject: `You're invited to join "${tripName}" on TripSync`,
     html,
-  });
+    attachments: [
+      {
+        filename: "tripsync-logo.png",
+        path: path.join(process.cwd(), "assets/tripsync-logo.png"),
+        cid: "tripsync-logo", // must match img src
+      },
+    ] 
+  })
 };
 
 export const validateInvitationRequest = async (req, res) => {

@@ -3,7 +3,7 @@ export const inviteEmailTemplate = ({
   inviterName,
   tripName,
   inviteLink,
-  expiryTime
+  expiryTime,
 }) => {
   return `
   <div style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
@@ -15,7 +15,7 @@ export const inviteEmailTemplate = ({
 
     <a href="${appLink}" target="_blank" style="text-decoration: none;">
       <img
-        src="https://your-cdn.com/logo.png"
+        src="cid:tripsync-logo"
         alt="TripSync"
         style="height: 32px; margin-bottom: 16px;"
       />
