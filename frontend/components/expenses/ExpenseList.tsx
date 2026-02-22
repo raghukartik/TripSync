@@ -146,7 +146,6 @@ export default function ExpenseList({ tripId, initialExpenses }: PageProps) {
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-2">
-              
               <Button 
                 size="sm" 
                 onClick={handleAddExpense}
@@ -155,6 +154,7 @@ export default function ExpenseList({ tripId, initialExpenses }: PageProps) {
                 <PlusCircle className="h-4 w-4" />
                 Add Expense
               </Button>
+
             </div>
           </div>
         </CardHeader>

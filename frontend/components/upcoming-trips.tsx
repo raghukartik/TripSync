@@ -24,7 +24,6 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import FooterSection from "./footer";
 import { useRouter } from "next/navigation";
 
 type Activity = {
@@ -552,8 +551,6 @@ const UpcomingTrips: React.FC = () => {
           ))}
         </div>
       )}
-
-      <FooterSection />
     </div>
   );
 };

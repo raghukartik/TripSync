@@ -15,7 +15,7 @@ export function ItineraryHeader({ tripId, totalDays, totalActivities }: Itinerar
     <div className="flex items-center justify-between mb-8">
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" asChild className="rounded-full">
-          <Link href="/dashboard">
+          <Link href="/dashboard/trips/upcoming-trips">
             <ChevronLeft className="h-5 w-5" />
           </Link>
         </Button>

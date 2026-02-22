@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Map, BookOpen, FolderOpen, Settings2, PlusCircle } from "lucide-react";
+import { Map, BookOpen, FolderOpen, Settings2, PlusCircle, LayoutDashboardIcon } from "lucide-react";
 import { getUserInfo } from "@/lib/api";
 import { NavMain } from "@/components/nav-main";
 import { NavProjects } from "@/components/nav-projects";
@@ -12,7 +12,9 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
+  useSidebar,
 } from "@/components/ui/sidebar";
+
 
 interface User {
   name: string;
@@ -22,6 +24,7 @@ interface User {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const [user, setUser] = React.useState<User | null>(null);
+  const { state, isMobile } = useSidebar();
   React.useEffect(() => {
     async function fetchUser() {
       const data = await getUserInfo();
@@ -37,6 +40,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   }, []);
   const navMain = [
     {
+      title: "Dashboard",
+      url: '/dashboard',
+      icon: LayoutDashboardIcon,
+    },
+    {
       title: "My Trips",
       url: "/dashboard/trips",
       icon: Map,
@@ -46,15 +54,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         { title: "Completed", url: "/completed-trips" },
         { title: "Create Trip", url: "/dashboard/create-trip" },
         { title: "Trip Chat", url: "/dashboard/trips/chat" },
-      ],
-    },
-    {
-      title: "Travel Stories",
-      url: "/dashboard/stories",
-      icon: BookOpen,
-      items: [
-        { title: "My Stories", url: "/dashboard/stories/mine" },
-        { title: "Write New", url: "/dashboard/stories/new" },
       ],
     },
     {
@@ -85,10 +84,21 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     },
     { name: "Write Story", url: "/dashboard/stories/new", icon: BookOpen },
   ];
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <div className="text-xl font-bold px-4 py-2">TripSync</div>
+        <div
+          className={`flex items-center h-14 font-bold text-xl ${
+            isMobile
+              ? "px-4 justify-start"
+              : state === "collapsed"
+                ? "justify-center"
+                : "px-4"
+          }`}
+        >
+          {isMobile || state === "expanded" ? "TripSync" : "TS"}
+        </div>
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={navMain} />

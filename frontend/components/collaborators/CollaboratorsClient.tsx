@@ -5,7 +5,9 @@ import PendingInvitations from "./PendingInvitations";
 import CollaboratorsList from "./CollaboratorsList";
 import ReceivedPendingInvitations from "./RecievedInvitation";
 import { Card, CardContent } from '@/components/ui/card';
-
+import { ChevronLeft } from "lucide-react";
+import Link from "next/link";
+import { Button } from "../ui/button";
 interface InvitedBy {
   name: string,
   email: string,
@@ -46,6 +48,12 @@ const CollaboratorsClient = ({
   tripId 
 }: CollabClientProps) => {
   return (
+    <div className="space-y-4 bg-gradient-to-br from-slate-50 to-slate-100">
+      <Button variant="ghost" size="icon" asChild className="rounded-full">
+        <Link href="/dashboard/trips/upcoming-trips">
+          <ChevronLeft className="h-5 w-5" />
+        </Link>
+      </Button>
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4 sm:p-6 lg:p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
@@ -97,6 +105,7 @@ const CollaboratorsClient = ({
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 };

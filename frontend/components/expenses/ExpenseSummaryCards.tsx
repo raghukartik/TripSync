@@ -1,6 +1,8 @@
 import { Card, CardContent } from "@/components/ui/card"
-import { IndianRupee, Receipt, Wallet } from "lucide-react"
+import { IndianRupee, Receipt, Wallet, ChevronLeft } from "lucide-react"
 import { formatAmount } from "@/lib/currencyConfig";
+import { Button } from "../ui/button";
+import Link from "next/link";
 
 interface ExpenseSummaryCardsProps {
   totalAmount: number;
@@ -14,48 +16,67 @@ export function ExpenseSummaryCards({
   averageExpense 
 }: ExpenseSummaryCardsProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <Card>
-        <CardContent className="p-6">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-green-50 rounded-lg">
-              <IndianRupee className="h-5 w-5 text-green-600" />
-            </div>
-            <div>
-              <p className="text-sm font-medium text-gray-600">Total Spent</p>
-              <p className="text-2xl font-bold text-gray-900">{formatAmount(totalAmount)}</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+    <div className="space-y-4">
       
-      <Card>
-        <CardContent className="p-6">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-50 rounded-lg">
-              <Receipt className="h-5 w-5 text-blue-600" />
+      {/* Back Button */}
+      <Button variant="ghost" size="icon" asChild className="rounded-full">
+        <Link href="/dashboard/trips/upcoming-trips">
+          <ChevronLeft className="h-5 w-5" />
+        </Link>
+      </Button>
+
+      {/* Cards Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-green-50 rounded-lg">
+                <IndianRupee className="h-5 w-5 text-green-600" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-600">Total Spent</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {formatAmount(totalAmount)}
+                </p>
+              </div>
             </div>
-            <div>
-              <p className="text-sm font-medium text-gray-600">Total Expenses</p>
-              <p className="text-2xl font-bold text-gray-900">{expenseCount}</p>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-blue-50 rounded-lg">
+                <Receipt className="h-5 w-5 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-600">Total Expenses</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {expenseCount}
+                </p>
+              </div>
             </div>
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Card>
-        <CardContent className="p-6">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-purple-50 rounded-lg">
-              <Wallet className="h-5 w-5 text-purple-600" />
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-purple-50 rounded-lg">
+                <Wallet className="h-5 w-5 text-purple-600" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-600">Average</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {formatAmount(averageExpense)}
+                </p>
+              </div>
             </div>
-            <div>
-              <p className="text-sm font-medium text-gray-600">Average</p>
-              <p className="text-2xl font-bold text-gray-900">{formatAmount(averageExpense)}</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+
+      </div>
     </div>
   );
 }
