@@ -1,7 +1,7 @@
 "use client";
 import { Plus, ChevronLeft } from "lucide-react";
 import { Button } from "../ui/button";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface TasksListHeaderProps {
   completedCount: number;
@@ -16,12 +16,11 @@ export function TasksListHeader({
   completionPercentage,
   onAddTask,
 }: TasksListHeaderProps) {
+  const router = useRouter();
   return (
     <div className="space-y-4">
-      <Button variant="ghost" size="icon" asChild className="rounded-full">
-        <Link href="/dashboard/trips/upcoming-trips">
-          <ChevronLeft className="h-5 w-5" />
-        </Link>
+      <Button variant="ghost" size="icon" asChild className="rounded-full" onClick={() => router.back()}>
+        <ChevronLeft className="h-5 w-5" />
       </Button>
 
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">

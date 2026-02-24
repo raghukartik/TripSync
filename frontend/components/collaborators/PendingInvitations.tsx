@@ -2,14 +2,13 @@
 
 import { Clock} from 'lucide-react';
 import { Button } from '../ui/button';
+import { PendingInvitation } from './CollaboratorsClient';
 
-interface PendingInvitation {
-  _id: string;
-  email: string;
-  sentAt: string;
+interface pageProps{
+  invitations: PendingInvitation[],
 }
 
-const PendingInvitations = ({ invitations }: { invitations: PendingInvitation[] }) => (
+const PendingInvitations = ({invitations}: pageProps) => (
   <div>
     <div className="flex items-center gap-2 mb-4">
       <Clock className="w-5 h-5 text-amber-600" />

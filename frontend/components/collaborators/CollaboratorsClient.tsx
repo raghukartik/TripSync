@@ -20,7 +20,7 @@ interface Collaborators{
   email: string,
 }
 
-interface PendingInvitation {
+export interface PendingInvitation {
   _id: string;
   email: string;
   sentAt: string;
@@ -80,7 +80,7 @@ const CollaboratorsClient = ({
             {/* Send Invitation */}
             <Card className="shadow-sm">
               <CardContent className="pt-6">
-                <SendInvitation tripId={tripId} />
+                <SendInvitation tripId={tripId} invitations={pendingInvitations}/>
               </CardContent>
             </Card>
           </div>

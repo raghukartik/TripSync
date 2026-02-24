@@ -2,7 +2,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { IndianRupee, Receipt, Wallet, ChevronLeft } from "lucide-react"
 import { formatAmount } from "@/lib/currencyConfig";
 import { Button } from "../ui/button";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface ExpenseSummaryCardsProps {
   totalAmount: number;
@@ -15,14 +15,13 @@ export function ExpenseSummaryCards({
   expenseCount, 
   averageExpense 
 }: ExpenseSummaryCardsProps) {
+  const router = useRouter();
   return (
     <div className="space-y-4">
       
       {/* Back Button */}
-      <Button variant="ghost" size="icon" asChild className="rounded-full">
-        <Link href="/dashboard/trips/upcoming-trips">
+      <Button variant="ghost" size="icon" asChild className="rounded-full" onClick={() => router.back()}>
           <ChevronLeft className="h-5 w-5" />
-        </Link>
       </Button>
 
       {/* Cards Grid */}

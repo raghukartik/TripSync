@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, Plus } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface ItineraryHeaderProps {
   tripId: string;
@@ -11,13 +12,12 @@ interface ItineraryHeaderProps {
 }
 
 export function ItineraryHeader({ tripId, totalDays, totalActivities }: ItineraryHeaderProps) {
+  const router = useRouter();
   return (
     <div className="flex items-center justify-between mb-8">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" asChild className="rounded-full">
-          <Link href="/dashboard/trips/upcoming-trips">
+        <Button variant="ghost" size="icon" asChild className="rounded-full" onClick={() => router.back()}>
             <ChevronLeft className="h-5 w-5" />
-          </Link>
         </Button>
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Trip Itinerary</h1>

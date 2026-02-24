@@ -13,8 +13,14 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { inviteCollaborator } from "@/lib/api";
+import { PendingInvitation } from "./CollaboratorsClient";
 
-const SendInvitation = ({ tripId }: { tripId: string }) => {
+interface pageProps{
+  tripId: string,
+  pendingInvitations: PendingInvitation[],
+}
+
+const SendInvitation = ({tripId, pendingInvitations}: pageProps) => {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);

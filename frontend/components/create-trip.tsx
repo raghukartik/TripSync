@@ -27,7 +27,7 @@ import {
   Building,
   Globe,
 } from "lucide-react";
-import FooterSection from "./footer";
+
 
 interface FormData {
   title: string;
@@ -712,7 +712,6 @@ export default function CreateTripPage() {
           </div>
         </div>
       </div>
-      <FooterSection />
     </div>
   );
 }

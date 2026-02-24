@@ -31,13 +31,6 @@ export const sendInvitationEmail = async ({
     to: email,
     subject: `You're invited to join "${tripName}" on TripSync`,
     html,
-    attachments: [
-      {
-        filename: "tripsync-logo.png",
-        path: path.join(process.cwd(), "assets/tripsync-logo.png"),
-        cid: "tripsync-logo", // must match img src
-      },
-    ] 
   })
 };
 

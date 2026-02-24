@@ -1095,7 +1095,8 @@ const inviteCollaborator = async (req, res) => {
 
     return res.status(200).json({
       message: "Invitation sent successfully.",
-      isUserAccExist
+      isUserAccExist,
+      invitation,
     });
 
   } catch (error) {

@@ -14,11 +14,7 @@ export const inviteEmailTemplate = ({
               margin: 0 auto;">
 
     <a href="${appLink}" target="_blank" style="text-decoration: none;">
-      <img
-        src="cid:tripsync-logo"
-        alt="TripSync"
-        style="height: 32px; margin-bottom: 16px;"
-      />
+      <img src="${appLink}/logo.png" alt="TripSync" height="32" />
     </a>
 
     <div style="border-top: 1px solid #eaeaea; padding-top: 16px;">
