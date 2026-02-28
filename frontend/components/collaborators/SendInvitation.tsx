@@ -1,5 +1,4 @@
 "use client";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import {
   Card,
@@ -14,18 +13,19 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { inviteCollaborator } from "@/lib/api";
 import { PendingInvitation } from "./CollaboratorsClient";
+import { Dispatch, SetStateAction } from "react";
 
 interface pageProps{
   tripId: string,
-  pendingInvitations: PendingInvitation[],
+  onSent: Dispatch<SetStateAction<PendingInvitation[]>>;
 }
 
-const SendInvitation = ({tripId, pendingInvitations}: pageProps) => {
+const SendInvitation = ({tripId, onSent}: pageProps) => {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
-  const router = useRouter();
+  
   const handleSendInvite = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -39,12 +39,12 @@ const SendInvitation = ({tripId, pendingInvitations}: pageProps) => {
     setSuccess(false);
 
     try {
-      await inviteCollaborator(tripId, email);
-
+      const data = await inviteCollaborator(tripId, email);
+      const newInvitation = data.invitation;
       setSuccess(true);
       setEmail("");
       setTimeout(() => setSuccess(false), 3000);
-      router.refresh();
+      onSent(pendingInvitations => [...pendingInvitations, newInvitation]);
     } catch (err) {
       setError("Failed to send invitation. Please try again.");
       console.log(err);

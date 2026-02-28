@@ -191,7 +191,7 @@ export async function inviteCollaborator(tripId: string, email: string) {
     }
 
     const data = await res.json();
-    return data.message;
+    return data;
   } catch (err) {
     throw err;
   }

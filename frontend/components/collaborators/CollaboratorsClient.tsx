@@ -8,6 +8,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { Button } from "../ui/button";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 interface InvitedBy {
   name: string,
   email: string,
@@ -47,12 +49,13 @@ const CollaboratorsClient = ({
   receivedInvitations = [],
   tripId 
 }: CollabClientProps) => {
+  const [pendInvi, setPendInvi] = useState<PendingInvitation[]>(pendingInvitations);
+  const router = useRouter();
+
   return (
     <div className="space-y-4 bg-gradient-to-br from-slate-50 to-slate-100">
-      <Button variant="ghost" size="icon" asChild className="rounded-full">
-        <Link href="/dashboard/trips/upcoming-trips">
+      <Button variant="ghost" size="icon" asChild className="rounded-full" onClick={() => router.back()}>
           <ChevronLeft className="h-5 w-5" />
-        </Link>
       </Button>
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-4 sm:p-6 lg:p-8">
       <div className="max-w-7xl mx-auto">
@@ -80,7 +83,7 @@ const CollaboratorsClient = ({
             {/* Send Invitation */}
             <Card className="shadow-sm">
               <CardContent className="pt-6">
-                <SendInvitation tripId={tripId} invitations={pendingInvitations}/>
+                <SendInvitation tripId={tripId} onSent={setPendInvi}/>
               </CardContent>
             </Card>
           </div>
@@ -99,7 +102,7 @@ const CollaboratorsClient = ({
             {/* Pending Invitations */}
             <Card className="shadow-sm border-amber-200 bg-amber-50/30">
               <CardContent className="pt-6">
-                <PendingInvitations invitations={pendingInvitations} />
+                <PendingInvitations invitations={pendInvi} />
               </CardContent>
             </Card>
           </div>
