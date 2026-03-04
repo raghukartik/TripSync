@@ -9,7 +9,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
-
+import Image from "next/image";
 
 export function SignupForm({
   className,
@@ -24,32 +24,34 @@ export function SignupForm({
   const [error, setError] = useState<string>("");
   const router = useRouter();
 
-  const handleSubmit = async(e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-
-      const res = await fetch(`http://localhost:8000/api/auth/create-account${token ? `?invite=${token}`: ""}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const res = await fetch(
+        `http://localhost:8000/api/auth/create-account${token ? `?invite=${token}` : ""}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({ name, email, password }),
         },
-        credentials: "include",
-        body: JSON.stringify({ name, email, password }),
-      })
-      if(res.ok){
+      );
+      if (res.ok) {
         router.push("/dashboard");
-      }else{
+      } else {
         const errorData = await res.json();
         setError(errorData.message || "Login failed. Please try again.");
       }
-    } catch{
-        setError("Network error. Please try again later.");
-    } finally{
+    } catch {
+      setError("Network error. Please try again later.");
+    } finally {
       setIsLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
     const fetchInvitationData = async () => {
@@ -60,7 +62,7 @@ export function SignupForm({
             `http://localhost:8000/api/trips/invitations/validate?token=${token}`,
             {
               credentials: "include",
-            }
+            },
           );
 
           if (res.ok) {
@@ -82,7 +84,6 @@ export function SignupForm({
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="overflow-hidden p-0">
         <CardContent className="grid p-0 md:grid-cols-2">
-
           <form className="p-6 md:p-8" onSubmit={handleSubmit}>
             <div className="flex flex-col gap-6">
               <div className="flex flex-col items-center text-center">
@@ -96,17 +97,24 @@ export function SignupForm({
                   </p>
                 )}
               </div>
-                
-                {error && (
+
+              {error && (
                 <Alert variant="destructive">
                   <ExclamationTriangleIcon className="h-4 w-4" />
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
-                )}
+              )}
 
               <div className="grid gap-3">
                 <Label htmlFor="name">Name</Label>
-                <Input id="name" type="text" value={name} placeholder="Jane Doe" required onChange={(e) => setName(e.target.value)}/>
+                <Input
+                  id="name"
+                  type="text"
+                  value={name}
+                  placeholder="Jane Doe"
+                  required
+                  onChange={(e) => setName(e.target.value)}
+                />
               </div>
               <div className="grid gap-3">
                 <Label htmlFor="email">Email</Label>
@@ -116,7 +124,7 @@ export function SignupForm({
                   type="email"
                   placeholder="jane@example.com"
                   required
-                  value={(email)}
+                  value={email}
                   onChange={(e) => {
                     // Only allow changes if there's no token
                     if (!token) {
@@ -129,7 +137,8 @@ export function SignupForm({
                 />
                 {token && (
                   <p className="text-xs text-muted-foreground">
-                    Email is pre-filled from your invitation and cannot be changed
+                    Email is pre-filled from your invitation and cannot be
+                    changed
                   </p>
                 )}
                 {isLoading && token && (
@@ -140,14 +149,16 @@ export function SignupForm({
               </div>
               <div className="grid gap-3">
                 <Label htmlFor="password">Password</Label>
-                <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)}/>
+                <Input
+                  id="password"
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
               </div>
-              
-              <Button 
-                type="submit" 
-                className="w-full"
-                disabled={isLoading}
-              >
+
+              <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading ? "Loading..." : "Create Account"}
               </Button>
 
@@ -195,17 +206,18 @@ export function SignupForm({
           </form>
 
           <div className="bg-muted relative hidden md:block">
-            <img
+            <Image
               src="/login-bg.jpg"
               alt="Image"
               className="absolute inset-0 h-full w-full object-cover transition-all duration-500 dark:brightness-100 dark:contrast-125"
+              fill
             />
           </div>
         </CardContent>
       </Card>
       <div className="text-muted-foreground *:[a]:hover:text-primary text-center text-xs text-balance *:[a]:underline *:[a]:underline-offset-4">
-        By clicking continue, you agree to our{" "}
-        <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
+        By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
+        and <a href="#">Privacy Policy</a>.
       </div>
     </div>
   );
