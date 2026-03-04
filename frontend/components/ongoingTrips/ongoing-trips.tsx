@@ -14,6 +14,7 @@ import {
   CalendarDays,
   MoreHorizontal,
   Share2,
+  ChevronLeft
 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
 import { Button } from "../ui/button";
@@ -358,28 +359,29 @@ const OngoingTrips = ({ ongoingTrips }: OngoingProps) => {
  
   const router = useRouter();
   return (
-    <div className="space-y-8 mt-8 px-6 py-6 max-w-7xl mx-auto">
+    <div className="space-y-8 mt-8 px-6 py-1 max-w-7xl mx-auto">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+        <div className="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => router.push('/dashboard')}
+            className="rounded-full hover:bg-white hover:shadow-sm"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </Button>
+          <h1 className="text-3xl font-bold text-gray-900">
             Ongoing Adventures
           </h1>
-          <p className="text-gray-600">
+        </div>
+      </div>
+      <p className="text-gray-600 -mt-4">
             {ongoingTrips.length > 0
               ? `You have ${ongoingTrips.length} upcoming ${
                   ongoingTrips.length === 1 ? "trip" : "trips"
                 }`
               : "No upcoming trips planned"}
-          </p>
-        </div>
-        <Button
-          className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-          onClick={() => router.push("/dashboard/create-trip")}
-        >
-          <Plus className="h-4 w-4" />
-          New Trip
-        </Button>
-      </div>
+      </p>
 
       {ongoingTrips.length === 0 ? (
         <Card className="border-2 border-dashed border-gray-200 bg-gradient-to-br from-gray-50 to-blue-50/50">

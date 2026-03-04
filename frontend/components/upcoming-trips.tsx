@@ -16,6 +16,7 @@ import {
   CalendarDays,
   MoreHorizontal,
   Share2,
+  ChevronLeft
 } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -499,19 +500,20 @@ const UpcomingTrips: React.FC = () => {
   }
 
   return (
-    <div className="space-y-8 mt-8 px-6 py-6 max-w-7xl mx-auto">
+    <div className="space-y-8 mt-8 px-6 py-2 max-w-7xl mx-auto">
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+        <div className="flex items-center gap-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => router.push('/dashboard')}
+            className="rounded-full hover:bg-white hover:shadow-sm"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </Button>
+          <h1 className="text-3xl font-bold text-gray-900">
             Upcoming Adventures
           </h1>
-          <p className="text-gray-600">
-            {trips.length > 0
-              ? `You have ${trips.length} upcoming ${
-                  trips.length === 1 ? "trip" : "trips"
-                }`
-              : "No upcoming trips planned"}
-          </p>
         </div>
         <Button
           className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
@@ -521,6 +523,13 @@ const UpcomingTrips: React.FC = () => {
           New Trip
         </Button>
       </div>
+      <p className="text-gray-600 -mt-4">
+        {trips.length > 0
+          ? `You have ${trips.length} upcoming ${
+              trips.length === 1 ? "trip" : "trips"
+            }`
+          : "No upcoming trips planned"}
+      </p>
 
       {trips.length === 0 ? (
         <Card className="border-2 border-dashed border-gray-200 bg-gradient-to-br from-gray-50 to-blue-50/50">

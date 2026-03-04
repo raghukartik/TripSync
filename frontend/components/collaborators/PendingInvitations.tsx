@@ -1,7 +1,6 @@
 "use client";
 
 import { Clock} from 'lucide-react';
-import { Button } from '../ui/button';
 import { PendingInvitation } from './CollaboratorsClient';
 
 interface pageProps{
@@ -26,11 +25,8 @@ const PendingInvitations = ({invitations}: pageProps) => (
           <div key={inv._id} className="flex items-center justify-between p-3 rounded-lg border bg-white">
             <div>
               <p className="font-medium text-sm">{inv.email}</p>
-              <p className="text-xs text-muted-foreground">Sent {new Date(inv.sentAt).toLocaleDateString()}</p>
+              <p className="text-xs text-muted-foreground">Sent {new Date(inv.createdAt).toLocaleDateString()}</p>
             </div>
-            <Button size="sm" variant="ghost" className="text-red-600 hover:text-red-700 hover:bg-red-50">
-              Cancel
-            </Button>
           </div>
         ))}
       </div>

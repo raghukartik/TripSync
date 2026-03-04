@@ -1,14 +1,34 @@
 "use client";
 import { Button } from '@/components/ui/button';
 import { Users } from 'lucide-react';
+import { Collaborators } from './CollaboratorsClient';
+import { removeCollaborator } from '@/lib/api';
+import { Dispatch, SetStateAction } from "react";
 
-interface Collaborator {
-  _id: string;
-  name: string;
-  email: string;
+interface pageProps{
+  tripId: string
+  collaborators: Collaborators[],
+  onModifyCollab: Dispatch<SetStateAction<Collaborators[]>>;
 }
 
-const CollaboratorsList = ({ collaborators }: { collaborators: Collaborator[] }) => (
+const CollaboratorsList = ({collaborators, tripId, onModifyCollab}: pageProps) => {
+
+  const handleRemoveCollaborator = async (e: React.MouseEvent,tripId: string,collaboratorId: string) => {
+    e.preventDefault();
+
+    try {
+      const res = await removeCollaborator(tripId, collaboratorId);
+      if(res.success){
+        onModifyCollab((prev) =>
+          prev.filter((collab) => collab._id !== collaboratorId)
+        );
+      }
+    } catch (error) {
+      console.error(error); 
+    }
+  };
+
+  return (
   <div>
     <div className="flex items-center gap-2 mb-4">
       <Users className="w-5 h-5 text-slate-700" />
@@ -28,13 +48,14 @@ const CollaboratorsList = ({ collaborators }: { collaborators: Collaborator[] })
               <p className="text-xs text-muted-foreground">{collab.email}</p>
             </div>
           </div>
-          <Button size="sm" variant="ghost" className="text-red-600 hover:text-red-700 hover:bg-red-50">
+          <Button size="sm" variant="ghost" className="text-red-600 hover:text-red-700 hover:bg-red-50" onClick={(e) => handleRemoveCollaborator(e, tripId, collab._id)}>
             Remove
           </Button>
         </div>
       ))}
     </div>
   </div>
-);
+  );
+};
 
 export default CollaboratorsList;

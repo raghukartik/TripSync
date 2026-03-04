@@ -239,3 +239,26 @@ export async function getTripTasks(tripId: string) {
     const data = await res.json();
     return data.data;
 }
+
+export async function removeCollaborator(tripId: string, collaboratorId: string){
+  const cookieStore = await cookies();
+  try {
+    const res = await fetch(`http://localhost:8000/api/trips/${tripId}/collaborators/${collaboratorId}`, {
+      method: "DELETE",
+      headers: {
+        Cookie: cookieStore.toString()
+      }
+    })
+
+    if(!res.ok){
+      throw new Error("Error removing the collaborator");
+    }
+
+    const data = await res.json();
+    return { success: true, message: data.message };
+
+  } catch (error) {
+    console.error(error);
+    return { success: false, message: "Error removing collaborator" };
+  }
+}
