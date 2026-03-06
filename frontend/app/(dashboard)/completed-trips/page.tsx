@@ -1,27 +1,6 @@
 import { cookies } from "next/headers";
 import CompletedTripsList from "@/components/completedTripsList";
-
-interface Trip {
-  _id: string;
-  title: string;
-  description: string;
-  startDate: string;
-  endDate: string;
-  story: {
-    visitedLocations: any[];
-    updatedAt: string;
-    contributors: any[];
-  };
-  owner: string;
-  collaborators: any[];
-  createdOn: string;
-  itinerary: any[];
-  tasks: any[];
-  expenses: any[];
-  chatMessages: any[];
-  __v: number;
-  pendingInvites: any[];
-}
+import { Trip } from "@/components/upcoming-trips";
 
 async function getCompletedTrips(): Promise<Trip[]> {
   const cookieStore = cookies();
@@ -30,27 +9,37 @@ async function getCompletedTrips(): Promise<Trip[]> {
       headers: {
         Cookie: cookieStore.toString(),
       },
-      next: { tags: ['completed-trips'] },
+      next: { tags: ["completed-trips"] },
     });
 
-    if (!res.ok) throw new Error('Failed to fetch trips');
-    
+    if (!res.ok) throw new Error("Failed to fetch trips");
+
     const data = await res.json();
-    return data.data.completedTrips || [];
+    const completedTrips = data.data?.completedTrips || [];
+
+    // Sanitize data to prevent runtime errors from missing array properties
+    return completedTrips.map((trip: Trip) => ({
+      ...trip,
+      destinations: trip.destinations || [],
+      tasks: trip.tasks || [],
+      collaborators: trip.collaborators || [],
+      expenses: trip.expenses || [],
+      itinerary: trip.itinerary || [],
+      chatMessages: trip.chatMessages || [],
+      pendingInvites: trip.pendingInvites || [],
+    }));
   } catch (error) {
-    console.error('Error fetching trips:', error);
+    console.error("Error fetching trips:", error);
     return [];
   }
 }
 
-
-
 export default async function CompletedTripsPage() {
   const trips = await getCompletedTrips();
-    const serializedTrips = trips.map(trip => ({
+  const serializedTrips = trips.map((trip) => ({
     ...trip,
     startDate: new Date(trip.startDate).toISOString(),
-    endDate: new Date(trip.endDate).toISOString()
+    endDate: new Date(trip.endDate).toISOString(),
   }));
   return <CompletedTripsList trips={serializedTrips} />;
 }

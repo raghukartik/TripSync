@@ -89,6 +89,7 @@ export type Trip = {
   chatMessages: ChatMessage[];
   pendingInvites: PendingInvite[];
   createdOn: string;
+  destinations: string[];
 };
 
 const TripCard = ({ trip }: { trip: Trip }) => {
