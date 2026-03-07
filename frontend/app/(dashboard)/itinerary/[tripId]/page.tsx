@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 import { cookies } from "next/headers";
 import { ItineraryClient } from "@/components/itinerary/ItineraryClient";
 
+
 interface Activity {
   activityId: string;
   time: string;
@@ -20,11 +21,12 @@ interface ItineraryPageProps {
   params: {
     tripId: string;
   };
+  searchParams: { isCompleted?: string }
 }
+
 
 async function fetchItinerary(tripId: string): Promise<ItineraryDay[]> {
   const cookieStore = await cookies();
-
   const res = await fetch(
     `http://localhost:8000/api/trips/${tripId}/itinerary`,
     {
@@ -52,8 +54,9 @@ async function fetchItinerary(tripId: string): Promise<ItineraryDay[]> {
   return json.data || [];
 }
 
-export default async function ItineraryPage({ params }: ItineraryPageProps) {
+export default async function ItineraryPage({ params, searchParams }: ItineraryPageProps) {
   const { tripId } = params;
+  const isCompleted = searchParams.isCompleted === "true";
 
   if (!tripId) {
     throw new Error("Trip ID is missing in params.");
@@ -61,5 +64,5 @@ export default async function ItineraryPage({ params }: ItineraryPageProps) {
 
   const itinerary = await fetchItinerary(tripId);
 
-  return <ItineraryClient itinerary={itinerary} tripId={tripId} />;
+  return <ItineraryClient itinerary={itinerary} tripId={tripId} isCompleted={isCompleted}/>;
 }

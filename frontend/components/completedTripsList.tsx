@@ -8,7 +8,8 @@ import {
   List,
   CheckCircle,
   DollarSign,
-  ChevronLeft
+  ChevronLeft,
+  MessageCircle,
 } from "lucide-react";
 import { Trip } from "./upcoming-trips";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
@@ -164,7 +165,7 @@ const CompletedTripCard = ({ trip }: { trip: Trip }) => {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => router.push(`/itinerary/${trip._id}`)}
+            onClick={() => router.push(`/itinerary/${trip._id}?isCompleted=${true}`)}
             className="flex items-center gap-1.5 hover:bg-blue-50 hover:text-blue-700 transition-colors rounded-lg px-3"
           >
             <List className="h-4 w-4" />
@@ -175,7 +176,18 @@ const CompletedTripCard = ({ trip }: { trip: Trip }) => {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => router.push(`/tasks/${trip._id}`)}
+            className="flex items-center gap-1.5 hover:bg-orange-50 hover:text-orange-700 transition-colors rounded-lg px-3"
+            onClick={() => router.push(`/triproom/${trip._id}?isCompleted=${true}`)}
+          >
+            <MessageCircle className="h-4 w-4" />
+            <span className="font-medium">Chat</span>
+            <ChevronRight className="h-3.5 w-3.5" />
+          </Button>
+
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => router.push(`/tasks/${trip._id}?isCompleted=${true}`)}
             className="flex items-center gap-1.5 hover:bg-green-50 hover:text-green-700 transition-colors rounded-lg px-3"
           >
             <CheckCircle className="h-4 w-4" />
@@ -186,7 +198,7 @@ const CompletedTripCard = ({ trip }: { trip: Trip }) => {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => router.push(`/expenses/${trip._id}`)}
+            onClick={() => router.push(`/expenses/${trip._id}?isCompleted=${true}`)}
             className="flex items-center gap-1.5 hover:bg-purple-50 hover:text-purple-700 transition-colors rounded-lg px-3"
           >
             <DollarSign className="h-4 w-4" />
@@ -197,7 +209,7 @@ const CompletedTripCard = ({ trip }: { trip: Trip }) => {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => router.push(`/collaborators/${trip._id}`)}
+            onClick={() => router.push(`/collaborators/${trip._id}?isCompleted=${true}`)}
             className="flex items-center gap-1.5 hover:bg-orange-50 hover:text-orange-700 transition-colors rounded-lg px-3"
           >
             <Users className="h-4 w-4" />

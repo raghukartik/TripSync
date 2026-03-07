@@ -6,9 +6,10 @@ import type { ItineraryDay } from "./ItineraryClient";
 interface ItineraryTimelineProps {
   itinerary: ItineraryDay[];
   tripId: string;
+  isCompleted?: boolean;
 }
 
-export function ItineraryTimeline({ itinerary, tripId }: ItineraryTimelineProps) {
+export function ItineraryTimeline({ itinerary, tripId, isCompleted }: ItineraryTimelineProps) {
   const startDate = itinerary.length > 0 ? itinerary[0].date : '';
 
   return (
@@ -26,6 +27,7 @@ export function ItineraryTimeline({ itinerary, tripId }: ItineraryTimelineProps)
             startDate={startDate}
             tripId={tripId}
             itineraryId={day._id}
+            isCompleted={isCompleted}
           />
         </div>
       ))}

@@ -36,6 +36,7 @@ interface TripRoomProps {
   userDetails: User;
   chatMessage: Message[];
   roomCollab: Collaborator[];
+  isCompleted: boolean;
 }
 
 const TripRoom = ({
@@ -43,10 +44,9 @@ const TripRoom = ({
   userDetails,
   chatMessage,
   roomCollab,
+  isCompleted,
 }: TripRoomProps) => {
-
   const [messages, setMessages] = useState<Message[]>(chatMessage);
-
   useEffect(() => {
     if (!socket.connected) {
       socket.connect();
@@ -88,7 +88,7 @@ const TripRoom = ({
       <div className="flex flex-col flex-1">
         <ChatHeader memberCount={roomCollab.length} />
         <ChatBody messages={messages} userId={userDetails._id} />
-        <ChatInput onSend={sendMessage} />
+        {!isCompleted && <ChatInput onSend={sendMessage} />}
       </div>
 
       <style>{`

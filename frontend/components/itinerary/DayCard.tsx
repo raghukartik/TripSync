@@ -14,9 +14,10 @@ interface DayCardProps {
   startDate: string;
   tripId: string;
   itineraryId: string;
+  isCompleted?: boolean;
 }
 
-export function DayCard({ day, startDate, tripId, itineraryId }: DayCardProps) {
+export function DayCard({ day, startDate, tripId, itineraryId, isCompleted }: DayCardProps) {
   const router = useRouter();
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -84,23 +85,27 @@ export function DayCard({ day, startDate, tripId, itineraryId }: DayCardProps) {
         >
           Day {dayNumber}
         </Badge>
-        <Button
-          asChild
-          className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-        >
-          <Link href={`/itinerary/${tripId}/edit/${day._id}`}>
-            <Plus className="h-4 w-4 mr-2" />
-            Add Activity
-          </Link>
-        </Button>
-        <Button
-          variant="destructive"
-          className="bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700"
-          onClick={handleDeleteItinerary}
-        >
-          <Trash2 className="h-4 w-4 mr-2" />
-          Delete Day
-        </Button>
+        {!isCompleted && (
+          <>
+            <Button
+              asChild
+              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+            >
+              <Link href={`/itinerary/${tripId}/edit/${day._id}`}>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Activity
+              </Link>
+            </Button>
+            <Button
+              variant="destructive"
+              className="bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700"
+              onClick={handleDeleteItinerary}
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Delete Day
+            </Button>
+          </>
+        )}
       </div>
 
       {/* Activities */}
@@ -113,6 +118,7 @@ export function DayCard({ day, startDate, tripId, itineraryId }: DayCardProps) {
             isLastActivity={activityIndex === day.activities.length - 1}
             tripId={tripId}
             dayId={day._id}
+            isCompleted={isCompleted}
           />
         ))}
       </div>

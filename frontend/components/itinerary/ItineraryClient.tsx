@@ -23,36 +23,42 @@ export interface ItineraryDay {
 interface ItineraryClientProps {
   itinerary: ItineraryDay[];
   tripId: string;
+  isCompleted: boolean;
 }
 
-export function ItineraryClient({ itinerary, tripId }: ItineraryClientProps) {
-  const totalActivities = itinerary.reduce((total, day) => total + day.activities.length, 0);
+export function ItineraryClient({
+  itinerary,
+  tripId,
+  isCompleted,
+}: ItineraryClientProps) {
+  const totalActivities = itinerary.reduce(
+    (total, day) => total + day.activities.length,
+    0,
+  );
   const totalDays = itinerary.length;
 
   if (itinerary.length === 0) {
-    return <EmptyState tripId={tripId} />;
+    return <EmptyState tripId={tripId} isCompleted={isCompleted} />;
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       <div className="container mx-auto px-4 py-8 max-w-6xl">
-        <ItineraryHeader 
-          tripId={tripId} 
-          totalDays={totalDays} 
-          totalActivities={totalActivities} 
-        />
-        
-        <ItineraryStats 
-          totalDays={totalDays} 
-          totalActivities={totalActivities} 
+        <ItineraryHeader
+          tripId={tripId}
+          totalDays={totalDays}
+          totalActivities={totalActivities}
+          isCompleted={isCompleted}
         />
 
-        <ItineraryTimeline 
-          itinerary={itinerary} 
-          tripId={tripId} 
+        <ItineraryStats
+          totalDays={totalDays}
+          totalActivities={totalActivities}
         />
 
-        <AddMoreCTA tripId={tripId} />
+        <ItineraryTimeline itinerary={itinerary} tripId={tripId} isCompleted={isCompleted} />
+
+        {!isCompleted && <AddMoreCTA tripId={tripId} />}
       </div>
     </div>
   );

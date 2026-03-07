@@ -4,21 +4,26 @@ import { getReceivedInvitations, getRoomCollab, getSentInvitations } from '@/lib
 interface pageProps{
     params: {
         tripId: string,
+    },
+    searchParams: {
+        isCompleted?: string
     }
 }
 
-const page = async({params}: pageProps) => {
+const page = async({params, searchParams}: pageProps) => {
     const awaitedParams = await params;
     const {tripId} = awaitedParams;
     const collab = await getRoomCollab(tripId);
     const pendingInvitations = await getSentInvitations();
     const receivedInvitations = await getReceivedInvitations();
+    const isCompleted = await searchParams.isCompleted === "true";
     return (
         <CollaboratorsClient 
             collaborators={collab}
             pendingInvitations={pendingInvitations} 
             receivedInvitations={receivedInvitations}
             tripId={tripId}
+            isCompleted={isCompleted}
         />
     )
 }

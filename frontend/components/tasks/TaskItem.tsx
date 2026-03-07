@@ -1,5 +1,5 @@
 "use client";
-import { CheckCircle2, Circle, Edit3, Trash2} from "lucide-react";
+import { CheckCircle2, Circle, Edit3, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 interface AssignedTo {
@@ -17,23 +17,34 @@ interface Task {
 
 interface TaskItemProps {
   task: Task;
-  tripId: string,
+  tripId: string;
   onToggleComplete: (taskId: string) => void;
+  isCompleted?: boolean;
 }
 
-export function TaskItem({ task, tripId, onToggleComplete}: TaskItemProps) {
+export function TaskItem({
+  task,
+  tripId,
+  onToggleComplete,
+  isCompleted = false,
+}: TaskItemProps) {
   const router = useRouter();
   const getInitials = (name: string) => {
-    return name.split(' ').map(n => n[0]).join('').toUpperCase();
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase();
   };
 
-  const handleDelete = async() => {
+  const handleDelete = async () => {
     try {
-      const res = await fetch(`http://localhost:8000/api/trips/${tripId}/tasks/${task.taskId}`,
+      const res = await fetch(
+        `http://localhost:8000/api/trips/${tripId}/tasks/${task.taskId}`,
         {
           method: "DELETE",
           credentials: "include",
-        }
+        },
       );
 
       if (res.ok) {
@@ -42,21 +53,23 @@ export function TaskItem({ task, tripId, onToggleComplete}: TaskItemProps) {
     } catch (error) {
       console.error(error);
     }
-    
-  }
+  };
 
   return (
     <div className="p-5">
       <div className="flex items-start gap-4">
         {/* Checkbox */}
         <button
-          onClick={() => onToggleComplete(task._id)}
+          onClick={() => !isCompleted && onToggleComplete(task._id)}
+          disabled={isCompleted}
           className={`flex-shrink-0 mt-0.5 transition-colors ${
             task.completed
               ? "text-green-600 hover:text-green-700"
               : "text-gray-400 hover:text-gray-600"
-          }`}
-          aria-label={task.completed ? "Mark as incomplete" : "Mark as complete"}
+          } ${isCompleted ? "cursor-not-allowed opacity-60" : ""}`}
+          aria-label={
+            task.completed ? "Mark as incomplete" : "Mark as complete"
+          }
         >
           {task.completed ? (
             <CheckCircle2 className="h-5 w-5" />
@@ -69,14 +82,16 @@ export function TaskItem({ task, tripId, onToggleComplete}: TaskItemProps) {
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between">
             <div className="flex-1">
-              <h3 className={`font-medium leading-6 ${
-                task.completed 
-                  ? "line-through text-gray-500" 
-                  : "text-gray-900"
-              }`}>
+              <h3
+                className={`font-medium leading-6 ${
+                  task.completed
+                    ? "line-through text-gray-500"
+                    : "text-gray-900"
+                }`}
+              >
                 {task.text}
               </h3>
-              
+
               <div className="flex items-center gap-4 mt-3">
                 {/* Assignee */}
                 <div className="flex items-center gap-2">
@@ -93,22 +108,26 @@ export function TaskItem({ task, tripId, onToggleComplete}: TaskItemProps) {
             </div>
 
             {/* Actions */}
-            <div className="flex items-center gap-1 ml-4">
-              <button
-                onClick={() => router.push(`/edit-tasks/${tripId}/task/${task.taskId}`)}
-                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                aria-label={`Edit task: ${task.text}`}
-              >
-                <Edit3 className="h-4 w-4" />
-              </button>
-               <button
+            {!isCompleted && (
+              <div className="flex items-center gap-1 ml-4">
+                <button
+                  onClick={() =>
+                    router.push(`/edit-tasks/${tripId}/task/${task.taskId}`)
+                  }
+                  className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                  aria-label={`Edit task: ${task.text}`}
+                >
+                  <Edit3 className="h-4 w-4" />
+                </button>
+                <button
                   onClick={handleDelete}
                   className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                   aria-label={`Delete task: ${task.text}`}
                 >
                   <Trash2 className="h-4 w-4" />
                 </button>
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

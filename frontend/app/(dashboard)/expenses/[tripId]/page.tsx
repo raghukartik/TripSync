@@ -19,6 +19,9 @@ interface Expense {
 interface expenseProps {
   params: {
     tripId: string;
+  },
+  searchParams: {
+    isCompleted? : string;
   }
 }
 
@@ -36,14 +39,15 @@ async function getExpenses(tripId: string): Promise<Expense[] | null> {
   return data.data;
 }
 
-export default async function ExpensePage({ params }: expenseProps) {
+export default async function ExpensePage({ params, searchParams }: expenseProps) {
   const paramsAwaited = await params;
   const expenses = await getExpenses(paramsAwaited.tripId);
-  
+  const isCompleted = searchParams.isCompleted === "true";
   return (
     <ExpenseList 
       tripId={paramsAwaited.tripId}
       initialExpenses={expenses || []}
+      isCompleted={isCompleted}
     />
   )
 }

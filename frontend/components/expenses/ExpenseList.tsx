@@ -1,6 +1,6 @@
-'use client';
-import { useState, useMemo } from 'react'
-import { useRouter } from 'next/navigation';
+"use client";
+import { useState, useMemo } from "react";
+import { useRouter } from "next/navigation";
 
 import {
   Table,
@@ -9,26 +9,21 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { PlusCircle, Receipt } from "lucide-react"
+} from "@/components/ui/table";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { PlusCircle, Receipt } from "lucide-react";
 
 // Import sub-components
-import { ExpenseSummaryCards } from './ExpenseSummaryCards'
-import { ExpenseFilters } from './ExpenseFilters'
-import { ExpenseTableRow } from './ExpenseTableRow'
-import { ExpenseMobileCard } from './ExpenseMobileCard'
-import { EmptyState } from './EmptyState'
-import { ErrorState } from './ErrorState'
-import { LoadingSkeleton } from './LoadingSkeleton'
-import { getCategoryBadgeVariant, getCategoryIcon } from '@/lib/expenseUtils';
-import { formatAmount } from '@/lib/currencyConfig';
+import { ExpenseSummaryCards } from "./ExpenseSummaryCards";
+import { ExpenseFilters } from "./ExpenseFilters";
+import { ExpenseTableRow } from "./ExpenseTableRow";
+import { ExpenseMobileCard } from "./ExpenseMobileCard";
+import { EmptyState } from "./EmptyState";
+import { ErrorState } from "./ErrorState";
+import { LoadingSkeleton } from "./LoadingSkeleton";
+import { getCategoryBadgeVariant, getCategoryIcon } from "@/lib/expenseUtils";
+import { formatAmount } from "@/lib/currencyConfig";
 
 interface User {
   _id: string;
@@ -49,15 +44,20 @@ interface Expense {
 interface PageProps {
   tripId: string;
   initialExpenses: Expense[];
+  isCompleted: boolean;
 }
 
-export default function ExpenseList({ tripId, initialExpenses }: PageProps) {
+export default function ExpenseList({
+  tripId,
+  initialExpenses,
+  isCompleted,
+}: PageProps) {
   const [expenses, setExpenses] = useState<Expense[]>(initialExpenses);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState<string>('');
-  const [categoryFilter, setCategoryFilter] = useState<string>('all');
-  const [sortBy, setSortBy] = useState<string>('date-desc');
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<string>("date-desc");
   const router = useRouter();
 
   const fetchExpenses = async () => {
@@ -65,34 +65,39 @@ export default function ExpenseList({ tripId, initialExpenses }: PageProps) {
     setError(null);
     try {
       const res = await fetch(`/api/trips/${tripId}/expenses`);
-      if (!res.ok) throw new Error('Failed to fetch expenses');
+      if (!res.ok) throw new Error("Failed to fetch expenses");
       const data = await res.json();
       setExpenses(data.data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An unknown error occurred');
+      setError(
+        err instanceof Error ? err.message : "An unknown error occurred",
+      );
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   // Filter and sort expenses
   const filteredAndSortedExpenses = useMemo(() => {
     return expenses
-      .filter(expense => {
-        const matchesSearch = expense.note.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            expense.spentBy.name.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchesCategory = categoryFilter === 'all' || expense.category.toLowerCase() === categoryFilter.toLowerCase();
+      .filter((expense) => {
+        const matchesSearch =
+          expense.note.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          expense.spentBy.name.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesCategory =
+          categoryFilter === "all" ||
+          expense.category.toLowerCase() === categoryFilter.toLowerCase();
         return matchesSearch && matchesCategory;
       })
       .sort((a, b) => {
         switch (sortBy) {
-          case 'date-desc':
+          case "date-desc":
             return new Date(b.date).getTime() - new Date(a.date).getTime();
-          case 'date-asc':
+          case "date-asc":
             return new Date(a.date).getTime() - new Date(b.date).getTime();
-          case 'amount-desc':
+          case "amount-desc":
             return b.amount - a.amount;
-          case 'amount-asc':
+          case "amount-asc":
             return a.amount - b.amount;
           default:
             return 0;
@@ -103,9 +108,13 @@ export default function ExpenseList({ tripId, initialExpenses }: PageProps) {
   // Calculate summary stats
   const { totalAmount, uniqueCategories, averageExpense } = useMemo(() => {
     const total = expenses.reduce((sum, expense) => sum + expense.amount, 0);
-    const unique = [...new Set(expenses.map(e => e.category))];
+    const unique = [...new Set(expenses.map((e) => e.category))];
     const average = expenses.length > 0 ? total / expenses.length : 0;
-    return { totalAmount: total, uniqueCategories: unique, averageExpense: average };
+    return {
+      totalAmount: total,
+      uniqueCategories: unique,
+      averageExpense: average,
+    };
   }, [expenses]);
 
   const handleAddExpense = () => {
@@ -113,8 +122,8 @@ export default function ExpenseList({ tripId, initialExpenses }: PageProps) {
   };
 
   const handleClearFilters = () => {
-    setSearchTerm('');
-    setCategoryFilter('all');
+    setSearchTerm("");
+    setCategoryFilter("all");
   };
 
   if (error) {
@@ -125,7 +134,7 @@ export default function ExpenseList({ tripId, initialExpenses }: PageProps) {
     <div className="w-full max-w-6xl mx-auto space-y-6">
       {/* Summary Cards */}
       {!loading && expenses.length > 0 && (
-        <ExpenseSummaryCards 
+        <ExpenseSummaryCards
           totalAmount={totalAmount}
           expenseCount={expenses.length}
           averageExpense={averageExpense}
@@ -146,15 +155,16 @@ export default function ExpenseList({ tripId, initialExpenses }: PageProps) {
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-2">
-              <Button 
-                size="sm" 
-                onClick={handleAddExpense}
-                className="gap-2 bg-blue-600 hover:bg-blue-700"
-              >
-                <PlusCircle className="h-4 w-4" />
-                Add Expense
-              </Button>
-
+              {!isCompleted && (
+                <Button
+                  size="sm"
+                  onClick={handleAddExpense}
+                  className="gap-2 bg-blue-600 hover:bg-blue-700"
+                >
+                  <PlusCircle className="h-4 w-4" />
+                  Add Expense
+                </Button>
+              )}
             </div>
           </div>
         </CardHeader>
@@ -179,17 +189,18 @@ export default function ExpenseList({ tripId, initialExpenses }: PageProps) {
           {loading ? (
             <LoadingSkeleton />
           ) : filteredAndSortedExpenses.length === 0 ? (
-            <EmptyState 
+            <EmptyState
               hasExpenses={expenses.length > 0}
               onAddExpense={handleAddExpense}
               onClearFilters={handleClearFilters}
+              isCompleted={isCompleted}
             />
           ) : (
             <div className="space-y-4">
               {/* Mobile-friendly cards for small screens */}
               <div className="block md:hidden space-y-3">
                 {filteredAndSortedExpenses.map((expense) => (
-                  <ExpenseMobileCard 
+                  <ExpenseMobileCard
                     key={expense._id}
                     expense={expense}
                     getCategoryBadgeVariant={getCategoryBadgeVariant}
@@ -202,17 +213,24 @@ export default function ExpenseList({ tripId, initialExpenses }: PageProps) {
               <div className="hidden md:block">
                 <Table>
                   <TableCaption className="text-left text-gray-600 mb-4">
-                    {filteredAndSortedExpenses.length} expense{filteredAndSortedExpenses.length !== 1 ? 's' : ''} 
-                    • Total: {formatAmount(totalAmount)}
+                    {filteredAndSortedExpenses.length} expense
+                    {filteredAndSortedExpenses.length !== 1 ? "s" : ""}• Total:{" "}
+                    {formatAmount(totalAmount)}
                   </TableCaption>
                   <TableHeader>
                     <TableRow className="bg-gray-50/50">
                       <TableHead className="font-semibold">Date</TableHead>
                       <TableHead className="font-semibold">Category</TableHead>
-                      <TableHead className="font-semibold">Description</TableHead>
+                      <TableHead className="font-semibold">
+                        Description
+                      </TableHead>
                       <TableHead className="font-semibold">Paid by</TableHead>
-                      <TableHead className="font-semibold">Shared with</TableHead>
-                      <TableHead className="text-right font-semibold">Amount</TableHead>
+                      <TableHead className="font-semibold">
+                        Shared with
+                      </TableHead>
+                      <TableHead className="text-right font-semibold">
+                        Amount
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -233,5 +251,5 @@ export default function ExpenseList({ tripId, initialExpenses }: PageProps) {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

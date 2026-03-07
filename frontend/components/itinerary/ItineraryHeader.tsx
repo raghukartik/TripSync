@@ -9,9 +9,10 @@ interface ItineraryHeaderProps {
   tripId: string;
   totalDays: number;
   totalActivities: number;
+  isCompleted?: boolean;
 }
 
-export function ItineraryHeader({ tripId, totalDays, totalActivities }: ItineraryHeaderProps) {
+export function ItineraryHeader({ tripId, totalDays, totalActivities, isCompleted }: ItineraryHeaderProps) {
   const router = useRouter();
   return (
     <div className="flex items-center justify-between mb-8">
@@ -27,12 +28,14 @@ export function ItineraryHeader({ tripId, totalDays, totalActivities }: Itinerar
         </div>
       </div>
       <div className="flex gap-2">
-        <Button asChild className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-          <Link href={`/itinerary/${tripId}/add`}>
-            <Plus className="h-4 w-4 mr-2" />
-            New Itinerary Day
-          </Link>
-        </Button>
+        {!isCompleted && (
+          <Button asChild className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+            <Link href={`/itinerary/${tripId}/add`}>
+              <Plus className="h-4 w-4 mr-2" />
+              New Itinerary Day
+            </Link>
+          </Button>
+        )}
       </div>
     </div>
   );

@@ -8,6 +8,7 @@ interface TasksListHeaderProps {
   totalCount: number;
   completionPercentage: number;
   onAddTask: () => void;
+  isCompleted?: boolean;
 }
 
 export function TasksListHeader({
@@ -15,11 +16,18 @@ export function TasksListHeader({
   totalCount,
   completionPercentage,
   onAddTask,
+  isCompleted = false,
 }: TasksListHeaderProps) {
   const router = useRouter();
   return (
     <div className="space-y-4">
-      <Button variant="ghost" size="icon" asChild className="rounded-full" onClick={() => router.back()}>
+      <Button
+        variant="ghost"
+        size="icon"
+        asChild
+        className="rounded-full"
+        onClick={() => router.back()}
+      >
         <ChevronLeft className="h-5 w-5" />
       </Button>
 
@@ -38,13 +46,15 @@ export function TasksListHeader({
               </div>
               <div className="text-sm text-gray-500">Complete</div>
             </div>
-            <button
-              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-              onClick={onAddTask}
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Add Task
-            </button>
+            {!isCompleted && (
+              <button
+                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                onClick={onAddTask}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add Task
+              </button>
+            )}
           </div>
         </div>
 

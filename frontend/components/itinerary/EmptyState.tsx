@@ -11,22 +11,22 @@ import {
   NotebookText 
 } from "lucide-react";
 import Link from "next/link";
-
+import { useRouter } from "next/navigation";
 interface EmptyStateProps {
   tripId: string;
+  isCompleted?: boolean;
 }
 
-export function EmptyState({ tripId }: EmptyStateProps) {
+export function EmptyState({ tripId, isCompleted }: EmptyStateProps) {
+  const router = useRouter();
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         {/* Header */}
         <div className="flex items-center justify-between mb-12">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon" asChild className="rounded-full">
-              <Link href="/dashboard">
-                <ChevronLeft className="h-5 w-5" />
-              </Link>
+            <Button variant="ghost" size="icon" asChild className="rounded-full" onClick={() => router.back()}> 
+              <ChevronLeft className="h-5 w-5" />
             </Button>
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Trip Itinerary</h1>
@@ -38,12 +38,14 @@ export function EmptyState({ tripId }: EmptyStateProps) {
               <Share2 className="h-4 w-4 mr-2" />
               Share
             </Button>
-            <Button asChild className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-              <Link href={`/itinerary/${tripId}/edit/}`}>
-                <Plus className="h-4 w-4 mr-2" />
-                Add Activities
-              </Link>
-            </Button>
+            {!isCompleted && (
+              <Button asChild className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                <Link href={`/itinerary/${tripId}/edit/}`}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Activities
+                </Link>
+              </Button>
+            )}
           </div>
         </div>
 
@@ -63,12 +65,14 @@ export function EmptyState({ tripId }: EmptyStateProps) {
             </p>
             
             <div className="space-y-4">
-              <Button size="lg" asChild className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-                <Link href={`/itinerary/${tripId}/add`}>
-                  <Plus className="h-5 w-5 mr-2" />
-                  Create Your First Itinerary
-                </Link>
-              </Button>
+              {!isCompleted && (
+                <Button size="lg" asChild className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                  <Link href={`/itinerary/${tripId}/add`}>
+                    <Plus className="h-5 w-5 mr-2" />
+                    Create Your First Itinerary
+                  </Link>
+                </Button>
+              )}
               
               <div className="flex items-center justify-center gap-8 mt-8 text-sm text-gray-500">
                 <div className="flex items-center gap-2">

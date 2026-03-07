@@ -6,7 +6,6 @@ import { TasksFilters } from "./TasksFilters";
 import { TaskItem } from "./TaskItem";
 import { EmptyTasksState, NoMatchingTasksState } from "./EmptyStates";
 
-
 export interface AssignedTo {
   _id: string;
   name: string;
@@ -28,24 +27,22 @@ interface TasksListProps {
   tasks: Tasks[] | null;
   tripId: string;
   availableAssignees?: AssignedTo[];
+  isCompleted: boolean;
 }
 
-export function TasksList({ tasks, tripId}: TasksListProps) {
+export function TasksList({ tasks, tripId, isCompleted }: TasksListProps) {
   const [localTasks, setLocalTasks] = useState<Tasks[]>(tasks || []);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState<Status>({ status: "all" });
   const router = useRouter();
 
   const handleToggleComplete = useCallback((taskId: string) => {
-    setLocalTasks(prevTasks => 
-      prevTasks.map(task => 
-        task._id === taskId 
-          ? { ...task, completed: !task.completed }
-          : task
-      )
+    setLocalTasks((prevTasks) =>
+      prevTasks.map((task) =>
+        task._id === taskId ? { ...task, completed: !task.completed } : task,
+      ),
     );
   }, []);
- 
 
   const handleAddTask = useCallback(() => {
     router.push(`/add-tasks/${tripId}`);
@@ -56,23 +53,28 @@ export function TasksList({ tasks, tripId}: TasksListProps) {
     setFilterStatus({ status: "all" });
   }, []);
 
-  const filteredTasks = localTasks.filter(task => {
-    const matchesSearch = task.text.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         task.assignedTo.name.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesStatus = filterStatus.status === "all" || 
-                         (filterStatus.status === "completed" && task.completed) ||
-                         (filterStatus.status === "pending" && !task.completed);
-    
+  const filteredTasks = localTasks.filter((task) => {
+    const matchesSearch =
+      task.text.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      task.assignedTo.name.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesStatus =
+      filterStatus.status === "all" ||
+      (filterStatus.status === "completed" && task.completed) ||
+      (filterStatus.status === "pending" && !task.completed);
+
     return matchesSearch && matchesStatus;
   });
 
-  const completedCount = localTasks.filter(task => task.completed).length;
+  const completedCount = localTasks.filter((task) => task.completed).length;
   const totalCount = localTasks.length;
-  const completionPercentage = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
+  const completionPercentage =
+    totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
 
   if (!localTasks || localTasks.length === 0) {
-    return <EmptyTasksState onCreateTask={handleAddTask} />;
+    return (
+      <EmptyTasksState onCreateTask={handleAddTask} isCompleted={isCompleted} />
+    );
   }
 
   return (
@@ -83,6 +85,7 @@ export function TasksList({ tasks, tripId}: TasksListProps) {
           totalCount={totalCount}
           completionPercentage={completionPercentage}
           onAddTask={handleAddTask}
+          isCompleted={isCompleted}
         />
 
         <TasksFilters
@@ -103,6 +106,7 @@ export function TasksList({ tasks, tripId}: TasksListProps) {
                 task={task}
                 tripId={tripId}
                 onToggleComplete={handleToggleComplete}
+                isCompleted={isCompleted}
               />
             </div>
           ))}

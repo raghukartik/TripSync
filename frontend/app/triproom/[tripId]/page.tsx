@@ -8,6 +8,9 @@ interface TripRoomPageProps {
   params: {
     tripId: string;
   };
+  searchParams: {
+    isCompleted?: string;
+  }
 }
 
 interface Sender {
@@ -42,7 +45,7 @@ async function getMessHistory(
   return data.messages;
 }
 
-export default async function TripChat({ params }: TripRoomPageProps) {
+export default async function TripChat({ params, searchParams }: TripRoomPageProps) {
   const userDetails = await getUserInfo();
   if (!userDetails) {
     return <div>Unauthorized</div>;
@@ -50,7 +53,7 @@ export default async function TripChat({ params }: TripRoomPageProps) {
   const awaitedParams = await params;
   const messages = await getMessHistory(awaitedParams.tripId);
   const collab = await getRoomCollab(awaitedParams.tripId);
-
+  const isCompleted = searchParams.isCompleted === "true";
   return (
     <div className="p-4">
       <TripRoom
@@ -58,6 +61,7 @@ export default async function TripChat({ params }: TripRoomPageProps) {
         userDetails={userDetails}
         chatMessage={messages || []}
         roomCollab={collab || []}
+        isCompleted={isCompleted}
       />
     </div>
   );

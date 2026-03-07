@@ -12,13 +12,15 @@ interface ActivityCardProps {
   isLastActivity: boolean;
   tripId: string;
   dayId: string;
+  isCompleted?: boolean;
 }
 
 export function ActivityCard({ 
   activity, 
   isLastActivity, 
   tripId, 
-  dayId 
+  dayId,
+  isCompleted
 }: ActivityCardProps) {
   return (
     <div className="group relative">
@@ -47,25 +49,27 @@ export function ActivityCard({
               </div>
             </div>
             
-            <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-              <Button
-                variant="ghost"
-                size="sm"
-                asChild
-                className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-              >
-                <Link
-                  href={{
-                    pathname: `/itinerary/${tripId}/edit/${dayId}`,
-                    query: {
-                      activity: activity.activityId,
-                    },
-                  }}
+            {!isCompleted && (
+              <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  asChild
+                  className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
                 >
-                  <Edit className="h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
+                  <Link
+                    href={{
+                      pathname: `/itinerary/${tripId}/edit/${dayId}`,
+                      query: {
+                        activity: activity.activityId,
+                      },
+                    }}
+                  >
+                    <Edit className="h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
+            )}
           </div>
         </div>
 
