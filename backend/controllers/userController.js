@@ -201,7 +201,7 @@ const completedTrips = async (req, res, next) => {
           endDate: { $lte: new Date() },
         },
       ],
-    });
+    }).populate("collaborators", "name email");
 
     if (!completedTrips) {
       return res.status(400).json({

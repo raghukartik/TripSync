@@ -12,11 +12,12 @@ interface pageProps{
 
 const page = async({params, searchParams}: pageProps) => {
     const awaitedParams = await params;
+    const awaitedSearchParams = await searchParams;
     const {tripId} = awaitedParams;
     const collab = await getRoomCollab(tripId);
-    const pendingInvitations = await getSentInvitations();
+    const pendingInvitations = await getSentInvitations(tripId);
     const receivedInvitations = await getReceivedInvitations();
-    const isCompleted = await searchParams.isCompleted === "true";
+    const isCompleted = awaitedSearchParams.isCompleted === "true";
     return (
         <CollaboratorsClient 
             collaborators={collab}

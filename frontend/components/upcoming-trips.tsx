@@ -89,7 +89,7 @@ export type Trip = {
   chatMessages: ChatMessage[];
   pendingInvites: PendingInvite[];
   createdOn: string;
-  destinations: string[];
+  destination: string[];
 };
 
 const TripCard = ({ trip }: { trip: Trip }) => {

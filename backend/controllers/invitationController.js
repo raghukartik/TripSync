@@ -7,7 +7,6 @@ import TripModel from "../models/Trips.js";
 import { inviteEmailTemplate } from "../utils/inviteEmailTemplate.js";
 import path from "path";
 
-
 export const sendInvitationEmail = async ({
   email,
   token,
@@ -16,7 +15,7 @@ export const sendInvitationEmail = async ({
   expiresAt,
 }) => {
   const inviteLink = `${process.env.CLIENT_URL}/invite/accept?token=${token}`;
-  console.log(process.env.CLIENT_URL)
+  console.log(process.env.CLIENT_URL);
 
   const html = inviteEmailTemplate({
     appLink: process.env.CLIENT_URL,
@@ -25,13 +24,13 @@ export const sendInvitationEmail = async ({
     inviteLink,
     expiryTime: expiresAt.toLocaleString(),
   });
-  
+
   await mailer.sendMail({
     from: `"TripSync" <${process.env.EMAIL_USER}>`,
     to: email,
     subject: `You're invited to join "${tripName}" on TripSync`,
     html,
-  })
+  });
 };
 
 export const validateInvitationRequest = async (req, res) => {
@@ -82,77 +81,85 @@ export const validateInvitationRequest = async (req, res) => {
   }
 };
 
-export const getRecievedInvitation = async(req, res) => {
-  try{
-    const {userId} = req.user;
+export const getRecievedInvitation = async (req, res) => {
+  try {
+    const { userId } = req.user;
     console.log(userId);
-    if(!userId){
+    if (!userId) {
       return res.status("404").json({
-        message: "user is not logged in!"
-      })
+        message: "user is not logged in!",
+      });
     }
 
-    const user = await User.findOne({_id: userId});
-    
-    const invitation = await InvitationModel.find({email: user.email, status: "PENDING"}).populate({
+    const user = await User.findOne({ _id: userId });
+
+    const invitation = await InvitationModel.find({
+      email: user.email,
+      status: "PENDING",
+    }).populate({
       path: "invitedBy",
-      select: "name email"
+      select: "name email",
     });
 
-    if(!invitation){
-      res.status(200).json({
-        message: "No pending invitations found"
-      })
+    if (invitation.length === 0) {
+      return res.status(200).json({
+        message: "No pending invitations found",
+      });
     }
 
     return res.status(200).json({
-      invitation
-    })
-
-  }catch(error){
-    console.error("validateInvitationRequest error:", error);
+      invitation,
+    });
+  } catch (error) {
+    console.error("getRecievedInvitation error:", error);
     return res.status(500).json({
       valid: false,
       message: "Error validating invitation",
     });
   }
-}
+};
 
-export const getSentInvitation = async(req, res) => {
-  try{
-    const {userId} = req.user;
+export const getSentInvitation = async (req, res) => {
+  try {
+    const { userId } = req.user;
+    const { tripId } = req.params;
     console.log(userId);
-    if(!userId){
-      return res.status("404").json({
-        message: "user is not logged in!"
-      })
+    if (!userId) {
+      return res.status(401).json({
+        message: "user is not logged in!",
+      });
+    }
+    if (!tripId) {
+      return res.status(400).json({
+        message: "TripId is required",
+      });
     }
 
-    const user = await User.findOne({_id: userId});
-    
-    const invitation = await InvitationModel.find({invitedBy: userId, status: "PENDING"}).populate({
+    const invitation = await InvitationModel.find({
+      tripId: tripId,
+      status: "PENDING",
+    }).populate({
       path: "invitedBy",
-      select: "name email"
+      select: "name email",
     });
 
-    if(!invitation){
-      res.status(200).json({
-        message: "No sent invitations found"
-      })
+    if (invitation.length === 0) {
+      return res.status(200).json({
+        message: "No sent invitations found",
+      });
     }
 
     return res.status(200).json({
-      invitation
-    })
-
-  }catch(error){
-    console.error("validateInvitationRequest error:", error);
+      invitation,
+    });
+  } catch (error) {
+    console.error("getSentInvitation error:", error);
     return res.status(500).json({
       valid: false,
       message: "Error validating invitation",
     });
   }
-}
+};
 
 export const acceptReceivedInvitation = async (req, res) => {
   try {
@@ -211,7 +218,7 @@ export const acceptReceivedInvitation = async (req, res) => {
     }
 
     const alreadyCollaborator = trip.collaborators.some(
-      (id) => id.toString() === userId
+      (id) => id.toString() === userId,
     );
 
     if (!alreadyCollaborator) {
@@ -226,7 +233,6 @@ export const acceptReceivedInvitation = async (req, res) => {
       message: "Invitation accepted successfully",
       tripId,
     });
-
   } catch (error) {
     console.error("acceptReceivedInvitation error:", error);
     return res.status(500).json({
@@ -291,7 +297,6 @@ export const rejectReceivedInvitation = async (req, res) => {
       message: "Invitation rejected successfully",
       tripId,
     });
-
   } catch (error) {
     console.error("rejectReceivedInvitation error:", error);
     return res.status(500).json({
@@ -299,4 +304,3 @@ export const rejectReceivedInvitation = async (req, res) => {
     });
   }
 };
-

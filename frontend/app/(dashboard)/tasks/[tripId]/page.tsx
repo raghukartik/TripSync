@@ -12,7 +12,8 @@ interface TasksProps{
 
 export default async function TaskPage({params, searchParams}: TasksProps) {
     const awaitedParams = await params;
-    const isCompleted = searchParams.isCompleted === "true";
+    const awaitedSearchParams = await searchParams;
+    const isCompleted = awaitedSearchParams.isCompleted === "true";
     const tasks = await getTripTasks(awaitedParams.tripId);
     return(
         <TasksList tasks={tasks} tripId={awaitedParams.tripId} isCompleted={isCompleted}/>

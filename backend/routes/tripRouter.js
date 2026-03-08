@@ -74,6 +74,6 @@ router.route("/trips/tripRooms/:tripId/collaborators").get(authController.protec
 
 router.route("/trips/invitations/validate").get(validateInvitationRequest);
 router.route("/trips/invitations/recieved").get(authController.protect, getRecievedInvitation);
-router.route("/trips/invitations/sent").get(authController.protect, getSentInvitation);
+router.route("/trips/invitations/sent/:tripId").get(authController.protect, getSentInvitation);
 router.route("/trips/:tripId/invitations/:invitationId").patch(authController.protect, acceptReceivedInvitation);
 export default router;

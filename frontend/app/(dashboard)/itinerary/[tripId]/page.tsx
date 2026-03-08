@@ -55,8 +55,10 @@ async function fetchItinerary(tripId: string): Promise<ItineraryDay[]> {
 }
 
 export default async function ItineraryPage({ params, searchParams }: ItineraryPageProps) {
-  const { tripId } = params;
-  const isCompleted = searchParams.isCompleted === "true";
+  const awaitedParams = await params;
+  const { tripId } = awaitedParams;
+  const awaitedSearchParams = await searchParams;
+  const isCompleted = awaitedSearchParams.isCompleted === "true";
 
   if (!tripId) {
     throw new Error("Trip ID is missing in params.");

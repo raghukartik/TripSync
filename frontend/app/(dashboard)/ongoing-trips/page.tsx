@@ -6,11 +6,8 @@ import OngoingTrips from '@/components/ongoingTrips/ongoing-trips'
 
 const ongoingTrips = async() => {
     const data = await getOngoingTrips();
-    if(!data){
-
-    }
-    const ongoingTrips: Trip[] = data.trips;
-    console.log(ongoingTrips);
+    
+    const ongoingTrips: Trip[] = data?.trips || [];
   return (
     <div>
         <OngoingTrips ongoingTrips={ongoingTrips}/>

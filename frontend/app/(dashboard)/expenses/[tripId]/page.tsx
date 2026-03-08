@@ -41,8 +41,9 @@ async function getExpenses(tripId: string): Promise<Expense[] | null> {
 
 export default async function ExpensePage({ params, searchParams }: expenseProps) {
   const paramsAwaited = await params;
+  const awaitedSearchParams = await searchParams;
   const expenses = await getExpenses(paramsAwaited.tripId);
-  const isCompleted = searchParams.isCompleted === "true";
+  const isCompleted = awaitedSearchParams.isCompleted === "true";
   return (
     <ExpenseList 
       tripId={paramsAwaited.tripId}

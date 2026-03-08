@@ -74,6 +74,26 @@ export async function getUserUpcomingTrips() {
   }
 }
 
+export async function getCompletedTrips(){
+  try {
+    const cookieStore = await cookies();
+    const res = await fetch("http://localhost:8000/api/user/completed-trips", {
+      headers: {
+        Cookie: cookieStore.toString(),
+      },
+      next: { tags: ["completed-trips"] },
+    });
+    
+    if(!res.ok) throw new Error("Failed to fetch completed trips");
+    const data = await res.json();
+    return data.data.completedTrips || [];
+
+  } catch (error) {
+    console.error("Error fetching user's upcoming trips:", error);
+    return null;
+  }
+}
+
 export async function getOngoingTrips() {
   try {
     const cookieStore = await cookies();
@@ -92,7 +112,7 @@ export async function getOngoingTrips() {
 
     if (!res.ok) throw new Error("failed to fetch ongoing trips");
     const data = await res.json();
-    return data.data;
+    return data.data || [];
   } catch (error) {
     console.error("Error fetching user's upcoming trips:", error);
     return null;
@@ -155,9 +175,9 @@ export async function getReceivedInvitations() {
   return data.invitation;
 }
 
-export async function getSentInvitations() {
+export async function getSentInvitations(tripId:string) {
   const cookieStore = await cookies();
-  const res = await fetch("http://localhost:8000/api/trips/invitations/sent", {
+  const res = await fetch(`http://localhost:8000/api/trips/invitations/sent/${tripId}`, {
     headers: {
       Cookie: cookieStore.toString(),
     },

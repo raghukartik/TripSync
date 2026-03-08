@@ -321,7 +321,7 @@ export default function CompletedTripsList({ trips }: { trips: Trip[] }) {
               <div>
                 <div className="text-3xl font-bold text-gray-900 mb-1">
                   {trips.reduce((total, trip) => {
-                    return total + (trip.destinations.length || 0);
+                    return total + (trip.destination.length || 0);
                   }, 0)}
                 </div>
                 <div className="text-gray-600 text-sm uppercase tracking-wider font-medium">
