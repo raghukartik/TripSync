@@ -124,6 +124,9 @@ app.use('/api', authRouter);
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/assets", express.static(path.join(__dirname, "assets")));
 
+app.get("/health-check", (req, res) => {
+  res.send("Welcome to the TripSync API");
+});
 
 const PORT = 8000;
 server.listen(PORT, () => {
