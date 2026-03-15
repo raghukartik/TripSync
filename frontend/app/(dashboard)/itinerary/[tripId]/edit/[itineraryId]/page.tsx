@@ -1,5 +1,5 @@
-import { cookies } from 'next/headers';
 import EditActivityClient from '@/components/edit-add-trip-itinerary';
+import { getActivityData } from '@/lib/api';
 
 interface EditActivityPageProps {
   params: {
@@ -9,24 +9,6 @@ interface EditActivityPageProps {
   searchParams: {
     activity?: string;
   };
-}
-
-async function getActivityData(tripId: string, activityId: string, itineraryId: string) {
-  const cookieStore = await cookies();
-  const res = await fetch(
-    `http://localhost:8000/api/trips/${tripId}/itinerary/${itineraryId}/activities/${activityId}`,
-    {
-      headers: {
-        Cookie: cookieStore.toString(),
-      },
-      next: { tags: ['itinerary'] },
-    }
-  );
-
-  if (!res.ok) return null;
-  const data = await res.json();
-  console.log(data.activity);
-  return data;
 }
 
 export default async function EditActivityPage({

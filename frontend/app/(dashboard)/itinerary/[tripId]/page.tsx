@@ -1,5 +1,5 @@
 export const dynamic = "force-dynamic";
-import { cookies } from "next/headers";
+import { fetchItinerary } from "@/lib/api";
 import { ItineraryClient } from "@/components/itinerary/ItineraryClient";
 
 
@@ -25,34 +25,7 @@ interface ItineraryPageProps {
 }
 
 
-async function fetchItinerary(tripId: string): Promise<ItineraryDay[]> {
-  const cookieStore = await cookies();
-  const res = await fetch(
-    `http://localhost:8000/api/trips/${tripId}/itinerary`,
-    {
-      cache: "no-store",
-      headers: {
-        Cookie: cookieStore.toString(),
-      },
-      next: { tags: ["itinerary"] },
-    }
-  );
 
-  if (!res.ok) {
-    const errorText = await res.text();
-    console.error(
-      `Failed to fetch itinerary. Status: ${res.status}. Body: ${errorText}`
-    );
-    if (res.status === 404) {
-      return [];
-    }
-    throw new Error("Failed to fetch itinerary");
-  }
-
-  const json = await res.json();
-  console.log(json.data);
-  return json.data || [];
-}
 
 export default async function ItineraryPage({ params, searchParams }: ItineraryPageProps) {
   const awaitedParams = await params;
@@ -64,7 +37,7 @@ export default async function ItineraryPage({ params, searchParams }: ItineraryP
     throw new Error("Trip ID is missing in params.");
   }
 
-  const itinerary = await fetchItinerary(tripId);
+  const itinerary: ItineraryDay[] = await fetchItinerary(tripId);
 
   return <ItineraryClient itinerary={itinerary} tripId={tripId} isCompleted={isCompleted}/>;
 }

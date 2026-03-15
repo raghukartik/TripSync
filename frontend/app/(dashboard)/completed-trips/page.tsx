@@ -3,6 +3,13 @@ import { Trip } from "@/components/upcoming-trips";
 import { getCompletedTrips } from "@/lib/api";
 
 export default async function CompletedTripsPage() {
-  const trips: Trip[] = await getCompletedTrips();
-  return <CompletedTripsList trips={trips} />;
+  try {
+    const trips: Trip[] = await getCompletedTrips();
+    if(!trips) {
+      throw new Error("No completed trips found");
+    }
+    return <CompletedTripsList trips={trips} />;
+  } catch (error) {
+    console.error("Error fetching completed trips:", error);
+  }
 }

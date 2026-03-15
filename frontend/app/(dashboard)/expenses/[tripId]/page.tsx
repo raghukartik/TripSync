@@ -1,4 +1,4 @@
-import { cookies } from 'next/headers';
+import { getExpenses } from '@/lib/api';
 import ExpenseList from '@/components/expenses/ExpenseList';
 interface User {
   _id: string;
@@ -25,24 +25,11 @@ interface expenseProps {
   }
 }
 
-async function getExpenses(tripId: string): Promise<Expense[] | null> {
-  const cookieStore = await cookies();
-  const res = await fetch(`http://localhost:8000/api/trips/${tripId}/expenses`, {
-    headers: {
-      Cookie: cookieStore.toString(),
-    },
-    next: { tags: ['expenses'] },
-  });
-
-  if(!res.ok) return null;
-  const data = await res.json();
-  return data.data;
-}
 
 export default async function ExpensePage({ params, searchParams }: expenseProps) {
   const paramsAwaited = await params;
   const awaitedSearchParams = await searchParams;
-  const expenses = await getExpenses(paramsAwaited.tripId);
+  const expenses: Expense[] = await getExpenses(paramsAwaited.tripId);
   const isCompleted = awaitedSearchParams.isCompleted === "true";
   return (
     <ExpenseList 

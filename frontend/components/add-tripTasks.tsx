@@ -33,6 +33,8 @@ interface FormData {
   priority: string;
 }
 
+const API_BASE_URL = process.env.NEXT_BACKEND_URL;
+
 export default function AddTask({ tripId, users }: AddTaskProps) {
   const router = useRouter();
   const demoUsers =
@@ -108,7 +110,7 @@ export default function AddTask({ tripId, users }: AddTaskProps) {
         };
 
         const response = await fetch(
-          `http://localhost:8000/api/trips/${tripId}/tasks`,
+          `${API_BASE_URL}/api/trips/${tripId}/tasks`,
           {
             method: "POST",
             headers: {

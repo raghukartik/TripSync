@@ -9,6 +9,8 @@ interface AddTripItineraryProps {
   onClose?: () => void;
 }
 
+const API_BASE_URL = process.env.NEXT_BACKEND_URL;
+
 export default function AddTripItinerary({ tripId, onClose }: AddTripItineraryProps) {
   const [date, setDate] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -27,7 +29,7 @@ export default function AddTripItinerary({ tripId, onClose }: AddTripItineraryPr
     setIsSubmitting(true);
     
     try {
-      const response = await fetch(`http://localhost:8000/api/trips/${tripId}/itinerary`, {
+      const response = await fetch(`${API_BASE_URL}/api/trips/${tripId}/itinerary`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

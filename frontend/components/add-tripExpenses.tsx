@@ -45,6 +45,8 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 
+const API_BASE_URL = process.env.NEXT_BACKEND_URL;
+
 const expenseFormSchema = z.object({
   amount: z.number().min(0.01, "Amount must be at least $0.01"),
   category: z.string().min(1, "Please select a category"),
@@ -152,7 +154,7 @@ export function ExpenseForm({ tripId, currentUserId, collaborators}: ExpenseForm
       };
       console.log("Submitting payload:", payload);
       const response = await fetch(
-        `http://localhost:8000/api/trips/${tripId}/expenses`,
+        `${API_BASE_URL}/api/trips/${tripId}/expenses`,
         {
           method: "POST",
           headers: {
