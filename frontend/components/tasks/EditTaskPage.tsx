@@ -13,6 +13,7 @@ interface EditTaskPageProps {
   }[];
 }
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 export function EditTaskPage({ 
   tasks, 
@@ -34,7 +35,7 @@ export function EditTaskPage({
 
   try {
     const res = await fetch(
-      `http://localhost:8000/api/trips/${tripId}/tasks/${tasks.taskId}`,
+      `${API_BASE_URL}/api/trips/${tripId}/tasks/${tasks.taskId}`,
       {
         method: "PUT",
         headers: {

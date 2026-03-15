@@ -9,7 +9,7 @@ interface AddTripItineraryProps {
   onClose?: () => void;
 }
 
-const API_BASE_URL = process.env.NEXT_BACKEND_URL;
+const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 export default function AddTripItinerary({ tripId, onClose }: AddTripItineraryProps) {
   const [date, setDate] = useState('');

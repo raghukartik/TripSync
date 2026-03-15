@@ -37,12 +37,12 @@ interface User{
   email: string, 
   avatar?: string,
 }
-
+const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 export function NavUser(user: User) {
   const { isMobile } = useSidebar()
   const router = useRouter();
   const handleLogout = async () => {
-    const res = await fetch("http://localhost:8000/api/auth/logout", {
+    const res = await fetch(`${API_BASE_URL}/api/auth/logout`, {
       method: "POST",
         headers: {
           "Content-Type": "application/json",

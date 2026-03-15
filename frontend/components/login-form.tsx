@@ -12,6 +12,8 @@ import { ExclamationTriangleIcon, EyeClosedIcon, EyeOpenIcon } from "@radix-ui/r
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+
 export function LoginForm({
   className,
   ...props
@@ -26,13 +28,15 @@ export function LoginForm({
   const searchParams = useSearchParams();
   const token = searchParams.get("invite");
 
+
+  
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError(null);
     setIsLoading(true);
 
     try {
-      const res = await fetch(`http://localhost:8000/api/auth/login${token ? `?invite=${token}`: ""}`, {
+      const res = await fetch(`${API_BASE_URL}/api/auth/login${token ? `?invite=${token}`: ""}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -63,7 +67,7 @@ export function LoginForm({
         setIsLoading(true);
         try {
           const res = await fetch(
-            `http://localhost:8000/api/trips/invitations/validate?token=${token}`,
+            `${API_BASE_URL}/api/trips/invitations/validate?token=${token}`,
             {
               credentials: "include",
             }

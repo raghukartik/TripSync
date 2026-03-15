@@ -17,6 +17,8 @@ interface DayCardProps {
   isCompleted?: boolean;
 }
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+
 export function DayCard({ day, startDate, tripId, itineraryId, isCompleted }: DayCardProps) {
   const router = useRouter();
   const formatDate = (dateString: string) => {
@@ -43,7 +45,7 @@ export function DayCard({ day, startDate, tripId, itineraryId, isCompleted }: Da
     e.preventDefault();
 
     const res = await fetch(
-      `http://localhost:8000/api/trips/${tripId}/itinerary/${itineraryId}`,
+      `${API_BASE_URL}/api/trips/${tripId}/itinerary/${itineraryId}`,
       {
         method: "DELETE",
         credentials: "include",

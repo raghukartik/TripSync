@@ -45,6 +45,8 @@ interface FormErrors {
   destination?: string;
 }
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+
 export default function CreateTripPage() {
   const router = useRouter();
   const [formData, setFormData] = useState<FormData>({
@@ -179,7 +181,7 @@ export default function CreateTripPage() {
     setError(null);
 
     try {
-      const res = await fetch("http://localhost:8000/api/trips", {
+      const res = await fetch(`${API_BASE_URL}/api/trips`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

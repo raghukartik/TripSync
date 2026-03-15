@@ -92,6 +92,8 @@ export type Trip = {
   destination: string[];
 };
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+
 const TripCard = ({ trip }: { trip: Trip }) => {
   const router = useRouter();
   const today = new Date();
@@ -427,7 +429,7 @@ const UpcomingTrips: React.FC = () => {
     const getUpcomingTrips = async () => {
       try {
         const res = await fetch(
-          "http://localhost:8000/api/user/upcoming-trips",
+          `${API_BASE_URL}/api/user/upcoming-trips`,
           {
             method: "GET",
             headers: {

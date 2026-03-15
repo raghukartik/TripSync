@@ -33,8 +33,8 @@ interface FormData {
   priority: string;
 }
 
-const API_BASE_URL = process.env.NEXT_BACKEND_URL;
-
+const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+console.log("API_BASE_URL:", API_BASE_URL);
 export default function AddTask({ tripId, users }: AddTaskProps) {
   const router = useRouter();
   const demoUsers =

@@ -22,6 +22,8 @@ interface TaskItemProps {
   isCompleted?: boolean;
 }
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+
 export function TaskItem({
   task,
   tripId,
@@ -40,7 +42,7 @@ export function TaskItem({
   const handleDelete = async () => {
     try {
       const res = await fetch(
-        `http://localhost:8000/api/trips/${tripId}/tasks/${task.taskId}`,
+        `${API_BASE_URL}/api/trips/${tripId}/tasks/${task.taskId}`,
         {
           method: "DELETE",
           credentials: "include",

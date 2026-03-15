@@ -36,7 +36,7 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(
   cors({
-    origin: "http://localhost:3000", // Your frontend URL
+    origin: process.env.FRONTEND_URL, // Your frontend URL
     credentials: true, // Allow cookies
   })
 );
@@ -53,7 +53,7 @@ app.use(express.urlencoded({ extended: true }));
 
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:3000', // Use your frontend URL in production
+    origin: process.env.FRONTEND_URL, // Use your frontend URL in production
     methods: ['GET', 'POST']
   }
 });

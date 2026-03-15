@@ -42,6 +42,8 @@ interface EditActivityClientProps {
   initialData?: ActivityFormData;
 }
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+
 export default function EditActivityClient({
   tripId,
   itineraryId,
@@ -101,8 +103,8 @@ export default function EditActivityClient({
 
     try {
       const url = isEditing
-        ? `http://localhost:8000/api/trips/${tripId}/itinerary/${itineraryId}/activities/${activityId}`
-        : `http://localhost:8000/api/trips/${tripId}/itinerary/${itineraryId}`;
+        ? `${API_BASE_URL}/api/trips/${tripId}/itinerary/${itineraryId}/activities/${activityId}`
+        : `${API_BASE_URL}/api/trips/${tripId}/itinerary/${itineraryId}`;
 
       const method = isEditing ? 'PUT' : 'POST';
 
@@ -141,7 +143,7 @@ export default function EditActivityClient({
     setIsLoading(true);
     try {
       const response = await fetch(
-        `http://localhost:8000/api/trips/${tripId}/itinerary/${itineraryId}/activities/${activityId}`,
+        `${API_BASE_URL}/api/trips/${tripId}/itinerary/${itineraryId}/activities/${activityId}`,
         {
           method: 'DELETE',
           credentials: 'include',
