@@ -8,19 +8,14 @@ interface Collaborator {
 }
 
 interface AddTaskProps {
-  params: {
+  params: Promise<{
     tripId: string;
-  };
+  }>;
 }
 
 export default async function AddTaskServer({ params }: AddTaskProps) {
-  const { tripId } = params;
+  const { tripId } = await params;
   const collaborators: Collaborator[] = await getTripCollaborators(tripId);
-  
-  return (
-    <AddTask 
-      tripId={tripId}
-      users={collaborators}
-    />
-  );
+
+  return <AddTask tripId={tripId} users={collaborators} />;
 }
