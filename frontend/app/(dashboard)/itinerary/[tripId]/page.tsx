@@ -2,7 +2,6 @@ export const dynamic = "force-dynamic";
 import { fetchItinerary } from "@/lib/api";
 import { ItineraryClient } from "@/components/itinerary/ItineraryClient";
 
-
 interface Activity {
   activityId: string;
   time: string;
@@ -18,16 +17,16 @@ interface ItineraryDay {
 }
 
 interface ItineraryPageProps {
-  params: {
+  params: Promise<{
     tripId: string;
-  };
-  searchParams: { isCompleted?: string }
+  }>;
+  searchParams: Promise<{ isCompleted?: string }>;
 }
 
-
-
-
-export default async function ItineraryPage({ params, searchParams }: ItineraryPageProps) {
+export default async function ItineraryPage({
+  params,
+  searchParams,
+}: ItineraryPageProps) {
   const awaitedParams = await params;
   const { tripId } = awaitedParams;
   const awaitedSearchParams = await searchParams;
@@ -39,5 +38,11 @@ export default async function ItineraryPage({ params, searchParams }: ItineraryP
 
   const itinerary: ItineraryDay[] = await fetchItinerary(tripId);
 
-  return <ItineraryClient itinerary={itinerary} tripId={tripId} isCompleted={isCompleted}/>;
+  return (
+    <ItineraryClient
+      itinerary={itinerary}
+      tripId={tripId}
+      isCompleted={isCompleted}
+    />
+  );
 }

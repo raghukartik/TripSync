@@ -3,15 +3,15 @@ import { getTripTasks } from "@/lib/api";
 import { Tasks, AssignedTo } from "@/components/tasks/TasksList";
 
 interface EditProps {
-  params: {
+  params: Promise<{
     tripId: string;
     taskId: string;
-  };
+  }>;
 }
 
 const EditTask = async ({ params }: EditProps) => {
   const awaitedParams = await params;
-  const { tripId, taskId } = await awaitedParams;
+  const { tripId, taskId } = awaitedParams;
 
   let response;
   try {

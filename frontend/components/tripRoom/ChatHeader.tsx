@@ -1,6 +1,6 @@
 import { MoreVertical } from "lucide-react";
 
-const ChatHeader = ({ memberCount }: { memberCount: number }) => {
+const ChatHeader = ({ memberCount = 0 }: { memberCount?: number }) => {
   return (
     <div className="h-16 px-6 flex items-center justify-between bg-white border-b border-gray-200 shadow-sm">
       <div>

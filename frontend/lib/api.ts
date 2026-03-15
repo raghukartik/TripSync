@@ -288,8 +288,7 @@ export async function removeCollaborator(
   }
 }
 
-
-export async function getTripCollaborators(tripId: string){
+export async function getTripCollaborators(tripId: string) {
   try {
     const cookieStore = await cookies();
     const res = await fetch(buildApiUrl(`/api/trips/${tripId}/collaborators`), {
@@ -297,10 +296,10 @@ export async function getTripCollaborators(tripId: string){
       headers: {
         Cookie: cookieStore.toString(),
       },
-      next: { tags: ['trip-collaborators'] }
-    })
+      next: { tags: ["trip-collaborators"] },
+    });
 
-    if(!res.ok){
+    if (!res.ok) {
       throw new Error(`Failed to fetch collaborators: ${res.statusText}`);
     }
 
@@ -318,49 +317,51 @@ export async function getExpenses(tripId: string) {
     headers: {
       Cookie: cookieStore.toString(),
     },
-    next: { tags: ['expenses'] },
+    next: { tags: ["expenses"] },
   });
 
-  if(!res.ok) return null;
+  if (!res.ok) return null;
   const data = await res.json();
   return data.data;
 }
 
-export async function getActivityData(tripId: string, activityId: string, itineraryId: string) {
+export async function getActivityData(
+  tripId: string,
+  activityId: string,
+  itineraryId: string,
+) {
   const cookieStore = await cookies();
   const res = await fetch(
-   buildApiUrl( `/api/trips/${tripId}/itinerary/${itineraryId}/activities/${activityId}`),
+    buildApiUrl(
+      `/api/trips/${tripId}/itinerary/${itineraryId}/activities/${activityId}`,
+    ),
     {
-      headers: {
-        Cookie: cookieStore.toString(),
-      },
-      next: { tags: ['itinerary'] },
-    }
-  );
-
-  if (!res.ok) return null;
-  const data = await res.json();
-  console.log(data.activity);
-  return data;
-}
-
-export async function fetchItinerary(tripId: string){
-  const cookieStore = await cookies();
-  const res = await fetch(
-    buildApiUrl(`/api/trips/${tripId}/itinerary`),
-    {
-      cache: "no-store",
       headers: {
         Cookie: cookieStore.toString(),
       },
       next: { tags: ["itinerary"] },
-    }
+    },
   );
+
+  if (!res.ok) return null;
+  const data = await res.json();
+  return data;
+}
+
+export async function fetchItinerary(tripId: string) {
+  const cookieStore = await cookies();
+  const res = await fetch(buildApiUrl(`/api/trips/${tripId}/itinerary`), {
+    cache: "no-store",
+    headers: {
+      Cookie: cookieStore.toString(),
+    },
+    next: { tags: ["itinerary"] },
+  });
 
   if (!res.ok) {
     const errorText = await res.text();
     console.error(
-      `Failed to fetch itinerary. Status: ${res.status}. Body: ${errorText}`
+      `Failed to fetch itinerary. Status: ${res.status}. Body: ${errorText}`,
     );
     if (res.status === 404) {
       return [];
@@ -369,13 +370,10 @@ export async function fetchItinerary(tripId: string){
   }
 
   const json = await res.json();
-  console.log(json.data);
   return json.data || [];
 }
 
-export async function getMessHistory(
-  tripId: string
-){
+export async function getMessHistory(tripId: string) {
   const cookieStore = await cookies();
   const res = await fetch(
     buildApiUrl(`/api/trips/tripRooms/${tripId}/messages`),
@@ -384,7 +382,7 @@ export async function getMessHistory(
         Cookie: cookieStore.toString(),
       },
       next: { tags: ["messages"] },
-    }
+    },
   );
 
   if (!res.ok) return null;

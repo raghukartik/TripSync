@@ -142,7 +142,7 @@ export default function AddTask({ tripId, users }: AddTaskProps) {
         setIsSubmitting(false);
       }
     },
-    [formData, tripId, validateForm, resetForm],
+    [formData, tripId, validateForm, router],
   );
 
   const getInitials = useCallback((name: string) => {

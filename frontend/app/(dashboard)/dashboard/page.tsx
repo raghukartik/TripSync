@@ -8,6 +8,8 @@ import {
 
 import DashboardClient from "@/components/dashboard/user-dashboard";
 
+export const dynamic = "force-dynamic";
+
 interface User {
   name: string;
 }
@@ -83,12 +85,15 @@ async function fetchDashboardData() {
 
   try {
     // Fetch upcoming trips (trips with end date in the future)
-    const { upComingTrips } = await getUserUpcomingTrips();
+    const upcomingData = await getUserUpcomingTrips();
+    const upComingTrips = upcomingData?.upComingTrips ?? [];
 
     // Fetch recent trips (completed trips, sorted by end date)
-    const { completedTrips } = await getUserCompletedTrips();
+    const completedData = await getUserCompletedTrips();
+    const completedTrips = completedData?.completedTrips ?? [];
 
-    const { allTrips } = await getAllUserTrips();
+    const allTripsData = await getAllUserTrips();
+    const allTrips = allTripsData?.allTrips ?? [];
 
     // Transform upcoming trips data
     const upcomingTrips = upComingTrips.map((trip: Trip) => ({
@@ -110,7 +115,7 @@ async function fetchDashboardData() {
           : "0/0",
       totalExpenses: trip.expenses.reduce(
         (sum, expense) => sum + expense.amount,
-        0
+        0,
       ),
     }));
 
@@ -123,7 +128,7 @@ async function fetchDashboardData() {
       // hasStory: trip.story && Object.keys(trip.story.content).length > 0,
       totalExpenses: trip.expenses.reduce(
         (sum, expense) => sum + expense.amount,
-        0
+        0,
       ),
     }));
 
@@ -131,7 +136,7 @@ async function fetchDashboardData() {
 
     // Get unique locations (trip titles as destinations)
     const uniqueDestinations = new Set(
-      allTrips.map((trip: Trip) => trip.destination)
+      allTrips.map((trip: Trip) => trip.destination),
     );
 
     // Calculate total days traveled

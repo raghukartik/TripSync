@@ -4,12 +4,12 @@ import { getUserInfo } from "@/lib/api";
 import { getRoomCollab, getMessHistory } from "@/lib/api";
 
 interface TripRoomPageProps {
-  params: {
+  params: Promise<{
     tripId: string;
-  };
-  searchParams: {
+  }>;
+  searchParams: Promise<{
     isCompleted?: string;
-  }
+  }>;
 }
 
 interface Sender {
@@ -25,17 +25,21 @@ interface MessagesHistory {
   createdAt: Date;
 }
 
-
-
-export default async function TripChat({ params, searchParams }: TripRoomPageProps) {
+export default async function TripChat({
+  params,
+  searchParams,
+}: TripRoomPageProps) {
   const userDetails = await getUserInfo();
   if (!userDetails) {
     return <div>Unauthorized</div>;
   }
   const awaitedParams = await params;
-  const messages: MessagesHistory[] = await getMessHistory(awaitedParams.tripId);
+  const awaitedSearchParams = await searchParams;
+  const messages: MessagesHistory[] = await getMessHistory(
+    awaitedParams.tripId,
+  );
   const collab = await getRoomCollab(awaitedParams.tripId);
-  const isCompleted = searchParams.isCompleted === "true";
+  const isCompleted = awaitedSearchParams.isCompleted === "true";
   return (
     <div className="p-4">
       <TripRoom

@@ -1,5 +1,5 @@
-import { getExpenses } from '@/lib/api';
-import ExpenseList from '@/components/expenses/ExpenseList';
+import { getExpenses } from "@/lib/api";
+import ExpenseList from "@/components/expenses/ExpenseList";
 interface User {
   _id: string;
   name: string;
@@ -17,25 +17,27 @@ interface Expense {
 }
 
 interface expenseProps {
-  params: {
+  params: Promise<{
     tripId: string;
-  },
-  searchParams: {
-    isCompleted? : string;
-  }
+  }>;
+  searchParams: Promise<{
+    isCompleted?: string;
+  }>;
 }
 
-
-export default async function ExpensePage({ params, searchParams }: expenseProps) {
+export default async function ExpensePage({
+  params,
+  searchParams,
+}: expenseProps) {
   const paramsAwaited = await params;
   const awaitedSearchParams = await searchParams;
   const expenses: Expense[] = await getExpenses(paramsAwaited.tripId);
   const isCompleted = awaitedSearchParams.isCompleted === "true";
   return (
-    <ExpenseList 
+    <ExpenseList
       tripId={paramsAwaited.tripId}
       initialExpenses={expenses || []}
       isCompleted={isCompleted}
     />
-  )
+  );
 }

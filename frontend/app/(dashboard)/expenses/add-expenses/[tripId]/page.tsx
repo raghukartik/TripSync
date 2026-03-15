@@ -3,9 +3,9 @@ import { ExpenseForm } from "@/components/add-tripExpenses";
 
 import { getUserInfo, getTripCollaborators } from "@/lib/api";
 interface PageProps {
-  params: {
+  params: Promise<{
     tripId: string;
-  };
+  }>;
 }
 
 interface Collaborator {
@@ -17,7 +17,6 @@ interface Collaborator {
 interface User {
   _id: string;
 }
-
 
 export default async function AddExpensePage({ params }: PageProps) {
   const { tripId } = await params;
