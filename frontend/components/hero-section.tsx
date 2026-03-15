@@ -15,16 +15,18 @@ export default function HeroSection() {
             <div className="relative mx-auto flex max-w-6xl flex-col px-6 lg:block">
               <div className="mx-auto max-w-lg text-center lg:ml-0 lg:w-1/2 lg:text-left">
                 <h1 className="mt-8 max-w-2xl text-balance text-5xl font-medium md:text-6xl lg:mt-16 xl:text-7xl">
-                  Plan. Share. Chat. Explore.
+                  One workspace for every group trip.
                 </h1>
                 <p className="mt-8 max-w-2xl text-pretty text-lg">
-                 TripSync makes group travel effortless with collaborative planning, live chat, and smart itinerary tools — all in one place.
+                  TripSync keeps your itinerary, tasks, expenses, and trip room
+                  chat in sync so your crew spends less time coordinating and
+                  more time traveling.
                 </p>
 
                 <div className="mt-12 flex flex-col items-center justify-center gap-2 sm:flex-row lg:justify-start">
                   <Button asChild size="lg" className="px-5 text-base">
-                    <Link href="#link">
-                      <span className="text-nowrap">Start Planning</span>
+                    <Link href="/signup">
+                      <span className="text-nowrap">Start Free</span>
                     </Link>
                   </Button>
                   <Button
@@ -34,10 +36,25 @@ export default function HeroSection() {
                     variant="ghost"
                     className="px-5 text-base"
                   >
-                    <Link href="#link">
-                      <span className="text-nowrap">See How It Works</span>
+                    <Link href="#features">
+                      <span className="text-nowrap">Explore Features</span>
                     </Link>
                   </Button>
+                </div>
+
+                <div className="mt-8 grid grid-cols-2 gap-4 text-sm sm:max-w-md">
+                  <div className="rounded-lg border p-3">
+                    <p className="font-medium">Live Trip Rooms</p>
+                    <p className="text-muted-foreground mt-1">
+                      Real-time group chat per trip.
+                    </p>
+                  </div>
+                  <div className="rounded-lg border p-3">
+                    <p className="font-medium">Shared Itinerary</p>
+                    <p className="text-muted-foreground mt-1">
+                      Edit plans together instantly.
+                    </p>
+                  </div>
                 </div>
               </div>
               <Image
@@ -53,10 +70,7 @@ export default function HeroSection() {
         <section className="bg-background pb-16 md:pb-32">
           <div className="group relative m-auto max-w-6xl px-6">
             <div className="flex flex-col items-center md:flex-row">
-              
               <div className="relative py-6 md:w-[calc(100%-11rem)]">
-                
-
                 <div className="bg-linear-to-r from-background absolute inset-y-0 left-0 w-20"></div>
                 <div className="bg-linear-to-l from-background absolute inset-y-0 right-0 w-20"></div>
                 <ProgressiveBlur

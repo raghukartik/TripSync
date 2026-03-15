@@ -1,10 +1,20 @@
 "use server";
 import { cookies } from "next/headers";
 
+const BACKEND_URL = process.env.BACKEND_URL;
+
+function buildApiUrl(path: string) {
+  if (!BACKEND_URL) {
+    throw new Error("BACKEND_URL is not set");
+  }
+
+  return `${BACKEND_URL}${path}`;
+}
+
 export async function getUserInfo() {
   try {
     const cookieStore = await cookies();
-    const res = await fetch("http://localhost:8000/api/user/me", {
+    const res = await fetch(buildApiUrl("/api/user/me"), {
       method: "GET",
       credentials: "include",
       headers: {
@@ -30,7 +40,7 @@ export async function getUserInfo() {
 export async function getAllUserTrips() {
   try {
     const cookieStore = await cookies();
-    const res = await fetch("http://localhost:8000/api/user/all-trips", {
+    const res = await fetch(buildApiUrl("/api/user/all-trips"), {
       method: "GET",
       credentials: "include",
       headers: {
@@ -52,18 +62,15 @@ export async function getAllUserTrips() {
 export async function getUserUpcomingTrips() {
   try {
     const cookieStore = await cookies();
-    const res = await fetch(
-      "http://localhost:8000/api/user/upcoming-trips-dashboard",
-      {
-        method: "GET",
-        credentials: "include",
-        headers: {
-          Cookie: cookieStore.toString(),
-          "Content-Type": "application/json",
-        },
-        cache: "no-store",
-      }
-    );
+    const res = await fetch(buildApiUrl("/api/user/upcoming-trips-dashboard"), {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        Cookie: cookieStore.toString(),
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    });
 
     if (!res.ok) throw new Error("failed to fetch upcoming trips");
     const data = await res.json();
@@ -74,20 +81,19 @@ export async function getUserUpcomingTrips() {
   }
 }
 
-export async function getCompletedTrips(){
+export async function getCompletedTrips() {
   try {
     const cookieStore = await cookies();
-    const res = await fetch("http://localhost:8000/api/user/completed-trips", {
+    const res = await fetch(buildApiUrl("/api/user/completed-trips"), {
       headers: {
         Cookie: cookieStore.toString(),
       },
       next: { tags: ["completed-trips"] },
     });
-    
-    if(!res.ok) throw new Error("Failed to fetch completed trips");
+
+    if (!res.ok) throw new Error("Failed to fetch completed trips");
     const data = await res.json();
     return data.data.completedTrips || [];
-
   } catch (error) {
     console.error("Error fetching user's upcoming trips:", error);
     return null;
@@ -97,18 +103,15 @@ export async function getCompletedTrips(){
 export async function getOngoingTrips() {
   try {
     const cookieStore = await cookies();
-    const res = await fetch(
-      "http://localhost:8000/api/user/ongoing-trips",
-      {
-        method: "GET",
-        credentials: "include",
-        headers: {
-          Cookie: cookieStore.toString(),
-          "Content-Type": "application/json",
-        },
-        cache: "no-store",
-      }
-    );
+    const res = await fetch(buildApiUrl("/api/user/ongoing-trips"), {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        Cookie: cookieStore.toString(),
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+    });
 
     if (!res.ok) throw new Error("failed to fetch ongoing trips");
     const data = await res.json();
@@ -123,7 +126,7 @@ export async function getUserCompletedTrips() {
   try {
     const cookieStore = await cookies();
     const res = await fetch(
-      "http://localhost:8000/api/user/completed-trips-dashboard",
+      buildApiUrl("/api/user/completed-trips-dashboard"),
       {
         method: "GET",
         credentials: "include",
@@ -132,7 +135,7 @@ export async function getUserCompletedTrips() {
           "Content-Type": "application/json",
         },
         cache: "no-store",
-      }
+      },
     );
 
     if (!res.ok) throw new Error("failed to fetch user's completed trips");
@@ -147,13 +150,13 @@ export async function getUserCompletedTrips() {
 export async function getRoomCollab(tripId: string) {
   const cookieStore = await cookies();
   const res = await fetch(
-    `http://localhost:8000/api/trips/tripRooms/${tripId}/collaborators`,
+    buildApiUrl(`/api/trips/tripRooms/${tripId}/collaborators`),
     {
       headers: {
         Cookie: cookieStore.toString(),
       },
       next: { tags: ["messages"] },
-    }
+    },
   );
   if (!res.ok) return null;
   const data = await res.json();
@@ -162,22 +165,7 @@ export async function getRoomCollab(tripId: string) {
 
 export async function getReceivedInvitations() {
   const cookieStore = await cookies();
-  const res = await fetch(
-    "http://localhost:8000/api/trips/invitations/recieved",
-    {
-      headers: {
-        Cookie: cookieStore.toString(),
-      },
-    }
-  );
-  if (!res.ok) return null;
-  const data = await res.json();
-  return data.invitation;
-}
-
-export async function getSentInvitations(tripId:string) {
-  const cookieStore = await cookies();
-  const res = await fetch(`http://localhost:8000/api/trips/invitations/sent/${tripId}`, {
+  const res = await fetch(buildApiUrl("/api/trips/invitations/recieved"), {
     headers: {
       Cookie: cookieStore.toString(),
     },
@@ -187,23 +175,35 @@ export async function getSentInvitations(tripId:string) {
   return data.invitation;
 }
 
+export async function getSentInvitations(tripId: string) {
+  const cookieStore = await cookies();
+  const res = await fetch(
+    buildApiUrl(`/api/trips/invitations/sent/${tripId}`),
+    {
+      headers: {
+        Cookie: cookieStore.toString(),
+      },
+    },
+  );
+  if (!res.ok) return null;
+  const data = await res.json();
+  return data.invitation;
+}
+
 export async function inviteCollaborator(tripId: string, email: string) {
   try {
     const cookieStore = await cookies();
-    const res = await fetch(
-      `http://localhost:8000/api/trips/${tripId}/invite`,
-      {
-        method: "POST",
-        credentials: "include",
-        headers: {
-          Cookie: cookieStore.toString(),
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-        }),
-      }
-    );
+    const res = await fetch(buildApiUrl(`/api/trips/${tripId}/invite`), {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        Cookie: cookieStore.toString(),
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email,
+      }),
+    });
 
     if (!res.ok) {
       const err = await res.json();
@@ -221,14 +221,14 @@ export async function acceptInvitation(tripId: string, invitationId: string) {
   try {
     const cookieStore = await cookies();
     const res = await fetch(
-      `http://localhost:8000/api/trips/${tripId}/invitations/${invitationId}`,
+      buildApiUrl(`/api/trips/${tripId}/invitations/${invitationId}`),
       {
         method: "PATCH",
         headers: {
           Cookie: cookieStore.toString(),
           "Content-type": "application/json",
         },
-      }
+      },
     );
 
     if (!res.ok) {
@@ -244,39 +244,44 @@ export async function acceptInvitation(tripId: string, invitationId: string) {
 }
 
 export async function getTripTasks(tripId: string) {
-    const cookieStore = await cookies();
-    const res = await fetch(`http://localhost:8000/api/trips/${tripId}/tasks`, {
+  const cookieStore = await cookies();
+  const res = await fetch(buildApiUrl(`/api/trips/${tripId}/tasks`), {
+    headers: {
+      Cookie: cookieStore.toString(),
+    },
+    next: { tags: ["tasks"] },
+  });
+
+  if (!res.ok) {
+    throw new Error("Error while fetching Trip's Tasks");
+  }
+
+  const data = await res.json();
+  return data.data;
+}
+
+export async function removeCollaborator(
+  tripId: string,
+  collaboratorId: string,
+) {
+  const cookieStore = await cookies();
+  try {
+    const res = await fetch(
+      buildApiUrl(`/api/trips/${tripId}/collaborators/${collaboratorId}`),
+      {
+        method: "DELETE",
         headers: {
           Cookie: cookieStore.toString(),
         },
-        next: { tags: ['tasks'] },
-    })
+      },
+    );
 
-    if(!res.ok){
-        throw new Error("Error while fetching Trip's Tasks");
-    }
-
-    const data = await res.json();
-    return data.data;
-}
-
-export async function removeCollaborator(tripId: string, collaboratorId: string){
-  const cookieStore = await cookies();
-  try {
-    const res = await fetch(`http://localhost:8000/api/trips/${tripId}/collaborators/${collaboratorId}`, {
-      method: "DELETE",
-      headers: {
-        Cookie: cookieStore.toString()
-      }
-    })
-
-    if(!res.ok){
+    if (!res.ok) {
       throw new Error("Error removing the collaborator");
     }
 
     const data = await res.json();
     return { success: true, message: data.message };
-
   } catch (error) {
     console.error(error);
     return { success: false, message: "Error removing collaborator" };

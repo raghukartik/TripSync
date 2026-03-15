@@ -1,62 +1,91 @@
-import Image from 'next/image'
-
 export default function ContentSection() {
-    return (
-        <section className="py-16 md:py-32">
-            <div className="mx-auto max-w-5xl space-y-8 px-6 md:space-y-16">
-                <h2 className="relative z-10 max-w-xl text-4xl font-medium lg:text-5xl">
-                    The TripSync ecosystem keeps your group in sync—before, during, and after the trip.
-                </h2>
+  return (
+    <section id="how-it-works" className="py-16 md:py-32">
+      <div className="mx-auto max-w-5xl space-y-8 px-6 md:space-y-16">
+        <h2 className="relative z-10 max-w-xl text-4xl font-medium lg:text-5xl">
+          From invite to check-in, everyone stays on the same page.
+        </h2>
 
-                <div className="grid gap-6 sm:grid-cols-2 md:gap-12 lg:gap-24">
-                    <div className="relative mb-6 sm:mb-0">
-                        <div className="bg-linear-to-b aspect-76/59 relative rounded-2xl from-zinc-300 to-transparent p-px dark:from-zinc-700">
-                            <Image
-                                src="/tripsync-dashboard-dark.png"
-                                className="hidden rounded-[15px] dark:block"
-                                alt="TripSync collaborative travel planning - dark mode"
-                                width={1207}
-                                height={929}
-                            />
-                            <Image
-                                src="/tripsync-dashboard-light.png"
-                                className="rounded-[15px] shadow dark:hidden"
-                                alt="TripSync collaborative travel planning - light mode"
-                                width={1207}
-                                height={929}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="relative space-y-4">
-                        <p className="text-muted-foreground">
-                            TripSync isn't just another travel planner. <span className="text-accent-foreground font-bold">It's a full collaboration suite</span> designed to bring friends, families, and teams together for unforgettable trips.
-                        </p>
-                        <p className="text-muted-foreground">
-                            Plan itineraries, assign responsibilities, and chat in real-time with everyone involved—all in one beautifully synced platform.
-                        </p>
-
-                        <div className="pt-6">
-                            <blockquote className="border-l-4 pl-4">
-                                <p>
-                                    TripSync completely changed how we organize group trips. From planning to sharing memories—everything’s in one place. It’s like Google Docs meets travel planning!
-                                </p>
-
-                                <div className="mt-6 space-y-3">
-                                    <cite className="block font-medium">Emily Chen, Travel Group Organizer</cite>
-                                    <img
-                                        className="h-5 w-fit dark:invert"
-                                        src="https://html.tailus.io/blocks/customers/airbnb.svg"
-                                        alt="Airbnb Logo"
-                                        height="20"
-                                        width="auto"
-                                    />
-                                </div>
-                            </blockquote>
-                        </div>
-                    </div>
+        <div className="grid gap-6 sm:grid-cols-2 md:gap-12 lg:gap-24">
+          <div className="relative mb-6 sm:mb-0">
+            <div className="bg-muted/40 rounded-2xl border p-6">
+              <p className="text-sm font-medium">
+                How a trip comes together in TripSync
+              </p>
+              <div className="mt-5 space-y-4">
+                <div className="rounded-lg border bg-background p-4">
+                  <p className="text-sm font-medium">1. Create Trip Room</p>
+                  <p className="text-muted-foreground mt-1 text-sm">
+                    Start a trip workspace with destination, dates, and core
+                    details.
+                  </p>
                 </div>
+                <div className="rounded-lg border bg-background p-4">
+                  <p className="text-sm font-medium">2. Invite Your Group</p>
+                  <p className="text-muted-foreground mt-1 text-sm">
+                    Add collaborators, manage pending invites, and bring
+                    everyone in.
+                  </p>
+                </div>
+                <div className="rounded-lg border bg-background p-4">
+                  <p className="text-sm font-medium">3. Plan, Assign, Track</p>
+                  <p className="text-muted-foreground mt-1 text-sm">
+                    Build itinerary, assign tasks, and monitor shared trip
+                    expenses.
+                  </p>
+                </div>
+              </div>
             </div>
-        </section>
-    )
+          </div>
+
+          <div className="relative space-y-4">
+            <p className="text-muted-foreground">
+              TripSync is more than a planner.{" "}
+              <span className="text-accent-foreground font-bold">
+                It is your group trip command center
+              </span>{" "}
+              with invitations, real-time room chat, shared itineraries, and
+              collaborative checklists.
+            </p>
+            <p className="text-muted-foreground">
+              Keep every decision visible to everyone involved, reduce planning
+              noise in scattered chats, and move faster with one connected
+              workspace.
+            </p>
+
+            <div className="grid grid-cols-1 gap-3 pt-2 text-sm sm:grid-cols-2">
+              <div className="rounded-lg border p-3">
+                <p className="font-medium">Invite collaborators</p>
+                <p className="text-muted-foreground mt-1">
+                  Send and manage trip invites in-app.
+                </p>
+              </div>
+              <div className="rounded-lg border p-3">
+                <p className="font-medium">Coordinate in trip rooms</p>
+                <p className="text-muted-foreground mt-1">
+                  Discuss plans without losing context.
+                </p>
+              </div>
+            </div>
+
+            <div className="pt-6">
+              <blockquote className="border-l-4 pl-4">
+                <p>
+                  We replaced five different apps with TripSync. Tasks,
+                  itinerary updates, and spending details are finally in one
+                  place, and nobody asks for the latest plan anymore.
+                </p>
+
+                <div className="mt-6 space-y-3">
+                  <cite className="block font-medium">
+                    Aarav Menon, Group Trip Planner
+                  </cite>
+                </div>
+              </blockquote>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
 }
